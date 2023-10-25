@@ -36,7 +36,7 @@
   "scripts": {
     "build": "tsup",
     "test": "jest",
-    "publish": "npm run build && npm publish"
+    "prepublish": "npm run build"
   },
   "author": "Bedrock-OSS",
   "license": "MIT",
