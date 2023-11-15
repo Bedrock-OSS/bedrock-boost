@@ -48,6 +48,37 @@ function applyImpulseNew(entity:Entity, vector: Vector3) {
   entity.applyKnockback(directionX, directionZ, horizontalStrength, verticalStrength);
 }
 
+
+/**
+ * Clears the velocity of an entity. This applies a knockback with the opposite
+ * direction and the same strength as the current velocity in horizontal direction.
+ * @param entity The entity to clear the velocity of.
+ */
+function clearVelocity(entity: Entity) {
+  const {x, y, z} = entity.getVelocity();
+
+  // Calculate the norm (magnitude) of the horizontal components (x and z)
+  const horizontalNorm = Math.sqrt(x * x + z * z);
+
+  // Calculate directionX and directionZ as normalized values
+  let directionX = 0;
+  let directionZ = 0;
+  if (horizontalNorm !== 0) {
+    directionX = -x / horizontalNorm;
+    directionZ = -z / horizontalNorm;
+  }
+
+  // The horizontalStrength is the horizontal norm of the velocity vector
+  const horizontalStrength = horizontalNorm;
+
+  // Apply the knockback
+  entity.applyKnockback(directionX, directionZ, horizontalStrength, 0);
+}
+
 Player.prototype.applyImpulse = function (vector: Vector3) {
   applyImpulseNew(this, vector);
+};
+
+Player.prototype.clearVelocity = function () {
+  clearVelocity(this);
 };
