@@ -305,4 +305,8 @@ export default class Vec3 implements Vector3 {
   equals(other: Vector3) {
     return this.x === other.x && this.y === other.y && this.z === other.z;
   }
+
+  toString() {
+    return `Vec3(${this.x}, ${this.y}, ${this.z})`;
+  }
 }
