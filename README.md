@@ -1,5 +1,7 @@
 # bedrock-boost
 
+[![npm version](https://badge.fury.io/js/@bedrock-oss%2Fbedrock-boost.svg)](https://badge.fury.io/js/@bedrock-oss%2Fbedrock-boost)
+
 A utility library to streamline the development process for Minecraft Bedrock's Script API, providing essential tools for vector operations, polyfills, and time measurements.
 
 ## Features
