@@ -260,8 +260,8 @@ export default class Vec3 implements Vector3 {
    * @param value - The new X value.
    * @returns The updated vector with the new X value.
    */
-  setX(x: number): Vec3 {
-    return new Vec3(x, this.y, this.z);
+  setX(value: number): Vec3 {
+    return new Vec3(value, this.y, this.z);
   }
   /**
    * Sets the Y component of the vector.
@@ -269,8 +269,8 @@ export default class Vec3 implements Vector3 {
    * @param value - The new Y value.
    * @returns The updated vector with the new Y value.
    */
-  setY(y: number): Vec3 {
-    return new Vec3(this.x, y, this.z);
+  setY(value: number): Vec3 {
+    return new Vec3(this.x, value, this.z);
   }
   /**
    * Sets the Z component of the vector.
@@ -278,8 +278,8 @@ export default class Vec3 implements Vector3 {
    * @param value - The new Z value.
    * @returns The updated vector with the new Z value.
    */
-  setZ(z: number): Vec3 {
-    return new Vec3(this.x, this.y, z);
+  setZ(value: number): Vec3 {
+    return new Vec3(this.x, this.y, value);
   }
   /**
    * Calculates the shortest distance between a point (represented by this Vector3 instance) and a line segment.
@@ -299,8 +299,8 @@ export default class Vec3 implements Vector3 {
     return this.subtract(projection).length();
   }
   /**
-   * 
-   * @param location 
+   * Checks if the current vector is equal to another vector.
+   * @param other
    */
   equals(other: Vector3) {
     return this.x === other.x && this.y === other.y && this.z === other.z;

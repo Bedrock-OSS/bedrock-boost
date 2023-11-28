@@ -17,10 +17,10 @@ function applyImpulse(player: Player, vector: Vector3) {
 /**
  * New implementation of applyImpulse. This one tries to replicate the behavior of
  * the normal impulse as much as possible.
- * @param player The player to apply the impulse to.
+ * @param entity The entity to apply the impulse to.
  * @param vector The vector of the impulse.
  */
-function applyImpulseNew(entity:Entity, vector: Vector3) {
+function applyImpulseNew(entity: Entity, vector: Vector3) {
   const { x, y, z } = vector;
   const previousVelocity = entity.getVelocity();
 
@@ -55,7 +55,7 @@ function applyImpulseNew(entity:Entity, vector: Vector3) {
  * @param entity The entity to clear the velocity of.
  */
 function clearVelocity(entity: Entity) {
-  const {x, y, z} = entity.getVelocity();
+  const { x, y, z } = entity.getVelocity();
 
   // Calculate the norm (magnitude) of the horizontal components (x and z)
   const horizontalNorm = Math.sqrt(x * x + z * z);
@@ -68,17 +68,16 @@ function clearVelocity(entity: Entity) {
     directionZ = -z / horizontalNorm;
   }
 
-  // The horizontalStrength is the horizontal norm of the velocity vector
-  const horizontalStrength = horizontalNorm;
-
   // Apply the knockback
-  entity.applyKnockback(directionX, directionZ, horizontalStrength, 0);
+  entity.applyKnockback(directionX, directionZ, horizontalNorm, 0);
 }
 
-Player.prototype.applyImpulse = function (vector: Vector3) {
-  applyImpulseNew(this, vector);
-};
+export function install() {
+  Player.prototype.applyImpulse = function (vector: Vector3) {
+    applyImpulseNew(this, vector);
+  };
 
-Player.prototype.clearVelocity = function () {
-  clearVelocity(this);
-};
+  Player.prototype.clearVelocity = function () {
+    clearVelocity(this);
+  };
+}

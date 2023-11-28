@@ -5,14 +5,14 @@ import ChatColor from "./chatColor";
  * The `LogLevel` class defines the various logging levels used by the logger.
  */
 export class LogLevel {
-  static All: LogLevel = new LogLevel(2, 'all');
-  static Trace: LogLevel = new LogLevel(2, 'trace', ChatColor.DARK_AQUA);
-  static Debug: LogLevel = new LogLevel(1, 'debug', ChatColor.AQUA);
+  static All: LogLevel = new LogLevel(-2, 'all');
+  static Trace: LogLevel = new LogLevel(-2, 'trace', ChatColor.DARK_AQUA);
+  static Debug: LogLevel = new LogLevel(-1, 'debug', ChatColor.AQUA);
   static Info: LogLevel = new LogLevel(0, 'info', ChatColor.GREEN);
-  static Warn: LogLevel = new LogLevel(-1, 'warn', ChatColor.GOLD);
-  static Error: LogLevel = new LogLevel(-2, 'error', ChatColor.RED);
-  static Fatal: LogLevel = new LogLevel(-3, 'fatal', ChatColor.DARK_RED);
-  static Off: LogLevel = new LogLevel(-100, 'off');
+  static Warn: LogLevel = new LogLevel(1, 'warn', ChatColor.GOLD);
+  static Error: LogLevel = new LogLevel(2, 'error', ChatColor.RED);
+  static Fatal: LogLevel = new LogLevel(3, 'fatal', ChatColor.DARK_RED);
+  static Off: LogLevel = new LogLevel(100, 'off');
 
   /**
    * The list of all available log levels.
@@ -35,7 +35,7 @@ export class LogLevel {
    * @param {string} name - The string name for this logger.
    * @param {ChatColor} color - The color to use for this logger. Defaults to `ChatColor.RESET`.
    */
-  private constructor(public level: number, public name: string, public color: ChatColor = ChatColor.RESET) {}
+  private constructor(public level: number, public name: string, public color: ChatColor = ChatColor.RESET) { }
 
   /**
    * Return the logging level as a string.
@@ -52,7 +52,7 @@ export class LogLevel {
    * @param {string} str - The string to parse.
    * @returns {LogLevel} The corresponding `LogLevel`, or `undefined` if none was found.
    */
-  static parse(str: string): LogLevel|undefined {
+  static parse(str: string): LogLevel | undefined {
     str = str.toLowerCase();
     for (const level of LogLevel.values) {
       if (level.name === str) return level;
@@ -106,32 +106,37 @@ const loggingSettings: {
 * The Logger class.
 */
 export class Logger {
+  private static readonly initialized: boolean = false;
   /**
   *  Initialize logger class
   */
   static init() {
-    system.afterEvents.scriptEventReceive.subscribe((ev) => {
-      if (ev.id === 'logging:level') {
-        if (!ev.message) {
-          loggingSettings.level = LogLevel.Info;
-          world.sendMessage(`${ChatColor.AQUA}Logging level set to ${loggingSettings.level}`);
-        } else {
-          const level = LogLevel.parse(ev.message);
-          if (level) {
-            loggingSettings.level = level;
-            world.sendMessage(`${ChatColor.AQUA}Logging level set to ${loggingSettings.level}`);
+    LOGGING: {
+      if (Logger.initialized) return;
+      system.afterEvents.scriptEventReceive.subscribe((ev) => {
+        if (ev.id === 'logging:level') {
+          if (!ev.message) {
+            loggingSettings.level = LogLevel.Info;
+            world.sendMessage(`${ChatColor.AQUA}Logging level set to ${ChatColor.BOLD}${loggingSettings.level}`);
           } else {
-            world.sendMessage(`${ChatColor.DARK_RED}Invalid logging level ${ev.message}`);
+            const level = LogLevel.parse(ev.message);
+            if (level) {
+              loggingSettings.level = level;
+              world.sendMessage(`${ChatColor.AQUA}Logging level set to ${ChatColor.BOLD}${loggingSettings.level}`);
+            } else {
+              world.sendMessage(`${ChatColor.DARK_RED}Invalid logging level: ${ev.message}`);
+            }
           }
+        } else if (ev.id === 'logging:filter') {
+          if (!ev.message) {
+            loggingSettings.filter = ['*'];
+          } else {
+            loggingSettings.filter = ev.message.split(',');
+          }
+          world.sendMessage(`${ChatColor.AQUA}Logging filter set to ${ChatColor.BOLD}${loggingSettings.filter.join(', ')}`);
         }
-      } else if (ev.id === 'logging:filter') {
-        if (!ev.message) {
-          loggingSettings.filter = ['*'];
-        } else {
-          loggingSettings.filter = ev.message.split(',');
-        }
-      }
-    });
+      });
+    }
   }
   /**
   * @param {LogLevel} level - The level to set.
@@ -162,6 +167,11 @@ export class Logger {
   * @returns {Logger} A new Logger.
   */
   static getLogger(name: string, ...tags: string[]): Logger {
+    LOGGING: {
+      if (!Logger.initialized) {
+        Logger.init();
+      }
+    }
     return new Logger(name, tags);
   }
   /**
@@ -180,15 +190,17 @@ export class Logger {
   * @param {array} message - An array of the messages to log.
   */
   private log(level: LogLevel, ...message: any[]) {
-    if (level.level < loggingSettings.level.level) return;
-    if (loggingSettings.filter.length === 0 || this.tags.length === 0) {
-      this.logRaw(level, ...message);
-      return;
-    }
-    for (const filter of loggingSettings.filter) {
-      if (starMatch(filter, this.name)) {
+    LOGGING: {
+      if (level.level < loggingSettings.level.level) return;
+      if (loggingSettings.filter.length === 0 || this.tags.length === 0) {
         this.logRaw(level, ...message);
         return;
+      }
+      for (const filter of loggingSettings.filter) {
+        if (starMatch(filter, this.name)) {
+          this.logRaw(level, ...message);
+          return;
+        }
       }
     }
   }
@@ -200,27 +212,36 @@ export class Logger {
   * @param {array} message - An array of the messages to log.
   */
   private logRaw(level: LogLevel, ...message: any[]) {
-    const msg:string = message.map((x:any) => {
-      if (x === void 0) {
-        return ChatColor.GOLD + 'undefined';
+    LOGGING: {
+      const msg: string = message.map((x: any) => {
+        if (x === void 0) {
+          return ChatColor.GOLD + 'undefined';
+        }
+        if (x === null) {
+          return ChatColor.GOLD + 'null';
+        }
+        if (x && x.stack && x.message) {
+          return `${ChatColor.DARK_RED}${ChatColor.BOLD}${x.message}\n${ChatColor.RESET}${ChatColor.GRAY}${ChatColor.ITALIC}${x.stack}`;
+        }
+        if (typeof x === 'object' || Array.isArray(x)) {
+          return ChatColor.prettyChatJSON(x);
+        }
+        return x;
+      }).join(ChatColor.RESET + ', ');
+      const formatted = loggingSettings.formatFunction(level, this, msg);
+      world.sendMessage(formatted);
+      if ((console as any).originalLog) {
+        (console as any).originalLog(ChatColor.stripColor(formatted));
+      } else {
+        console.log(ChatColor.stripColor(formatted));
       }
-      if (x === null) {
-        return ChatColor.GOLD + 'null';
+      // Consider moving warnings and up completely to console, which ends up in content log
+      if (level === LogLevel.Warn) {
+        console.warn(formatted);
       }
-      if (x && x.stack && x.message) {
-        return `${ChatColor.DARK_RED}${ChatColor.BOLD}${x.message}\n${ChatColor.RESET}${ChatColor.GRAY}${ChatColor.ITALIC}${x.stack}`;
+      if (level === LogLevel.Error || level === LogLevel.Fatal) {
+        console.error(formatted);
       }
-      if (typeof x === 'object' || Array.isArray(x)) {
-        return ChatColor.prettyChatJSON(x);
-      }
-      return x;
-    }).join(ChatColor.RESET + ', ');
-    const formatted = loggingSettings.formatFunction(level, this, msg);
-    world.sendMessage(formatted);
-    if ((console as any).originalLog) {
-      (console as any).originalLog(ChatColor.stripColor(formatted));
-    } else {
-      console.log(ChatColor.stripColor(formatted));
     }
   }
 
@@ -230,7 +251,7 @@ export class Logger {
    * @param {...any} message - The message(s) to be logged.
    */
   trace(...message: any[]) {
-    this.log(LogLevel.Trace, ...message);
+    LOGGING: this.log(LogLevel.Trace, ...message);
   }
 
   /**
@@ -239,7 +260,7 @@ export class Logger {
    * @param {...any[]} message - The message(s) to be logged.
    */
   debug(...message: any[]) {
-    this.log(LogLevel.Debug, ...message);
+    LOGGING: this.log(LogLevel.Debug, ...message);
   }
 
   /**
@@ -248,7 +269,7 @@ export class Logger {
    * @param {...any[]} message - The message(s) to be logged.
    */
   info(...message: any[]) {
-    this.log(LogLevel.Info, ...message);
+    LOGGING: this.log(LogLevel.Info, ...message);
   }
 
   /**
@@ -257,7 +278,7 @@ export class Logger {
    * @param {...any[]} message - The warning message or messages to be logged.
    */
   warn(...message: any[]) {
-    this.log(LogLevel.Warn, ...message);
+    LOGGING: this.log(LogLevel.Warn, ...message);
   }
 
   /**
@@ -266,7 +287,7 @@ export class Logger {
    * @param {...any[]} message - The error message(s) to log.
    */
   error(...message: any[]) {
-    this.log(LogLevel.Error, ...message);
+    LOGGING: this.log(LogLevel.Error, ...message);
   }
 
   /**
@@ -275,6 +296,6 @@ export class Logger {
    * @param {any[]} message - The error message to log.
    */
   fatal(...message: any[]) {
-    this.log(LogLevel.Fatal, ...message);
+    LOGGING: this.log(LogLevel.Fatal, ...message);
   }
 }

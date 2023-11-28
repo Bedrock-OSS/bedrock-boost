@@ -1,6 +1,6 @@
 {
   "name": "@bedrock-oss/bedrock-boost",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "A utility package with helper functions for developing add-ons with Script API in Minecraft Bedrock Edition",
   "keywords": [
     "minecraft",
@@ -23,14 +23,6 @@
     ".": {
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
-    },
-    "./playerPolyfill": {
-      "import": "./dist/playerPolyfill.mjs",
-      "require": "./dist/playerPolyfill.js"
-    },
-    "./consolePolyfill": {
-      "import": "./dist/consolePolyfill.mjs",
-      "require": "./dist/consolePolyfill.js"
     }
   },
   "scripts": {

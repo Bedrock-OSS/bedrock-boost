@@ -1,3 +1,5 @@
+import { world } from "@minecraft/server";
+
 /**
  * ChatColor is a class for defining color codes.
  */
@@ -51,6 +53,7 @@ export default class ChatColor {
     private static readonly KEY_COLOR: ChatColor = ChatColor.GRAY;
     private static readonly ESCAPE_COLOR: ChatColor = ChatColor.GOLD;
     private static readonly FUNCTION_COLOR: ChatColor = ChatColor.GRAY;
+    private static readonly CLASS_COLOR: ChatColor = ChatColor.GRAY;
     private static readonly CYCLE_COLOR: ChatColor = ChatColor.DARK_RED;
     private static readonly COMPACT_THRESHOLD: number = 60;
 
@@ -107,39 +110,44 @@ export default class ChatColor {
             if (knownElements.has(value)) {
                 return `${ChatColor.CYCLE_COLOR}[...cycle...]${ChatColor.RESET}`;
             }
-            let keySet:Set<string> = new Set();
-            let prototype = Object.getPrototypeOf(value);
-            let keys = Object.keys(prototype);
-            while (keys.length > 0) {
-                keys.forEach(key => keySet.add(key));
-                prototype = Object.getPrototypeOf(prototype);
-                keys = Object.keys(prototype);
-            }
-            Object.keys(value).forEach(key => keySet.add(key));
-            const allKeys = [...keySet].sort();
-            const entries = allKeys.map((key: string) => [key, value[key]]).filter(([key, val]) => typeof val !== 'function' && val !== void 0);
+            let name = value.constructor.name;
+            if (name === 'Object' || knownElements.size === 0) {
+                let keySet: Set<string> = new Set();
+                let prototype = Object.getPrototypeOf(value);
+                let keys = Object.keys(prototype);
+                while (keys.length > 0) {
+                    keys.forEach(key => keySet.add(key));
+                    prototype = Object.getPrototypeOf(prototype);
+                    keys = Object.keys(prototype);
+                }
+                Object.keys(value).forEach(key => keySet.add(key));
+                const allKeys = [...keySet].sort();
+                const entries = allKeys.map((key: string) => [key, value[key]]).filter(([key, val]) => typeof val !== 'function' && val !== void 0);
 
-            if (entries.length === 0) {
-                return `${ChatColor.OBJECT_BRACKETS_COLOR}{}${ChatColor.RESET}`;
-            }
-            let result = `${ChatColor.OBJECT_BRACKETS_COLOR}{${ChatColor.RESET}\n`;
-            let compactResult = `${ChatColor.OBJECT_BRACKETS_COLOR}{${ChatColor.RESET}`;
+                if (entries.length === 0) {
+                    return `${ChatColor.CLASS_COLOR}${ChatColor.BOLD}${name}${ChatColor.RESET} ${ChatColor.OBJECT_BRACKETS_COLOR}{}${ChatColor.RESET}`;
+                }
+                let result = `${ChatColor.OBJECT_BRACKETS_COLOR}{${ChatColor.RESET}\n`;
+                let compactResult = `${ChatColor.OBJECT_BRACKETS_COLOR}{${ChatColor.RESET}`;
 
-            knownElements.add(value);
-            entries.forEach(([key, val], index) => {
-                let compactVal = this.prettyChatJSONInternal(val, indentLevel + 1, knownElements);
-                result += `${indentSpace}  ${this.KEY_COLOR}${key}${this.RESET}: ${compactVal}`;
-                result += (index < entries.length - 1) ? `,\n` : '\n';
-                compactResult += `${this.KEY_COLOR}${key}${this.RESET}: ${compactVal}`;
-                compactResult += (index < entries.length - 1) ? `, ` : '';
-            });
-            knownElements.delete(value);
-            result += `${indentSpace}${ChatColor.OBJECT_BRACKETS_COLOR}}${ChatColor.RESET}`;
-            compactResult += `${ChatColor.OBJECT_BRACKETS_COLOR}}${ChatColor.RESET}`;
-            if (compactResult.length < ChatColor.COMPACT_THRESHOLD) {
-                return compactResult;
+                knownElements.add(value);
+                entries.forEach(([key, val], index) => {
+                    let compactVal = this.prettyChatJSONInternal(val, indentLevel + 1, knownElements);
+                    result += `${indentSpace}  ${this.KEY_COLOR}${key}${this.RESET}: ${compactVal}`;
+                    result += (index < entries.length - 1) ? `,\n` : '\n';
+                    compactResult += `${this.KEY_COLOR}${key}${this.RESET}: ${compactVal}`;
+                    compactResult += (index < entries.length - 1) ? `, ` : '';
+                });
+                knownElements.delete(value);
+                result += `${indentSpace}${ChatColor.OBJECT_BRACKETS_COLOR}}${ChatColor.RESET}`;
+                compactResult += `${ChatColor.OBJECT_BRACKETS_COLOR}}${ChatColor.RESET}`;
+                if (compactResult.length < ChatColor.COMPACT_THRESHOLD) {
+                    return compactResult;
+                }
+                return result;
+            } else {
+                return `${ChatColor.CLASS_COLOR}${ChatColor.BOLD}${name}${ChatColor.RESET} {...}`;
             }
-            return result;
         }
 
         return `${ChatColor.RESET}${value}`;
