@@ -96,7 +96,7 @@ scriptevent logger:filter <comma separated tags>
 
 When using esbuild, you can use `dropLabels` option with `LOGGING` label to remove all logging code from the final bundle.
 
-When using (gametests regolith filter)[https://github.com/Bedrock-OSS/regolith-filters/tree/master/gametests], you can configure it like this:
+When using [gametests regolith filter](https://github.com/Bedrock-OSS/regolith-filters/tree/master/gametests), you can configure it like this:
 ```json
 {
   "filter": "gametests",
