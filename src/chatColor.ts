@@ -1,5 +1,3 @@
-import { world } from "@minecraft/server";
-
 /**
  * ChatColor is a class for defining color codes.
  */
