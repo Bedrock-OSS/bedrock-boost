@@ -1,5 +1,6 @@
 import { system, world } from "@minecraft/server"
 import ChatColor from "./chatColor";
+import ColorJSON from "./colorJson";
 
 /**
  * The `LogLevel` class defines the various logging levels used by the logger.
@@ -224,7 +225,7 @@ export class Logger {
           return `${ChatColor.DARK_RED}${ChatColor.BOLD}${x.message}\n${ChatColor.RESET}${ChatColor.GRAY}${ChatColor.ITALIC}${x.stack}`;
         }
         if (typeof x === 'object' || Array.isArray(x)) {
-          return ChatColor.prettyChatJSON(x);
+          return ColorJSON.DEFAULT.stringify(x);
         }
         return x;
       }).join(ChatColor.RESET + ', ');

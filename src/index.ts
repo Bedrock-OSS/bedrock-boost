@@ -4,7 +4,8 @@ import { addIdleDummy, clearIdleDummy } from "./profilingUtils";
 import { getDimension } from "./cache";
 import { Logger, LogLevel } from "./logging";
 import ChatColor from "./chatColor";
+import ColorJSON from "./colorJson";
 import Polyfill from "./polyfill/polyfill";
 
 
-export { Vec3, Timings, addIdleDummy, clearIdleDummy, getDimension, LogLevel, Logger, ChatColor, Polyfill };
+export { Vec3, Timings, addIdleDummy, clearIdleDummy, getDimension, LogLevel, Logger, ChatColor, Polyfill, ColorJSON };

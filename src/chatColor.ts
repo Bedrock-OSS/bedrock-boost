@@ -121,22 +121,6 @@ export default class ChatColor {
     private static readonly PREFIX = '§';
 
     /**
-     * Different ChatColor instances for different tokens in JSON.
-     */
-    private static readonly OBJECT_BRACKETS_COLOR: ChatColor = ChatColor.YELLOW;
-    private static readonly ARRAY_BRACKETS_COLOR: ChatColor = ChatColor.AQUA;
-    private static readonly NUMBER_COLOR: ChatColor = ChatColor.DARK_AQUA;
-    private static readonly STRING_COLOR: ChatColor = ChatColor.DARK_GREEN;
-    private static readonly BOOLEAN_COLOR: ChatColor = ChatColor.GOLD;
-    private static readonly NULL_COLOR: ChatColor = ChatColor.GOLD;
-    private static readonly KEY_COLOR: ChatColor = ChatColor.GRAY;
-    private static readonly ESCAPE_COLOR: ChatColor = ChatColor.GOLD;
-    private static readonly FUNCTION_COLOR: ChatColor = ChatColor.GRAY;
-    private static readonly CLASS_COLOR: ChatColor = ChatColor.GRAY;
-    private static readonly CYCLE_COLOR: ChatColor = ChatColor.DARK_RED;
-    private static readonly COMPACT_THRESHOLD: number = 60;
-
-    /**
      * Returns the string representation of the ChatColor instance,
      * which includes the PREFIX followed by the color code.
      * @returns A string representing the ChatColor instance
@@ -227,95 +211,6 @@ export default class ChatColor {
             }
         }
         return closestColor;
-    }
-
-    /**
-   * Transforms a value into a chat-friendly, colored JSON representation.
-   * @param value - The value to transform.
-   */
-    static prettyChatJSON(value: any): string {
-        return this.prettyChatJSONInternal(value);
-    }
-    private static prettyChatJSONInternal(value: any, indentLevel: number = 0, knownElements: Set<any> = new Set()): string {
-        const indentSpace = ' '.repeat(indentLevel * 2);
-
-        if (value === null) return `${ChatColor.NULL_COLOR}null${ChatColor.RESET}`;
-        if (value === void 0) return `${ChatColor.NULL_COLOR}undefined${ChatColor.RESET}`;
-        if (typeof value === 'number') return `${ChatColor.NUMBER_COLOR}${value}${ChatColor.RESET}`;
-        if (typeof value === 'string') return `${ChatColor.STRING_COLOR}"${this.escapeString(value)}"${ChatColor.RESET}`;
-        if (typeof value === 'boolean') return `${ChatColor.BOOLEAN_COLOR}${value}${ChatColor.RESET}`;
-        if (typeof value === 'function') return `${ChatColor.FUNCTION_COLOR}f()${ChatColor.RESET}`;
-
-        if (Array.isArray(value)) {
-            if (knownElements.has(value)) {
-                return `${ChatColor.CYCLE_COLOR}[...cycle...]${ChatColor.RESET}`;
-            }
-            if (value.length === 0) {
-                return `${ChatColor.ARRAY_BRACKETS_COLOR}[]${ChatColor.RESET}`;
-            }
-            let result = `${ChatColor.ARRAY_BRACKETS_COLOR}[${ChatColor.RESET}\n`;
-            knownElements.add(value);
-            value.forEach((item, index) => {
-                result += `${indentSpace}  ${ChatColor.prettyChatJSONInternal(item, indentLevel + 1, knownElements)}`;
-                result += (index < value.length - 1 ? `,\n` : '\n');
-            });
-            knownElements.delete(value);
-            return result + `${indentSpace}${ChatColor.ARRAY_BRACKETS_COLOR}]${ChatColor.RESET}`;
-        }
-
-        if (typeof value === 'object') {
-            if (knownElements.has(value)) {
-                return `${ChatColor.CYCLE_COLOR}[...cycle...]${ChatColor.RESET}`;
-            }
-            let name = value.constructor.name;
-            if (name === 'Object' || knownElements.size === 0) {
-                let keySet: Set<string> = new Set();
-                let prototype = Object.getPrototypeOf(value);
-                let keys = Object.keys(prototype);
-                while (keys.length > 0) {
-                    keys.forEach(key => keySet.add(key));
-                    prototype = Object.getPrototypeOf(prototype);
-                    keys = Object.keys(prototype);
-                }
-                Object.keys(value).forEach(key => keySet.add(key));
-                const allKeys = [...keySet].sort();
-                const entries = allKeys.map((key: string) => [key, value[key]]).filter(([key, val]) => typeof val !== 'function' && val !== void 0);
-
-                if (entries.length === 0) {
-                    return `${ChatColor.CLASS_COLOR}${ChatColor.BOLD}${name}${ChatColor.RESET} ${ChatColor.OBJECT_BRACKETS_COLOR}{}${ChatColor.RESET}`;
-                }
-                let result = `${ChatColor.OBJECT_BRACKETS_COLOR}{${ChatColor.RESET}\n`;
-                let compactResult = `${ChatColor.OBJECT_BRACKETS_COLOR}{${ChatColor.RESET}`;
-
-                knownElements.add(value);
-                entries.forEach(([key, val], index) => {
-                    let compactVal = this.prettyChatJSONInternal(val, indentLevel + 1, knownElements);
-                    result += `${indentSpace}  ${this.KEY_COLOR}${key}${this.RESET}: ${compactVal}`;
-                    result += (index < entries.length - 1) ? `,\n` : '\n';
-                    compactResult += `${this.KEY_COLOR}${key}${this.RESET}: ${compactVal}`;
-                    compactResult += (index < entries.length - 1) ? `, ` : '';
-                });
-                knownElements.delete(value);
-                result += `${indentSpace}${ChatColor.OBJECT_BRACKETS_COLOR}}${ChatColor.RESET}`;
-                compactResult += `${ChatColor.OBJECT_BRACKETS_COLOR}}${ChatColor.RESET}`;
-                if (compactResult.length < ChatColor.COMPACT_THRESHOLD) {
-                    return compactResult;
-                }
-                return result;
-            } else {
-                return `${ChatColor.CLASS_COLOR}${ChatColor.BOLD}${name}${ChatColor.RESET} {...}`;
-            }
-        }
-
-        return `${ChatColor.RESET}${value}`;
-    }
-
-    private static escapeString(str: string): string {
-        return str.replace(/\\/g, ChatColor.ESCAPE_COLOR + '\\\\' + ChatColor.STRING_COLOR)
-            .replace(/"/g, ChatColor.ESCAPE_COLOR + '\\"' + ChatColor.STRING_COLOR)
-            .replace(/\n/g, ChatColor.ESCAPE_COLOR + '\\n' + ChatColor.STRING_COLOR)
-            .replace(/\r/g, ChatColor.ESCAPE_COLOR + '\\r' + ChatColor.STRING_COLOR)
-            .replace(/\t/g, ChatColor.ESCAPE_COLOR + '\\t' + ChatColor.STRING_COLOR);
     }
 }
 
