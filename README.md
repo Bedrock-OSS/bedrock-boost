@@ -34,7 +34,6 @@ import { Vec3 } from "@bedrock-oss/bedrock-boost";
 import { world } from "@minecraft/server";
 
 world.beforeEvents.itemUse.subscribe((event) => {
-  
   event.source.applyImpulse(Vec3.from(event.source.getViewDirection()).setY(0).normalize().multiply(2));
 })
 
@@ -77,6 +76,16 @@ Timings.begin("big operation 1");
 Timings.begin("big operation 2");
 // Some operations...
 Timings.end();
+```
+
+### ChatColor and ColorJSON classes
+
+```typescript
+import { Logger } from "@bedrock-oss/bedrock-boost"
+
+const log = Logger.getLogger("main", "tag1", "tag2");
+log.info("Hello, Minecraft World!");
+```
 ```
 
 ### Logger
