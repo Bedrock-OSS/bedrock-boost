@@ -2,6 +2,8 @@ import * as srv from "@minecraft/server";
 import { Vector3, Direction } from "@minecraft/server";
 import {Vector as PolyfillVector} from "./vectorPolyfill"
 
+type XComponent = Vector3 | Vec3 | Direction | number[] | number
+
 function getVectorClass(): any {
   if ((srv as any).Vector) {
     return (srv as any).Vector;
@@ -10,10 +12,10 @@ function getVectorClass(): any {
 }
 
 export default class Vec3 implements Vector3 {
-  x: number;
-  y: number;
-  z: number;
-  constructor(x: Vector3 | Vec3 | Direction | number[] | number, y?: number, z?: number) {
+  readonly x: number;
+  readonly y: number;
+  readonly z: number;
+  constructor(x: XComponent, y?: number, z?: number) {
     if (x === Direction.Down) {
       this.x = 0;
       this.y = -1;
@@ -51,6 +53,7 @@ export default class Vec3 implements Vector3 {
       this.y = x.y;
       this.z = x.z;
     } else {
+      if (!x || !x.x || !x.y || !x.z) throw new Error("Invalid vector");
       this.x = x.x;
       this.y = x.y;
       this.z = x.z;
@@ -60,7 +63,8 @@ export default class Vec3 implements Vector3 {
   /**
    * Creates a new vector from the given values.
    */
-  static from(x: Vector3 | Vec3 | Direction | number[] | number, y?: number, z?: number): Vec3 {
+  static from(x: XComponent, y?: number, z?: number): Vec3 {
+    if (x instanceof Vec3) return x;
     return new Vec3(x, y, z);
   }
   toVector(): any {
@@ -97,8 +101,8 @@ export default class Vec3 implements Vector3 {
    * @param v - The vector to be added.
    * @returns The updated vector after addition.
    */
-  add(v: Vector3): Vec3 {
-    if (!v) return Vec3.from(this);
+  add(x: XComponent, y?: number, z?: number): Vec3 {
+    let v: Vec3 = Vec3.from(x, y, z);
     return Vec3.from(getVectorClass().add(this, v));
   }
   /**
@@ -107,8 +111,8 @@ export default class Vec3 implements Vector3 {
    * @param v - The vector to be subtracted.
    * @returns The updated vector after subtraction.
    */
-  subtract(v: Vector3): Vec3 {
-    if (!v) return Vec3.from(this);
+  subtract(x: XComponent, y?: number, z?: number): Vec3 {
+    let v: Vec3 = Vec3.from(x, y, z);
     return Vec3.from(getVectorClass().subtract(this, v));
   }
   /**
@@ -117,8 +121,11 @@ export default class Vec3 implements Vector3 {
    * @param v - The vector or scalar to multiply with.
    * @returns The updated vector after multiplication.
    */
-  multiply(v: Vector3 | number): Vec3 {
-    if (!v) return Vec3.from(this);
+  multiply(x: XComponent, y?: number, z?: number): Vec3 {
+    if (typeof x === "number" && y === undefined && z === undefined) {
+      return Vec3.from(getVectorClass().multiply(this, x));
+    }
+    let v: Vec3 = Vec3.from(x, y, z);
     return Vec3.from(getVectorClass().multiply(this, v));
   }
   /**
@@ -127,8 +134,11 @@ export default class Vec3 implements Vector3 {
    * @param v - The vector or scalar to divide by.
    * @returns The updated vector after division.
    */
-  divide(v: Vector3 | number): Vec3 {
-    if (!v) return Vec3.from(this);
+  divide(x: XComponent, y?: number, z?: number): Vec3 {
+    if (typeof x === "number" && y === undefined && z === undefined) {
+      return Vec3.from(getVectorClass().divide(this, x));
+    }
+    let v: Vec3 = Vec3.from(x, y, z);
     return Vec3.from(getVectorClass().divide(this, v));
   }
   /**
@@ -165,8 +175,8 @@ export default class Vec3 implements Vector3 {
    * @param v - The other vector.
    * @returns A new vector representing the cross product.
    */
-  cross(v: Vector3): Vec3 {
-    if (!v) return Vec3.from(this);
+  cross(x: XComponent, y?: number, z?: number): Vec3 {
+    let v: Vec3 = Vec3.from(x, y, z);
     return Vec3.from(getVectorClass().cross(this, v));
   }
   /**
@@ -175,8 +185,8 @@ export default class Vec3 implements Vector3 {
    * @param v - The other vector.
    * @returns The distance between the two vectors.
    */
-  distance(v: Vector3): number {
-    if (!v) return 0;
+  distance(x: XComponent, y?: number, z?: number): number {
+    let v: Vec3 = Vec3.from(x, y, z);
     return getVectorClass().distance(this, v);
   }
   /**
@@ -186,7 +196,8 @@ export default class Vec3 implements Vector3 {
    * @param v - The other vector.
    * @returns The squared distance between the two vectors.
    */
-  distanceSquared(v: Vector3): number {
+  distanceSquared(x: XComponent, y?: number, z?: number): number {
+    let v: Vec3 = Vec3.from(x, y, z);
     return this.subtract(v).lengthSquared();
   }
   /**
@@ -217,7 +228,8 @@ export default class Vec3 implements Vector3 {
    * @param v - The other vector.
    * @returns The dot product of the two vectors.
    */
-  dot(v: Vector3): number {
+  dot(x: XComponent, y?: number, z?: number): number {
+    let v: Vec3 = Vec3.from(x, y, z);
     return this.x * v.x + this.y * v.y + this.z * v.z;
   }
   /**
@@ -227,7 +239,8 @@ export default class Vec3 implements Vector3 {
    * @returns The angle in radians between the two vectors.
    *          To convert to degrees, use: angleInDegrees = angleInRadians * (180 / Math.PI).
    */
-  angleBetween(v: Vector3): number {
+  angleBetween(x: XComponent, y?: number, z?: number): number {
+    let v: Vec3 = Vec3.from(x, y, z);
     const dotProduct = this.dot(v);
     const lengths = this.length() * new Vec3(v.x, v.y, v.z).length();
     return Math.acos(dotProduct / lengths);
@@ -239,7 +252,8 @@ export default class Vec3 implements Vector3 {
    * @param v - The vector onto which the current vector will be projected.
    * @returns A new vector representing the projection of the current vector onto `v`.
    */
-  projectOnto(v: Vector3): Vec3 {
+  projectOnto(x: XComponent, y?: number, z?: number): Vec3 {
+    let v: Vec3 = Vec3.from(x, y, z);
     const scale = this.dot(v) / Vec3.from(v).dot(v);
     return Vec3.from(v.x * scale, v.y * scale, v.z * scale);
   }
@@ -250,7 +264,8 @@ export default class Vec3 implements Vector3 {
    * @param normal - The normal vector against which the current vector will be reflected.
    * @returns A new vector representing the reflection of the current vector.
    */
-  reflect(normal: Vector3): Vec3 {
+  reflect(x: XComponent, y?: number, z?: number): Vec3 {
+    let normal: Vec3 = Vec3.from(x, y, z);
     const proj = this.projectOnto(normal);
     return this.subtract(proj.multiply(2));
   }
@@ -302,7 +317,8 @@ export default class Vec3 implements Vector3 {
    * Checks if the current vector is equal to another vector.
    * @param other
    */
-  equals(other: Vector3) {
+  equals(x: XComponent, y?: number, z?: number) {
+    let other: Vec3 = Vec3.from(x, y, z);
     return this.x === other.x && this.y === other.y && this.z === other.z;
   }
 
