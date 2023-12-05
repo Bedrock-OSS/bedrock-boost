@@ -29,6 +29,8 @@ npm install @bedrock-oss/bedrock-boost
 
 ### Vec3 Class
 
+[Documentation](docs/vec3.md)
+
 ```typescript
 import { Vec3 } from "@bedrock-oss/bedrock-boost";
 import { world } from "@minecraft/server";
@@ -37,6 +39,51 @@ world.beforeEvents.itemUse.subscribe((event) => {
   event.source.applyImpulse(Vec3.from(event.source.getViewDirection()).setY(0).normalize().multiply(2));
 })
 
+```
+
+### Logger
+
+[Documentation](docs/logging.md)
+
+```typescript
+import { Logger } from "@bedrock-oss/bedrock-boost"
+
+const log = Logger.getLogger("main", "tag1", "tag2");
+log.info("Hello, Minecraft World!");
+```
+
+It also includes 2 commands to control the logging system:
+```
+scriptevent logger:level <level either as string or as a number>
+scriptevent logger:filter <comma separated tags>
+```
+
+When using esbuild, you can use `dropLabels` option with `LOGGING` label to remove all logging code from the final bundle.
+
+When using [gametests regolith filter](https://github.com/Bedrock-OSS/regolith-filters/tree/master/gametests), you can configure it like this:
+```json
+{
+  "filter": "gametests",
+  "settings": {
+    "modules": [
+      // ...
+    ],
+    "buildOptions": {
+      "dropLabels": ["LOGGING"]
+    }
+  }
+}
+```
+
+### ChatColor and ColorJSON classes
+
+[Documentation](docs/colorJson.md)
+
+```typescript
+import { Logger } from "@bedrock-oss/bedrock-boost"
+
+const log = Logger.getLogger("main", "tag1", "tag2");
+log.info("Hello, Minecraft World!");
 ```
 
 ### playerPolyfill
@@ -76,48 +123,6 @@ Timings.begin("big operation 1");
 Timings.begin("big operation 2");
 // Some operations...
 Timings.end();
-```
-
-### ChatColor and ColorJSON classes
-
-```typescript
-import { Logger } from "@bedrock-oss/bedrock-boost"
-
-const log = Logger.getLogger("main", "tag1", "tag2");
-log.info("Hello, Minecraft World!");
-```
-```
-
-### Logger
-
-```typescript
-import { Logger } from "@bedrock-oss/bedrock-boost"
-
-const log = Logger.getLogger("main", "tag1", "tag2");
-log.info("Hello, Minecraft World!");
-```
-
-It also includes 2 commands to control the logging system:
-```
-scriptevent logger:level <level either as string or as a number>
-scriptevent logger:filter <comma separated tags>
-```
-
-When using esbuild, you can use `dropLabels` option with `LOGGING` label to remove all logging code from the final bundle.
-
-When using [gametests regolith filter](https://github.com/Bedrock-OSS/regolith-filters/tree/master/gametests), you can configure it like this:
-```json
-{
-  "filter": "gametests",
-  "settings": {
-    "modules": [
-      // ...
-    ],
-    "buildOptions": {
-      "dropLabels": ["LOGGING"]
-    }
-  }
-}
 ```
 
 ## Contributing
