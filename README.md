@@ -17,7 +17,8 @@ A utility library to streamline the development process for Minecraft Bedrock's 
 5. **Logging**: Log messages with different levels and filters:
    - Adds a way to filter messages by tags (e.g. `player`, `entity`, `block`).
    - Adds a way to filter messages by levels (e.g. `info`, `warn`, `error`).
-6. **ChatColor Class**: Simplify chat color formatting. `ChatColor.prettyChatJSON` function included to convert a JSON chat message to a string with color formatting.
+6. **ChatColor Class**: Simplifies chat color formatting.
+7. **ColorJSON Class**: JSON formatter for usage in chat messages. Simply use `ColorJSON.DEFAULT.stringify` function to convert any value to a JSON string with color formatting.
 
 ## Installation
 
@@ -56,23 +57,6 @@ It also includes 2 commands to control the logging system:
 ```
 scriptevent logger:level <level either as string or as a number>
 scriptevent logger:filter <comma separated tags>
-```
-
-When using esbuild, you can use `dropLabels` option with `LOGGING` label to remove all logging code from the final bundle.
-
-When using [gametests regolith filter](https://github.com/Bedrock-OSS/regolith-filters/tree/master/gametests), you can configure it like this:
-```json
-{
-  "filter": "gametests",
-  "settings": {
-    "modules": [
-      // ...
-    ],
-    "buildOptions": {
-      "dropLabels": ["LOGGING"]
-    }
-  }
-}
 ```
 
 ### ChatColor and ColorJSON classes
