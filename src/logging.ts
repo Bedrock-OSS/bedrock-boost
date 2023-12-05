@@ -91,16 +91,20 @@ function starMatch(pattern: string, str: string): boolean {
   return pattern === str
 }
 
-const loggingSettings: {
-  filter: string[];
-  level: LogLevel;
+type LoggingSettings = {
+  filter: string[],
+  level: LogLevel,
   formatFunction: (level: LogLevel, logger: Logger, message: string) => string
-} = {
+  jsonFormatter: ColorJSON
+}
+
+const loggingSettings:LoggingSettings = {
   level: LogLevel.Info,
   filter: ['*'],
   formatFunction: (level: LogLevel, logger: Logger, message: string) => {
     return `[${level}][${ChatColor.MATERIAL_EMERALD}${logger.name}${ChatColor.RESET}] ${message}`
-  }
+  },
+  jsonFormatter: ColorJSON.DEFAULT
 }
 
 /**
@@ -158,6 +162,13 @@ export class Logger {
   */
   static setFormatFunction(func: (level: LogLevel, logger: Logger, message: string) => string) {
     loggingSettings.formatFunction = func;
+  }
+  /**
+  * Set the JSON formatter for the logger.
+  * @param {ColorJSON} formatter - The json formatter to set.
+  */
+  static setJsonFormatter(formatter: ColorJSON) {
+    loggingSettings.jsonFormatter = formatter;
   }
   /**
   * Returns a new Logger.
