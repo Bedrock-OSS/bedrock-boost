@@ -13,6 +13,7 @@ let runId = -1;
  * The call that was chosen to be the dummy function is `system.currentTick`.
  */
 export function addIdleDummy() {
+  if (runId !== -1) return;
   runId = system.runInterval(idle, 1);
 }
 
