@@ -98,7 +98,7 @@ type LoggingSettings = {
   jsonFormatter: ColorJSON
 }
 
-const loggingSettings:LoggingSettings = {
+const loggingSettings: LoggingSettings = {
   level: LogLevel.Info,
   filter: ['*'],
   formatFunction: (level: LogLevel, logger: Logger, message: string) => {

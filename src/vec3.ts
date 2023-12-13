@@ -1,6 +1,6 @@
 import * as srv from "@minecraft/server";
 import { Vector3, Direction } from "@minecraft/server";
-import {Vector as PolyfillVector} from "./vectorPolyfill"
+import { Vector as PolyfillVector } from "./vectorPolyfill"
 import { Logger } from "./logging";
 
 const log = Logger.getLogger("vec3", "vec3", "bedrock-boost");
@@ -91,15 +91,15 @@ export default class Vec3 implements Vector3 {
    * @param pitch - The pitch value in degrees.
    * @returns A new vector representing the direction.
    */
-  static fromYawPitch(yaw:number, pitch:number): Vec3 {
-      // Convert degrees to radians
-      const psi = yaw * (Math.PI / 180);
-      const theta = pitch * (Math.PI / 180);
+  static fromYawPitch(yaw: number, pitch: number): Vec3 {
+    // Convert degrees to radians
+    const psi = yaw * (Math.PI / 180);
+    const theta = pitch * (Math.PI / 180);
 
-      const x = Math.cos(theta) * Math.sin(psi);
-      const y = Math.sin(theta);
-      const z = Math.cos(theta) * Math.cos(psi);
-      return new Vec3(x, y, z);
+    const x = Math.cos(theta) * Math.sin(psi);
+    const y = Math.sin(theta);
+    const z = Math.cos(theta) * Math.cos(psi);
+    return new Vec3(x, y, z);
   }
   /**
    * Adds another vector to the current vector.

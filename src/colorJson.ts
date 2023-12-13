@@ -195,7 +195,7 @@ export default class ColorJSON {
     }
 
     protected shouldTruncateObject(value: object, className: string, indentLevel: number = 0, knownElements: Set<any>): boolean {
-      return className === 'Object' || knownElements.size <= this.MaxDepth || this.MaxDepth <= 0;
+        return className === 'Object' || knownElements.size <= this.MaxDepth || this.MaxDepth <= 0;
     }
 
     /**

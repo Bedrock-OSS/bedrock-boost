@@ -230,7 +230,7 @@ export class Vector implements Vector3 {
       .multiply(Math.cos(theta))
       .add(relative.multiply(Math.sin(theta)))
       .toVector() as Vector;
-  
+
   }
   /**
    * @remarks
