@@ -111,13 +111,14 @@ const loggingSettings:LoggingSettings = {
 * The Logger class.
 */
 export class Logger {
-  private static readonly initialized: boolean = false;
+  private static initialized: boolean = false;
   /**
   *  Initialize logger class
   */
   static init() {
     LOGGING: {
       if (Logger.initialized) return;
+      Logger.initialized = true;
       system.afterEvents.scriptEventReceive.subscribe((ev) => {
         if (ev.id === 'logging:level') {
           if (!ev.message) {
