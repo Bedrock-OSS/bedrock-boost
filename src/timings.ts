@@ -1,3 +1,6 @@
+import { Logger } from "./logging";
+
+const log = Logger.getLogger("Timings", 'timings');
 /**
  * A simple class to measure the time it takes to perform an operation.
  */
@@ -26,7 +29,7 @@ export default class Timings {
   static end() {
     const time = new Date().getTime();
     if (this.lastTime > 0) {
-      console.log(`[Measure] Operation ${this.lastOperation} took ${time - this.lastTime}ms`);
+      log.debug(`Operation ${this.lastOperation} took ${time - this.lastTime}ms`);
     }
     this.lastTime = -1;
   }
