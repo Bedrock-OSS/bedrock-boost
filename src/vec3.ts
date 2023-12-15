@@ -15,6 +15,14 @@ function getVectorClass(): any {
 }
 
 export default class Vec3 implements Vector3 {
+  public static readonly Zero = new Vec3(0, 0, 0);
+  public static readonly Down = new Vec3(Direction.Down);
+  public static readonly Up = new Vec3(Direction.Up);
+  public static readonly North = new Vec3(Direction.North);
+  public static readonly South = new Vec3(Direction.South);
+  public static readonly East = new Vec3(Direction.East);
+  public static readonly West = new Vec3(Direction.West);
+
   readonly x: number;
   readonly y: number;
   readonly z: number;
@@ -154,6 +162,10 @@ export default class Vec3 implements Vector3 {
    * @returns The normalized vector.
    */
   normalize(): Vec3 {
+    if (this.isZero()) {
+      log.error(new Error("Cannot normalize zero-length vector"));
+      throw new Error("Cannot normalize zero-length vector");
+    }
     return Vec3.from(new (getVectorClass())(this.x, this.y, this.z).normalized());
   }
   /**
@@ -336,6 +348,33 @@ export default class Vec3 implements Vector3 {
    */
   isZero(): boolean {
     return this.x === 0 && this.y === 0 && this.z === 0;
+  }
+  /**
+   * Converts the vector to an array containing the X, Y, and Z components of the vector.
+   * @returns An array containing the X, Y, and Z components of the vector.
+   */
+  toArray(): number[] {
+    return [this.x, this.y, this.z];
+  }
+  /**
+   * Converts the vector to a direction.
+   * If the vector is not a unit vector, then it will be normalized and rounded to the nearest direction.
+   */
+  toDirection(): Direction {
+    if (this.isZero()) {
+      log.error(new Error("Cannot convert zero-length vector to direction"));
+      throw new Error("Cannot convert zero-length vector to direction");
+    }
+    const normalized = this.normalize();
+    const rounded = new Vec3(Math.round(normalized.x), Math.round(normalized.y), Math.round(normalized.z));
+    if (rounded.x === 1) return Direction.East;
+    if (rounded.x === -1) return Direction.West;
+    if (rounded.y === 1) return Direction.Up;
+    if (rounded.y === -1) return Direction.Down;
+    if (rounded.z === 1) return Direction.North;
+    if (rounded.z === -1) return Direction.South;
+    log.error(new Error("Cannot convert vector to direction"), this);
+    throw new Error("Cannot convert vector to direction");
   }
   /**
    * Checks if the current vector is equal to another vector.
