@@ -95,6 +95,7 @@ type LoggingSettings = {
   filter: string[],
   level: LogLevel,
   formatFunction: (level: LogLevel, logger: Logger, message: string) => string
+  messagesJoinFunction: (messages: string[]) => string
   jsonFormatter: ColorJSON
 }
 
@@ -103,6 +104,9 @@ const loggingSettings: LoggingSettings = {
   filter: ['*'],
   formatFunction: (level: LogLevel, logger: Logger, message: string) => {
     return `[${level}][${ChatColor.MATERIAL_EMERALD}${logger.name}${ChatColor.RESET}] ${message}`
+  },
+  messagesJoinFunction: (messages: string[]) => {
+    return messages.join(' ')
   },
   jsonFormatter: ColorJSON.DEFAULT
 }
@@ -163,6 +167,13 @@ export class Logger {
   */
   static setFormatFunction(func: (level: LogLevel, logger: Logger, message: string) => string) {
     loggingSettings.formatFunction = func;
+  }
+  /**
+  * Set the function, that joins multiple messages into one for the logger.
+  * @param {function} func - The function to set.
+  */
+  static setMessagesJoinFunction(func: (messages: string[]) => string) {
+    loggingSettings.messagesJoinFunction = func;
   }
   /**
   * Set the JSON formatter for the logger.
@@ -226,22 +237,22 @@ export class Logger {
   */
   private logRaw(level: LogLevel, ...message: any[]) {
     LOGGING: {
-      const msg: string = message.map((x: any) => {
+      const msgs: string[] = message.map((x: any) => {
         if (x === void 0) {
-          return ChatColor.GOLD + 'undefined';
+          return ChatColor.GOLD + 'undefined' + ChatColor.RESET;
         }
         if (x === null) {
-          return ChatColor.GOLD + 'null';
+          return ChatColor.GOLD + 'null' + ChatColor.RESET;
         }
         if (x && x.stack && x.message) {
-          return `${ChatColor.DARK_RED}${ChatColor.BOLD}${x.message}\n${ChatColor.RESET}${ChatColor.GRAY}${ChatColor.ITALIC}${x.stack}`;
+          return `${ChatColor.DARK_RED}${ChatColor.BOLD}${x.message}\n${ChatColor.RESET}${ChatColor.GRAY}${ChatColor.ITALIC}${x.stack}${ChatColor.RESET}`;
         }
         if (typeof x === 'object' || Array.isArray(x)) {
-          return loggingSettings.jsonFormatter.stringify(x);
+          return loggingSettings.jsonFormatter.stringify(x) + ChatColor.RESET;
         }
-        return x;
-      }).join(ChatColor.RESET + ', ');
-      const formatted = loggingSettings.formatFunction(level, this, msg);
+        return x + ChatColor.RESET;
+      });
+      const formatted = loggingSettings.formatFunction(level, this, loggingSettings.messagesJoinFunction(msgs));
       world.sendMessage(formatted);
       if ((console as any).originalLog) {
         (console as any).originalLog(ChatColor.stripColor(formatted));
