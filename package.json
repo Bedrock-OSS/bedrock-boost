@@ -39,7 +39,8 @@
     "tsup": "^7.2.0"
   },
   "dependencies": {
-    "@minecraft/server": "beta"
+    "@minecraft/server": "beta",
+    "@minecraft/common": "latest"
   },
   "publishConfig": {
     "access": "public"
