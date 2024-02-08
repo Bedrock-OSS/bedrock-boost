@@ -295,6 +295,32 @@ export default class Vec3 implements Vector3 {
     return this.subtract(proj.multiply(2));
   }
   /**
+   * Rotates the current normalized vector by a given angle around a given axis.
+   * 
+   * @param axis - The axis of rotation.
+   * @param angle - The angle of rotation in degrees.
+   * @returns The rotated vector.
+   */
+  rotate(axis: Vector3, angle: number): Vec3 {
+    // Convert angle from degrees to radians and compute half angle
+    const halfAngle = angle * Math.PI / 180 / 2;
+
+    // Quaternion representing the rotation
+    const w = Math.cos(halfAngle);
+    const x = axis.x * Math.sin(halfAngle);
+    const y = axis.y * Math.sin(halfAngle);
+    const z = axis.z * Math.sin(halfAngle);
+    const v = this;
+
+    // Rotate vector (v) using quaternion
+    // Simplified direct computation reflecting quaternion rotation and its conjugate effect
+    const qv_x = w * w * v.x + 2 * y * w * v.z - 2 * z * w * v.y + x * x * v.x + 2 * y * x * v.y + 2 * z * x * v.z - z * z * v.x - y * y * v.x;
+    const qv_y = 2 * x * y * v.x + y * y * v.y + 2 * z * y * v.z + 2 * w * z * v.x - z * z * v.y + w * w * v.y - 2 * x * w * v.z - x * x * v.y;
+    const qv_z = 2 * x * z * v.x + 2 * y * z * v.y + z * z * v.z - 2 * w * y * v.x - y * y * v.z + 2 * w * x * v.y - x * x * v.z + w * w * v.z;
+
+    return new Vec3(qv_x, qv_y, qv_z);
+  }
+  /**
    * Sets the X component of the vector.
    *
    * @param value - The new X value.
