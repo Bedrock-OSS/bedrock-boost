@@ -124,7 +124,7 @@ export class Logger {
       if (Logger.initialized) return;
       Logger.initialized = true;
       system.afterEvents.scriptEventReceive.subscribe((ev) => {
-        if (ev.id === 'logging:level') {
+        if (ev.id === 'logging:level' || ev.id === 'log:level') {
           if (!ev.message) {
             loggingSettings.level = LogLevel.Info;
             world.sendMessage(`${ChatColor.AQUA}Logging level set to ${ChatColor.BOLD}${loggingSettings.level}`);
@@ -137,7 +137,7 @@ export class Logger {
               world.sendMessage(`${ChatColor.DARK_RED}Invalid logging level: ${ev.message}`);
             }
           }
-        } else if (ev.id === 'logging:filter') {
+        } else if (ev.id === 'logging:filter' || ev.id === 'log:filter') {
           if (!ev.message) {
             loggingSettings.filter = ['*'];
           } else {

@@ -55,8 +55,13 @@ logger.info("Hello, world!", { foo: "bar"});
 The logging system includes 2 commands to control the logging system:
 
 ```
-scriptevent logger:level <level either as string or as a number>
-scriptevent logger:filter <comma separated tags>
+scriptevent logging:level <level either as string or as a number>
+# or
+scriptevent log:level <level either as string or as a number>
+
+scriptevent logging:filter <comma separated tags>
+# or
+scriptevent log:filter <comma separated tags>
 ```
 
 ## Build Options
