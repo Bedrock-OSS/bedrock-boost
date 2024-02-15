@@ -81,6 +81,10 @@ export default class Vec3 implements Vector3 {
     if (x instanceof Vec3) return x;
     return new Vec3(x, y, z);
   }
+  /**
+   * Converts the current Vec3 object to a Vector object.
+   * @returns {any} The converted Vector object.
+   */
   toVector(): any {
     return new (getVectorClass())(this.x, this.y, this.z);
   }
