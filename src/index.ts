@@ -8,6 +8,7 @@ import ColorJSON from "./colorJson";
 import Polyfill from "./polyfill/polyfill";
 import { jobProgressPromise, jobPromise } from "./jobUtils";
 import { isValidLocation } from "./blockUtils";
+import { consumeDurability } from "./itemUtils";
 
 
 export {
@@ -24,5 +25,6 @@ export {
   ColorJSON,
   jobPromise,
   jobProgressPromise,
-  isValidLocation
+  isValidLocation,
+  consumeDurability
 };
