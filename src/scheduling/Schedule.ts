@@ -21,6 +21,9 @@ export default class Schedule<T> {
     if (period <= 0) {
       throw new Error("Period must be a positive integer.");
     }
+    if (!processor || typeof processor !== "function") {
+      throw new Error("Processor function must be defined.");
+    }
     this.period = period;
     this.processor = processor;
   }
