@@ -9,22 +9,26 @@ import Polyfill from "./polyfill/polyfill";
 import { jobProgressPromise, jobPromise } from "./jobUtils";
 import { isValidLocation } from "./blockUtils";
 import { consumeDurability } from "./itemUtils";
+import Schedule from "./scheduling/Schedule";
+import TaskSchedule from "./scheduling/TaskSchedule";
 
 
 export {
-  Vec3, 
-  Timings, 
-  addIdleDummy, 
-  clearIdleDummy, 
-  getDimension, 
-  getDimensionHeightRange, 
-  LogLevel, 
-  Logger, 
-  ChatColor, 
-  Polyfill, 
+  Vec3,
+  Timings,
+  addIdleDummy,
+  clearIdleDummy,
+  getDimension,
+  getDimensionHeightRange,
+  LogLevel,
+  Logger,
+  ChatColor,
+  Polyfill,
   ColorJSON,
   jobPromise,
   jobProgressPromise,
   isValidLocation,
-  consumeDurability
+  consumeDurability,
+  Schedule,
+  TaskSchedule
 };
