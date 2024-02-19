@@ -1,18 +1,9 @@
-import * as srv from "@minecraft/server";
-import { Vector3, Direction } from "@minecraft/server";
-import { Vector as PolyfillVector } from "./VectorPolyfill"
+import { Vector3, Direction, Vector as McVector } from "@minecraft/server";
 import { Logger } from "./Logging";
 
 const log = Logger.getLogger("vec3", "vec3", "bedrock-boost");
 
 type VectorLike = Vector3 | Vec3 | Direction | number[] | number
-
-function getVectorClass(): any {
-  if ((srv as any).Vector) {
-    return (srv as any).Vector;
-  }
-  return PolyfillVector;
-}
 
 export default class Vec3 implements Vector3 {
   public static readonly Zero = new Vec3(0, 0, 0);
@@ -86,7 +77,7 @@ export default class Vec3 implements Vector3 {
    * @returns {any} The converted Vector object.
    */
   toVector(): any {
-    return new (getVectorClass())(this.x, this.y, this.z);
+    return new McVector(this.x, this.y, this.z);
   }
   /**
    * Creates a copy of the current vector.
@@ -121,7 +112,7 @@ export default class Vec3 implements Vector3 {
    */
   add(x: VectorLike, y?: number, z?: number): Vec3 {
     let v: Vec3 = Vec3.from(x, y, z);
-    return Vec3.from(getVectorClass().add(this, v));
+    return Vec3.from(v.x + this.x, v.y + this.y, v.z + this.z);
   }
   /**
    * Subtracts another vector from the current vector.
@@ -131,7 +122,7 @@ export default class Vec3 implements Vector3 {
    */
   subtract(x: VectorLike, y?: number, z?: number): Vec3 {
     let v: Vec3 = Vec3.from(x, y, z);
-    return Vec3.from(getVectorClass().subtract(this, v));
+    return Vec3.from(this.x - v.x, this.y - v.y, this.z - v.z);
   }
   /**
    * Multiplies the current vector by another vector or scalar.
@@ -141,10 +132,10 @@ export default class Vec3 implements Vector3 {
    */
   multiply(x: VectorLike, y?: number, z?: number): Vec3 {
     if (typeof x === "number" && y === undefined && z === undefined) {
-      return Vec3.from(getVectorClass().multiply(this, x));
+      return Vec3.from(this.x * x, this.y * x, this.z * x);
     }
     let v: Vec3 = Vec3.from(x, y, z);
-    return Vec3.from(getVectorClass().multiply(this, v));
+    return Vec3.from(v.x * this.x, v.y * this.y, v.z * this.z);
   }
   /**
    * Divides the current vector by another vector or scalar.
@@ -154,10 +145,10 @@ export default class Vec3 implements Vector3 {
    */
   divide(x: VectorLike, y?: number, z?: number): Vec3 {
     if (typeof x === "number" && y === undefined && z === undefined) {
-      return Vec3.from(getVectorClass().divide(this, x));
+      return Vec3.from(this.x / x, this.y / x, this.z / x);
     }
     let v: Vec3 = Vec3.from(x, y, z);
-    return Vec3.from(getVectorClass().divide(this, v));
+    return Vec3.from(this.x / v.x, this.y / v.y, this.z / v.z);
   }
   /**
    * Normalizes the vector to have a length (magnitude) of 1.
@@ -170,7 +161,8 @@ export default class Vec3 implements Vector3 {
       log.error(new Error("Cannot normalize zero-length vector"));
       throw new Error("Cannot normalize zero-length vector");
     }
-    return Vec3.from(new (getVectorClass())(this.x, this.y, this.z).normalized());
+    const len = this.length();
+    return Vec3.from(this.x / len, this.y / len, this.z / len);
   }
   /**
    * Computes the length (magnitude) of the vector.
@@ -178,7 +170,7 @@ export default class Vec3 implements Vector3 {
    * @returns The length of the vector.
    */
   length(): number {
-    return new (getVectorClass())(this.x, this.y, this.z).length();
+    return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
   }
   /**
    * Computes the squared length of the vector.
@@ -187,7 +179,7 @@ export default class Vec3 implements Vector3 {
    * @returns The squared length of the vector.
    */
   lengthSquared(): number {
-    return new (getVectorClass())(this.x, this.y, this.z).lengthSquared();
+    return this.x * this.x + this.y * this.y + this.z * this.z;
   }
   /**
    * Computes the cross product of the current vector with another vector.
@@ -199,7 +191,11 @@ export default class Vec3 implements Vector3 {
    */
   cross(x: VectorLike, y?: number, z?: number): Vec3 {
     let v: Vec3 = Vec3.from(x, y, z);
-    return Vec3.from(getVectorClass().cross(this, v));
+    return Vec3.from(
+      this.y * v.z - this.z * v.y,
+      this.z * v.x - this.x * v.z,
+      this.x * v.y - this.y * v.x
+    );
   }
   /**
    * Computes the distance between the current vector and another vector.
@@ -209,7 +205,7 @@ export default class Vec3 implements Vector3 {
    */
   distance(x: VectorLike, y?: number, z?: number): number {
     let v: Vec3 = Vec3.from(x, y, z);
-    return getVectorClass().distance(this, v);
+    return Math.sqrt(this.distanceSquared(v));
   }
   /**
    * Computes the squared distance between the current vector and another vector.
@@ -231,7 +227,11 @@ export default class Vec3 implements Vector3 {
    */
   lerp(v: Vector3, t: number): Vec3 {
     if (!v || !t) return Vec3.from(this);
-    return Vec3.from(getVectorClass().lerp(this, v, t));
+    return Vec3.from(
+      this.x + (v.x - this.x) * t,
+      this.y + (v.y - this.y) * t,
+      this.z + (v.z - this.z) * t
+    );
   }
   /**
    * Computes the spherical linear interpolation between the current vector and another vector.
@@ -242,7 +242,12 @@ export default class Vec3 implements Vector3 {
    */
   slerp(v: Vector3, t: number): Vec3 {
     if (!v || !t) return Vec3.from(this);
-    return Vec3.from(getVectorClass().slerp(this, v, t));
+    const dot = this.dot(v);
+    const theta = Math.acos(dot) * t;
+    const relative = Vec3.from(v).subtract(this.multiply(dot)).normalize();
+    return this
+      .multiply(Math.cos(theta))
+      .add(relative.multiply(Math.sin(theta)));
   }
   /**
    * Computes the dot product of the current vector with another vector.
