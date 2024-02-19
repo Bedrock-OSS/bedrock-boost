@@ -1,16 +1,16 @@
-import Vec3 from "./vec3";
-import Timings from "./timings";
-import { addIdleDummy, clearIdleDummy } from "./profilingUtils";
-import { getDimension, getDimensionHeightRange } from "./cache";
-import { Logger, LogLevel } from "./logging";
-import ChatColor from "./chatColor";
-import ColorJSON from "./colorJson";
-import Polyfill from "./polyfill/polyfill";
-import { jobProgressPromise, jobPromise } from "./jobUtils";
-import { isValidLocation } from "./blockUtils";
-import { consumeDurability } from "./itemUtils";
-import Schedule from "./scheduling/Schedule";
-import TaskSchedule from "./scheduling/TaskSchedule";
+import Vec3 from "./Vec3";
+import Timings from "./Timings";
+import { addIdleDummy, clearIdleDummy } from "./ProfilingUtils";
+import { getDimension, getDimensionHeightRange } from "./Cache";
+import { Logger, LogLevel } from "./Logging";
+import ChatColor from "./ChatColor";
+import ColorJSON from "./ColorJSON";
+import Polyfill from "./polyfill/Polyfill";
+import { jobProgressPromise, jobPromise } from "./JobUtils";
+import { isValidLocation } from "./BlockUtils";
+import { consumeDurability } from "./ItemUtils";
+import PulseScheduler from "./scheduling/PulseScheduler";
+import TaskPulseScheduler from "./scheduling/TaskPulseScheduler";
 
 
 export {
@@ -29,6 +29,6 @@ export {
   jobProgressPromise,
   isValidLocation,
   consumeDurability,
-  Schedule,
-  TaskSchedule
+  PulseScheduler as Schedule,
+  TaskPulseScheduler as TaskSchedule
 };

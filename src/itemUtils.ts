@@ -1,5 +1,5 @@
 import { EquipmentSlot, Player } from "@minecraft/server";
-import { Logger } from "./logging";
+import { Logger } from "./Logging";
 
 const log = Logger.getLogger("itemUtils", "bedrock-boost", "itemUtils");
 

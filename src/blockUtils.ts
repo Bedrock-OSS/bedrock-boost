@@ -1,5 +1,5 @@
 import { Dimension, Vector3 } from "@minecraft/server";
-import { getDimensionHeightRange } from "./cache";
+import { getDimensionHeightRange } from "./Cache";
 
 // /**
 //  * Checks if a block is passable.

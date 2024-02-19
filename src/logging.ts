@@ -1,6 +1,6 @@
 import { system, world } from "@minecraft/server"
-import ChatColor from "./chatColor";
-import ColorJSON from "./colorJson";
+import ChatColor from "./ChatColor";
+import ColorJSON from "./ColorJSON";
 
 /**
  * The `LogLevel` class defines the various logging levels used by the logger.

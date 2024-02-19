@@ -1,5 +1,5 @@
 import { system } from "@minecraft/server";
-import { Logger } from "./logging";
+import { Logger } from "./Logging";
 
 const log = Logger.getLogger("jobUtils", "bedrock-boost", "jobUtils");
 

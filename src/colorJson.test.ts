@@ -1,5 +1,5 @@
-import ChatColor from './chatColor';
-import ColorJSON from './colorJson';
+import ChatColor from './ChatColor';
+import ColorJSON from './ColorJSON';
 
 describe('ColorJSON', () => {
   let colorJson: ColorJSON;

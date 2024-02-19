@@ -1,7 +1,7 @@
 import * as srv from "@minecraft/server";
 import { Vector3, Direction } from "@minecraft/server";
-import { Vector as PolyfillVector } from "./vectorPolyfill"
-import { Logger } from "./logging";
+import { Vector as PolyfillVector } from "./VectorPolyfill"
+import { Logger } from "./Logging";
 
 const log = Logger.getLogger("vec3", "vec3", "bedrock-boost");
 

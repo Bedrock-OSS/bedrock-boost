@@ -1,4 +1,4 @@
-import ChatColor from "./chatColor";
+import ChatColor from "./ChatColor";
 
 export default class ColorJSON {
     // Tokens

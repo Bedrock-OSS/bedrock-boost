@@ -1,10 +1,10 @@
 import { system } from "@minecraft/server";
 
 /**
- * Represents a schedule that executes a processor function at regular intervals for each item in the list.
- * @template T The type of items in the schedule.
+ * Represents a scheduler that executes a processor function at regular intervals for each item in the list.
+ * @template T The type of items in the scheduler.
  */
-export default class Schedule<T> {
+export default class PulseScheduler<T> {
   private items: T[] = [];
   private period: number;
   private currentTick: number = 0;
@@ -14,8 +14,8 @@ export default class Schedule<T> {
   processor: (t: T) => void;
 
   /**
-   * Creates a new Schedule instance.
-   * @param period The period of the schedule.
+   * Creates a new PulseScheduler instance.
+   * @param period The period of the scheduler.
    */
   constructor(processor: (t: T) => void, period: number) {
     if (period <= 0) {

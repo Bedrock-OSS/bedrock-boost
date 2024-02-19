@@ -1,4 +1,4 @@
-import { Logger } from "./logging";
+import { Logger } from "./Logging";
 
 const log = Logger.getLogger("Timings", 'timings');
 /**

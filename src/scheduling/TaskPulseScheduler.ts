@@ -1,9 +1,9 @@
-import Schedule from "./Schedule";
+import PulseScheduler from "./PulseScheduler";
 
 /**
- * Represents a schedule for executing tasks.
+ * Represents a scheduler for executing tasks.
  */
-export default class TaskSchedule extends Schedule<() => void> {
+export default class TaskPulseScheduler extends PulseScheduler<() => void> {
   /**
    * Creates a new TaskSchedule instance.
    * @param period The period of the schedule.

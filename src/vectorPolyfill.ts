@@ -1,5 +1,5 @@
 import { Vector3 } from "@minecraft/server";
-import Vec3 from "./vec3";
+import Vec3 from "./Vec3";
 
 export class Vector implements Vector3 {
   /**
