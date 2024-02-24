@@ -15,6 +15,21 @@ describe('PulseScheduler', () => {
     jest.clearAllTimers();
   });
 
+  function prepareData(size: number): number[] {
+    const data: number[] = [];
+    for (let i = 0; i < size; i++) {
+      data.push(i + 1);
+    }
+    return data;
+  }
+
+  function ensureExecution(data: number[]): void {
+    expect(mockProcessor).toHaveBeenCalledTimes(data.length);
+    for (let i = 0; i < data.length; i++) {
+      expect(mockProcessor).toHaveBeenNthCalledWith(i + 1, data[i]);
+    }
+  }
+
   it('should add an item to the schedule', () => {
     scheduler.add(1);
     expect(scheduler.getItems()).toEqual([1]);
@@ -50,14 +65,49 @@ describe('PulseScheduler', () => {
   });
 
   it('should process items according to the schedule', () => {
-    scheduler.addAll([1, 2, 3, 4, 5]);
+    const data = prepareData(5);
+    scheduler.addAll(data);
     scheduler.start();
     jest.advanceTimersByTime(10);
-    expect(mockProcessor).toHaveBeenCalledTimes(5);
-    expect(mockProcessor).toHaveBeenNthCalledWith(1, 1);
-    expect(mockProcessor).toHaveBeenNthCalledWith(2, 2);
-    expect(mockProcessor).toHaveBeenNthCalledWith(3, 3);
-    expect(mockProcessor).toHaveBeenNthCalledWith(4, 4);
-    expect(mockProcessor).toHaveBeenNthCalledWith(5, 5);
+    ensureExecution(data);
+  });
+
+  it('should not process items if the schedule is stopped', () => {
+    const data = prepareData(5);
+    scheduler.addAll(data);
+    scheduler.start();
+    scheduler.stop();
+    jest.advanceTimersByTime(10);
+    expect(mockProcessor).not.toHaveBeenCalled();
+  });
+
+  it('should not process items if the schedule is empty', () => {
+    scheduler.start();
+    jest.advanceTimersByTime(10);
+    expect(mockProcessor).not.toHaveBeenCalled();
+  });
+
+  it('should spread processing evenly across ticks', () => {
+    const data = prepareData(10);
+    scheduler.addAll(data);
+    scheduler.start();
+    jest.advanceTimersByTime(10);
+    ensureExecution(data);
+  });
+
+  it('should handle a large number of items', () => {
+    const data = prepareData(100);
+    scheduler.addAll(data);
+    scheduler.start();
+    jest.advanceTimersByTime(10);
+    ensureExecution(data);
+  });
+
+  it('should handle odd numbers of items compared to the tick interval', () => {
+    const data = prepareData(13);
+    scheduler.addAll(data);
+    scheduler.start();
+    jest.advanceTimersByTime(10);
+    ensureExecution(data);
   });
 });
