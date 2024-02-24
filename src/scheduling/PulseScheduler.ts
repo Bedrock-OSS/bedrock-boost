@@ -1,4 +1,7 @@
 import { system } from "@minecraft/server";
+import { Logger } from "../Logging";
+
+const log:Logger = Logger.getLogger("PulseScheduler", "bedrock-boost", "pulse-scheduler");
 
 /**
  * Represents a scheduler that executes a processor function at regular intervals for each item in the list.
@@ -118,11 +121,15 @@ export default class PulseScheduler<T> {
 
   private tick() {
     if (this.items.length === 0) {
+      log.debug("No items to process.");
       return;
     }
     // Number of items to process this tick
     let scheduledExecutions = this.executionSchedule[this.currentTick];
     if (scheduledExecutions === 0) {
+      log.debug("No items to process this tick.");
+      // Increment the tick counter
+      this.currentTick = (this.currentTick + 1) % this.period;
       return;
     }
     // Execution counter for this tick
