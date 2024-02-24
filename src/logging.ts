@@ -3,6 +3,28 @@ import ChatColor from "./ChatColor";
 import ColorJSON from "./ColorJSON";
 
 /**
+ * The `OutputType` enum defines the various types of outputs that the logger can use.
+ */
+export enum OutputType {
+  /**
+   * Uses `world.sendMessage` to send the log message to the chat.
+  */
+  Chat,
+  /**
+   * Uses `console.log` to send the log message to the console.
+  */
+  ConsoleInfo,
+  /**
+   * Uses `console.warn` to send the log message to the console as a warning.
+  */
+  ConsoleWarn,
+  /**
+   * Uses `console.error` to send the log message to the console as an error.
+  */
+  ConsoleError,
+}
+
+/**
  * The `LogLevel` class defines the various logging levels used by the logger.
  */
 export class LogLevel {
@@ -36,7 +58,7 @@ export class LogLevel {
    * @param {string} name - The string name for this logger.
    * @param {ChatColor} color - The color to use for this logger. Defaults to `ChatColor.RESET`.
    */
-  private constructor(public level: number, public name: string, public color: ChatColor = ChatColor.RESET) { }
+  private constructor(public readonly level: number, public readonly name: string, public color: ChatColor = ChatColor.RESET) { }
 
   /**
    * Return the logging level as a string.
@@ -70,6 +92,14 @@ export class LogLevel {
 }
 
 /**
+ * The `OutputConfig` type defines the configuration for the logger's outputs.
+ * It is a mapping of `LogLevel` to an array of `OutputType`.
+ */
+export type OutputConfig = {
+  [key in LogLevel["level"]]?: OutputType[]
+}
+
+/**
 * Function to match the provided string to the given pattern.
 *
 * @param {string} pattern - The pattern to match.
@@ -96,7 +126,8 @@ type LoggingSettings = {
   level: LogLevel,
   formatFunction: (level: LogLevel, logger: Logger, message: string) => string
   messagesJoinFunction: (messages: string[]) => string
-  jsonFormatter: ColorJSON
+  jsonFormatter: ColorJSON,
+  outputConfig: OutputConfig
 }
 
 const loggingSettings: LoggingSettings = {
@@ -108,7 +139,15 @@ const loggingSettings: LoggingSettings = {
   messagesJoinFunction: (messages: string[]) => {
     return messages.join(' ')
   },
-  jsonFormatter: ColorJSON.DEFAULT
+  jsonFormatter: ColorJSON.DEFAULT,
+  outputConfig: {
+    [LogLevel.Trace.level]: [OutputType.Chat, OutputType.ConsoleInfo],
+    [LogLevel.Debug.level]: [OutputType.Chat, OutputType.ConsoleInfo],
+    [LogLevel.Info.level]: [OutputType.Chat, OutputType.ConsoleInfo],
+    [LogLevel.Warn.level]: [OutputType.Chat, OutputType.ConsoleInfo, OutputType.ConsoleWarn],
+    [LogLevel.Error.level]: [OutputType.Chat, OutputType.ConsoleInfo, OutputType.ConsoleError],
+    [LogLevel.Fatal.level]: [OutputType.Chat, OutputType.ConsoleInfo, OutputType.ConsoleError],
+  }
 }
 
 /**
@@ -183,6 +222,13 @@ export class Logger {
     loggingSettings.jsonFormatter = formatter;
   }
   /**
+   * Get the output configuration for the logger.
+   * @returns {OutputConfig} The output configuration.
+   */
+  static getOutputConfig(): OutputConfig {
+    return loggingSettings.outputConfig;
+  }
+  /**
   * Returns a new Logger.
   *
   * @param {string} name - The name of the Logger.
@@ -253,17 +299,21 @@ export class Logger {
         return x + ChatColor.RESET;
       });
       const formatted = loggingSettings.formatFunction(level, this, loggingSettings.messagesJoinFunction(msgs));
-      world.sendMessage(formatted);
-      if ((console as any).originalLog) {
-        (console as any).originalLog(ChatColor.stripColor(formatted));
-      } else {
-        console.log(ChatColor.stripColor(formatted));
+      const outputs = loggingSettings.outputConfig[level.level] || [OutputType.Chat, OutputType.ConsoleInfo];
+      if (outputs.includes(OutputType.Chat)) {
+        world.sendMessage(formatted);
       }
-      // Consider moving warnings and up completely to console, which ends up in content log
-      if (level === LogLevel.Warn) {
+      if (outputs.includes(OutputType.ConsoleInfo)) {
+        if ((console as any).originalLog) {
+          (console as any).originalLog(ChatColor.stripColor(formatted));
+        } else {
+          console.log(ChatColor.stripColor(formatted));
+        }
+      }
+      if (outputs.includes(OutputType.ConsoleWarn)) {
         console.warn(formatted);
       }
-      if (level === LogLevel.Error || level === LogLevel.Fatal) {
+      if (outputs.includes(OutputType.ConsoleError)) {
         console.error(formatted);
       }
     }
