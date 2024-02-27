@@ -11,6 +11,7 @@ import { isValidLocation } from "./BlockUtils";
 import { consumeDurability } from "./ItemUtils";
 import PulseScheduler from "./scheduling/PulseScheduler";
 import TaskPulseScheduler from "./scheduling/TaskPulseScheduler";
+import CommandUtils, { CameraShakeType, InputPermission } from "./CommandUtils";
 
 
 export {
@@ -29,6 +30,9 @@ export {
   jobProgressPromise,
   isValidLocation,
   consumeDurability,
-  PulseScheduler as Schedule,
-  TaskPulseScheduler as TaskSchedule
+  PulseScheduler,
+  TaskPulseScheduler,
+  CommandUtils,
+  CameraShakeType,
+  InputPermission
 };
