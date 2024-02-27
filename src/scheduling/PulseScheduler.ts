@@ -125,7 +125,7 @@ export default class PulseScheduler<T> {
       return;
     }
     // Number of items to process this tick
-    let scheduledExecutions = this.executionSchedule[this.currentTick];
+    const scheduledExecutions = this.executionSchedule[this.currentTick];
     if (scheduledExecutions === 0) {
       log.debug("No items to process this tick.");
       // Increment the tick counter

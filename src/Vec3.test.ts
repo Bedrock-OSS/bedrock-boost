@@ -1,4 +1,4 @@
-import { LogLevel, Logger } from './Logging';
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Vec3 from './Vec3';
 import { Direction } from '@minecraft/server';
 
