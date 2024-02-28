@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable no-unused-labels */
 import { system, world } from "@minecraft/server"
 import ChatColor from "./ChatColor";
 import ColorJSON from "./ColorJSON";

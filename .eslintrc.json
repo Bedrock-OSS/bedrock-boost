@@ -22,8 +22,9 @@
         }
     ],
     "rules": {
-        "minecraft-linting/avoid-unnecessary-command": "error"
-        // "prefer-const": "warn",
-        // "@typescript-eslint/no-explicit-any": "off"
+        "minecraft-linting/avoid-unnecessary-command": "error",
+        "prefer-const": "warn",
+        "@typescript-eslint/no-explicit-any": "off",
+        "eslint-disable no-unused-labels": "off"
     }
 }

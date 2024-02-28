@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { world } from "@minecraft/server";
 import { install as playerInstall } from "./PlayerPolyfill";
 

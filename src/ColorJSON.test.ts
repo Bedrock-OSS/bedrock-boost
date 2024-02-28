@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import ChatColor from './ChatColor';
 import ColorJSON from './ColorJSON';
 

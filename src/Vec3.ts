@@ -92,8 +92,11 @@ export default class Vec3 implements Vector3 {
     if (x === Direction.South) return Vec3.South;
     if (x === Direction.East) return Vec3.East;
     if (x === Direction.West) return Vec3.West;
-    log.error(new Error('Invalid arguments'));
-    return Vec3.Zero;
+    if (!x || (!(x as any).x && (x as any).x !== 0) || (!(x as any).y && (x as any).y !== 0) || (!(x as any).z && (x as any).z !== 0)) {
+      log.error(new Error('Invalid arguments'), x, y, z);
+      throw new Error('Invalid arguments');
+    }
+    return new Vec3((x as any).x as number, (x as any).y as number, (x as any).z as number);
   }
   private static _from(x: VectorLike, y?: number, z?: number): Vec3 {
     if (x instanceof Vec3) return x;
@@ -109,8 +112,11 @@ export default class Vec3 implements Vector3 {
     if (x === Direction.South) return Vec3.South;
     if (x === Direction.East) return Vec3.East;
     if (x === Direction.West) return Vec3.West;
-    log.error(new Error('Invalid arguments'));
-    return Vec3.Zero;
+    if (!x || (!(x as any).x && (x as any).x !== 0) || (!(x as any).y && (x as any).y !== 0) || (!(x as any).z && (x as any).z !== 0)) {
+      log.error(new Error('Invalid arguments'), x, y, z);
+      throw new Error('Invalid arguments');
+    }
+    return new Vec3((x as any).x as number, (x as any).y as number, (x as any).z as number);
   }
   /**
    * Creates a copy of the current vector.
@@ -200,9 +206,11 @@ export default class Vec3 implements Vector3 {
   divide(x: number): Vec3;
   divide(x: VectorLike, y?: number, z?: number): Vec3 {
     if (typeof x === "number" && y === undefined && z === undefined) {
+      if (x === 0) throw new Error("Cannot divide by zero");
       return Vec3.from(this.x / x, this.y / x, this.z / x);
     }
     const v: Vec3 = Vec3._from(x, y, z);
+    if (v.x === 0 || v.y === 0 || v.z === 0) throw new Error("Cannot divide by zero");
     return Vec3.from(this.x / v.x, this.y / v.y, this.z / v.z);
   }
   /**
@@ -289,14 +297,17 @@ export default class Vec3 implements Vector3 {
     return this.subtract(v).lengthSquared();
   }
   /**
-   * Computes the linear interpolation between the current vector and another vector.
+   * Computes the linear interpolation between the current vector and another vector, when t is in the range [0, 1].
+   * Computes the extrapolation when t is outside this range.
    *
    * @param v - The other vector.
-   * @param t - The interpolation factor (0 <= t <= 1).
+   * @param t - The interpolation factor.
    * @returns A new vector after performing the lerp operation.
    */
   lerp(v: Vector3, t: number): Vec3 {
     if (!v || !t) return Vec3.from(this);
+    if (t === 1) return Vec3.from(v);
+    if (t === 0) return Vec3.from(this);
     return Vec3.from(
       this.x + (v.x - this.x) * t,
       this.y + (v.y - this.y) * t,
@@ -304,14 +315,17 @@ export default class Vec3 implements Vector3 {
     );
   }
   /**
-   * Computes the spherical linear interpolation between the current vector and another vector.
+   * Computes the spherical linear interpolation between the current vector and another vector, when t is in the range [0, 1].
+   * Computes the extrapolation when t is outside this range.
    *
    * @param v - The other vector.
-   * @param t - The interpolation factor (0 <= t <= 1).
+   * @param t - The interpolation factor.
    * @returns A new vector after performing the slerp operation.
    */
   slerp(v: Vector3, t: number): Vec3 {
     if (!v || !t) return Vec3.from(this);
+    if (t === 1) return Vec3.from(v);
+    if (t === 0) return Vec3.from(this);
     const dot = this.dot(v);
     const theta = Math.acos(dot) * t;
     const relative = Vec3.from(v).subtract(this.multiply(dot)).normalize();
@@ -339,7 +353,6 @@ export default class Vec3 implements Vector3 {
    *
    * @param v - The other vector.
    * @returns The angle in radians between the two vectors.
-   *          To convert to degrees, use: angleInDegrees = angleInRadians * (180 / Math.PI).
    */
   angleBetween(x: number, y: number, z: number): number;
   angleBetween(x: Vec3): number;
@@ -499,6 +512,7 @@ export default class Vec3 implements Vector3 {
     if (rounded.y === -1) return Direction.Down;
     if (rounded.z === 1) return Direction.North;
     if (rounded.z === -1) return Direction.South;
+    // This should never happen
     log.error(new Error("Cannot convert vector to direction"), this);
     throw new Error("Cannot convert vector to direction");
   }
