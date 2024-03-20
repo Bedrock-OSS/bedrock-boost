@@ -19,6 +19,7 @@ A utility library to streamline the development process for Minecraft Bedrock's 
    - Adds a way to filter messages by levels (e.g. `info`, `warn`, `error`).
 6. **ChatColor Class**: Simplifies chat color formatting.
 7. **ColorJSON Class**: JSON formatter for usage in chat messages. Simply use `ColorJSON.DEFAULT.stringify` function to convert any value to a JSON string with color formatting.
+8. **PulseScheduler**: A simple scheduler, that processes all items once in a set period of time to avoid load spikes.
 
 ## Installation
 
@@ -112,6 +113,28 @@ Timings.begin("big operation 1");
 Timings.begin("big operation 2");
 // Some operations...
 Timings.end();
+```
+
+### PulseScheduler
+
+```typescript
+import { PulseScheduler } from "@bedrock-oss/bedrock-boost"
+
+// Define a processor function to apply an effect to an entity
+const applyEffect = (entity) => {
+    // Example function applying an effect to the entity
+    console.log(`Applying effect to entity: ${entity}`);
+};
+
+// Create a PulseScheduler with a 100-tick interval
+const entityEffectScheduler = new PulseScheduler(applyEffect, 100);
+
+// Add entities to the scheduler
+entityEffectScheduler.add("Entity1");
+entityEffectScheduler.add("Entity2");
+
+// Start the scheduler to begin processing entities
+entityEffectScheduler.start();
 ```
 
 ## Contributing
