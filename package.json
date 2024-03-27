@@ -1,6 +1,6 @@
 {
   "name": "@bedrock-oss/bedrock-boost",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "A utility package with helper functions for developing add-ons with Script API in Minecraft Bedrock Edition",
   "keywords": [
     "minecraft",
