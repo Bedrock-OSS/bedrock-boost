@@ -25,6 +25,8 @@
         "minecraft-linting/avoid-unnecessary-command": "error",
         "prefer-const": "warn",
         "@typescript-eslint/no-explicit-any": "off",
-        "eslint-disable no-unused-labels": "off"
+        "eslint-disable no-unused-labels": "off",
+        "no-unused-vars": "off",
+        "@typescript-eslint/no-unused-vars": "warn"
     }
 }

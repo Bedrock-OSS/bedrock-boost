@@ -85,6 +85,7 @@ export default class ColorJSON {
      * Transforms a function into a JSON representation.
      * @param value - The function to transform.
      */
+    // eslint-disable-next-line @typescript-eslint/ban-types
     protected stringifyFunction(value: Function): string {
         // Functions are transformed to predefined function token
         return this.FunctionColor + this.FunctionValue + ChatColor.RESET;
@@ -244,7 +245,13 @@ export default class ColorJSON {
                 // Sort the keys
                 const allKeys = [...keySet].sort();
                 // Get all entries
-                const entries = allKeys.map((key: string) => [key, (value as any)[key] ?? undefined]).filter(([key, val]) => typeof val !== 'function' && val !== void 0);
+                const entries = allKeys.map((key: string) => {
+                    try {
+                        return [key, (value as any)[key] ?? void 0];
+                    } catch(e) {
+                        return [key, void 0];
+                    }
+                }).filter(([, val]) => typeof val !== 'function' && val !== void 0);
                 const result = this.stringifyObject(value, name, entries, indentLevel);
                 this.clearCycle(value);
                 return result;
