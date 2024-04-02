@@ -1,14 +1,14 @@
 import { system } from "@minecraft/server";
 import { Logger } from "../Logging";
 
-const log:Logger = Logger.getLogger("PulseScheduler", "bedrock-boost", "pulse-scheduler");
+const log: Logger = Logger.getLogger("PulseScheduler", "bedrock-boost", "pulse-scheduler");
 
 /**
  * Represents a scheduler that executes a processor function at regular intervals for each item in the list.
  * @template T The type of items in the scheduler.
  */
 export default class PulseScheduler<T> {
-  private items: T[] = [];
+  protected items: T[] = [];
   private period: number;
   private currentTick: number = 0;
   private runId?: number;
@@ -34,20 +34,20 @@ export default class PulseScheduler<T> {
   /**
    * Adds an item to the schedule.
    * @param item The item to be added.
+   * @deprecated Use `push` instead.
    */
   add(item: T) {
-    this.items.push(item);
-    this.recalculateExecutionSchedule();
+    this.push(item);
   }
 
   /**
     * Adds multiple items to the schedule.
     * 
     * @param items - The items to be added.
+    * @deprecated Use `push` instead.
     */
   addAll(items: T[]) {
-    this.items.push(...items);
-    this.recalculateExecutionSchedule();
+    this.push(...items);
   }
 
   /**
@@ -81,9 +81,8 @@ export default class PulseScheduler<T> {
   /**
    * Returns a list of the items in the schedule.
    */
-  getItems() {
-    // Return a copy of the list to prevent external modification
-    return this.items.slice();
+  getItems(): ReadonlyArray<T> {
+    return this.items;
   }
 
   /**
@@ -121,13 +120,13 @@ export default class PulseScheduler<T> {
 
   private tick() {
     if (this.items.length === 0) {
-      log.debug("No items to process.");
+      log.trace("No items to process.");
       return;
     }
     // Number of items to process this tick
     const scheduledExecutions = this.executionSchedule[this.currentTick];
     if (scheduledExecutions === 0) {
-      log.debug("No items to process this tick.");
+      log.trace("No items to process this tick.");
       // Increment the tick counter
       this.currentTick = (this.currentTick + 1) % this.period;
       return;
@@ -139,7 +138,11 @@ export default class PulseScheduler<T> {
     // If we reach the end of the list without having correct number of executions, stop. 
     // It's most likely caused by an item being removed.
     for (; this.nextIndex < this.items.length && executed < scheduledExecutions; this.nextIndex++) {
-      this.processor(this.items[this.nextIndex]);
+      try {
+        this.processor(this.items[this.nextIndex]);
+      } catch (e) {
+        log.error("Error processing item", e);
+      }
       executed++;
     }
 
@@ -151,4 +154,41 @@ export default class PulseScheduler<T> {
       this.nextIndex = 0;
     }
   }
+
+  get length(): number {
+    return this.items.length;
+  }
+
+  push(...items: T[]): number {
+    this.items.push(...items);
+    this.recalculateExecutionSchedule();
+    return this.items.length;
+  }
+
+  pop(): T | undefined {
+    const item = this.items.pop();
+    this.recalculateExecutionSchedule();
+    return item;
+  }
+
+  shift(): T | undefined {
+    const item = this.items.shift();
+    this.recalculateExecutionSchedule();
+    return item;
+  }
+
+  unshift(...items: T[]): number {
+    this.items.unshift(...items);
+    this.recalculateExecutionSchedule();
+    return this.items.length;
+  }
+
+  splice(start: number, deleteCount?: number): T[];
+  splice(start: number, deleteCount: number, ...items: T[]): T[];
+  splice(start: number, deleteCount: number = 0, ...items: T[]): T[] {
+    const removed = this.items.splice(start, deleteCount, ...items);
+    this.recalculateExecutionSchedule();
+    return removed;
+  }
+
 }
