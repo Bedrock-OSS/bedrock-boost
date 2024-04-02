@@ -482,6 +482,132 @@ export default class Vec3 implements Vector3 {
     return this.subtract(projection).length();
   }
   /**
+   * Floors the X, Y, and Z components of the vector.
+   * @returns A new vector with the floored components.
+   */
+  floor(): Vec3 {
+    return new Vec3(Math.floor(this.x), Math.floor(this.y), Math.floor(this.z));
+  }
+  /**
+   * Floors the X component of the vector.
+   * @returns A new vector with the floored X component.
+   */
+  floorX(): Vec3 {
+    return new Vec3(Math.floor(this.x), this.y, this.z);
+  }
+  /**
+   * Floors the Y component of the vector.
+   * @returns A new vector with the floored Y component.
+   */
+  floorY(): Vec3 {
+    return new Vec3(this.x, Math.floor(this.y), this.z);
+  }
+  /**
+   * Floors the Z component of the vector.
+   * @returns A new vector with the floored Z component.
+   */
+  floorZ(): Vec3 {
+    return new Vec3(this.x, this.y, Math.floor(this.z));
+  }
+  /**
+   * Ceils the X, Y, and Z components of the vector.
+   * @returns A new vector with the ceiled components.
+   */
+  ceil(): Vec3 {
+    return new Vec3(Math.ceil(this.x), Math.ceil(this.y), Math.ceil(this.z));
+  }
+  /**
+   * Ceils the X component of the vector.
+   * @returns A new vector with the ceiled X component.
+   */
+  ceilX(): Vec3 {
+    return new Vec3(Math.ceil(this.x), this.y, this.z);
+  }
+  /**
+   * Ceils the Y component of the vector.
+   * @returns A new vector with the ceiled Y component.
+   */
+  ceilY(): Vec3 {
+    return new Vec3(this.x, Math.ceil(this.y), this.z);
+  }
+  /**
+   * Ceils the Z component of the vector.
+   * @returns A new vector with the ceiled Z component.
+   */
+  ceilZ(): Vec3 {
+    return new Vec3(this.x, this.y, Math.ceil(this.z));
+  }
+  /**
+   * Rounds the X, Y, and Z components of the vector.
+   * @returns A new vector with the rounded components.
+   */
+  round(): Vec3 {
+    return new Vec3(Math.round(this.x), Math.round(this.y), Math.round(this.z));
+  }
+  /**
+   * Rounds the X component of the vector.
+   * @returns A new vector with the rounded X component.
+   */
+  roundX(): Vec3 {
+    return new Vec3(Math.round(this.x), this.y, this.z);
+  }
+  /**
+   * Rounds the Y component of the vector.
+   * @returns A new vector with the rounded Y component.
+   */
+  roundY(): Vec3 {
+    return new Vec3(this.x, Math.round(this.y), this.z);
+  }
+  /**
+   * Rounds the Z component of the vector.
+   * @returns A new vector with the rounded Z component.
+   */
+  roundZ(): Vec3 {
+    return new Vec3(this.x, this.y, Math.round(this.z));
+  }
+  /**
+   * Returns a new vector offset from the current vector up by 1 block.
+   * @returns A new vector offset from the current vector up by 1 block.
+   */
+  up(): Vec3 {
+    return this.add(Vec3.Up);
+  }
+  /**
+   * Returns a new vector offset from the current vector down by 1 block.
+   * @returns A new vector offset from the current vector down by 1 block.
+   */
+  down(): Vec3 {
+    return this.add(Vec3.Down);
+  }
+  /**
+   * Returns a new vector offset from the current vector north by 1 block.
+   * @returns A new vector offset from the current vector north by 1 block.
+   */
+  north(): Vec3 {
+    return this.add(Vec3.North);
+  }
+  /**
+   * Returns a new vector offset from the current vector south by 1 block.
+   * @returns A new vector offset from the current vector south by 1 block.
+   */
+  south(): Vec3 {
+    return this.add(Vec3.South);
+  }
+  /**
+   * Returns a new vector offset from the current vector east by 1 block.
+   * @returns A new vector offset from the current vector east by 1 block.
+   */
+  east(): Vec3 {
+    return this.add(Vec3.East);
+  }
+  /**
+   * Returns a new vector offset from the current vector west by 1 block.
+   * @returns A new vector offset from the current vector west by 1 block.
+   */
+  west(): Vec3 {
+    return this.add(Vec3.West);
+  }
+  /**
    * Checks if the current vector is equal to the zero vector.
    * @returns true if the vector is equal to the zero vector, else returns false.
    */

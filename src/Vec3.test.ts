@@ -636,5 +636,80 @@ describe('Vec3', () => {
     expect(() => vec.toDirection()).toThrow('Cannot convert zero-length vector to direction');
   });
 
+  it('should return vector offset up when using up function', () => {
+    const vec = Vec3.Zero.up();
+    expect(vec.x).toEqual(0);
+    expect(vec.y).toEqual(1);
+    expect(vec.z).toEqual(0);
+  })
+
+  it('should return vector offset down when using down function', () => {
+    const vec = Vec3.Zero.down();
+    expect(vec.x).toEqual(0);
+    expect(vec.y).toEqual(-1);
+    expect(vec.z).toEqual(0);
+  })
+
+  it('should return vector offset north when using north function', () => {
+    const vec = Vec3.Zero.north();
+    expect(vec.x).toEqual(0);
+    expect(vec.y).toEqual(0);
+    expect(vec.z).toEqual(1);
+  })
+
+  it('should return vector offset south when using south function', () => {
+    const vec = Vec3.Zero.south();
+    expect(vec.x).toEqual(0);
+    expect(vec.y).toEqual(0);
+    expect(vec.z).toEqual(-1);
+  })
+
+  it('should return vector offset east when using east function', () => {
+    const vec = Vec3.Zero.east();
+    expect(vec.x).toEqual(1);
+    expect(vec.y).toEqual(0);
+    expect(vec.z).toEqual(0);
+  })
+
+  it('should return vector offset west when using west function', () => {
+    const vec = Vec3.Zero.west();
+    expect(vec.x).toEqual(-1);
+    expect(vec.y).toEqual(0);
+    expect(vec.z).toEqual(0);
+  })
+
+
+  it('should return a new Vec3 instance with floored values', () => {
+    const vec = new Vec3(1.5, 2.7, 3.9);
+    const result = vec.floor();
+    expect(result.x).toEqual(1);
+    expect(result.y).toEqual(2);
+    expect(result.z).toEqual(3);
+  });
+
+  it('should return a new Vec3 instance with ceiling values', () => {
+    const vec = new Vec3(1.5, 2.7, 3.9);
+    const result = vec.ceil();
+    expect(result.x).toEqual(2);
+    expect(result.y).toEqual(3);
+    expect(result.z).toEqual(4);
+  });
+
+  it('should return a new Vec3 instance with rounded values', () => {
+    const vec = new Vec3(1.5, 2.7, 3.9);
+    const result = vec.round();
+    expect(result.x).toEqual(2);
+    expect(result.y).toEqual(3);
+    expect(result.z).toEqual(4);
+  });
+
+  it('should return a new Vec3 instance with ceilX, floorY and roundZ', () => {
+    const vec = new Vec3(1.1, 1.9, 1.5);
+    const result = vec.ceilX().floorY().roundZ();
+    expect(result.x).toEqual(2);
+    expect(result.y).toEqual(1);
+    expect(result.z).toEqual(2);
+  });
+
 
 });
