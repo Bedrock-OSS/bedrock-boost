@@ -129,6 +129,10 @@ export default class PulseScheduler<T> {
       log.trace("No items to process this tick.");
       // Increment the tick counter
       this.currentTick = (this.currentTick + 1) % this.period;
+      // Reset the index if we're at the end of the period
+      if (this.currentTick === 0) {
+        this.nextIndex = 0;
+      }
       return;
     }
     // Execution counter for this tick
@@ -153,10 +157,6 @@ export default class PulseScheduler<T> {
     if (this.currentTick === 0) {
       this.nextIndex = 0;
     }
-  }
-
-  get length(): number {
-    return this.items.length;
   }
 
   push(...items: T[]): number {

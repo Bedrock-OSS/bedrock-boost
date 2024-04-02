@@ -31,23 +31,23 @@ describe('PulseScheduler', () => {
   }
 
   it('should add an item to the schedule', () => {
-    scheduler.add(1);
+    scheduler.push(1);
     expect(scheduler.getItems()).toEqual([1]);
   });
 
   it('should add multiple items to the schedule', () => {
-    scheduler.addAll([1, 2, 3]);
+    scheduler.push(1, 2, 3);
     expect(scheduler.getItems()).toEqual([1, 2, 3]);
   });
 
   it('should remove an item from the schedule', () => {
-    scheduler.addAll([1, 2, 3]);
+    scheduler.push(1, 2, 3);
     scheduler.remove(1);
     expect(scheduler.getItems()).toEqual([1, 3]);
   });
 
   it('should remove items from the schedule based on a predicate', () => {
-    scheduler.addAll([1, 2, 3, 4, 5]);
+    scheduler.push(1, 2, 3, 4, 5);
     scheduler.removeIf((item) => item % 2 === 0);
     expect(scheduler.getItems()).toEqual([1, 3, 5]);
   });
@@ -60,13 +60,13 @@ describe('PulseScheduler', () => {
   });
 
   it('should recalculate the execution schedule', () => {
-    scheduler.addAll([1, 2, 3, 4, 5]);
+    scheduler.push(1, 2, 3, 4, 5);
     expect(scheduler['executionSchedule']).toEqual([1, 0, 1, 0, 1, 0, 1, 0, 1, 0]);
   });
 
   it('should process items according to the schedule', () => {
     const data = prepareData(5);
-    scheduler.addAll(data);
+    scheduler.push(...data);
     scheduler.start();
     jest.advanceTimersByTime(10);
     ensureExecution(data);
@@ -74,7 +74,7 @@ describe('PulseScheduler', () => {
 
   it('should not process items if the schedule is stopped', () => {
     const data = prepareData(5);
-    scheduler.addAll(data);
+    scheduler.push(...data);
     scheduler.start();
     scheduler.stop();
     jest.advanceTimersByTime(10);
@@ -89,7 +89,7 @@ describe('PulseScheduler', () => {
 
   it('should spread processing evenly across ticks', () => {
     const data = prepareData(10);
-    scheduler.addAll(data);
+    scheduler.push(...data);
     scheduler.start();
     jest.advanceTimersByTime(10);
     ensureExecution(data);
@@ -97,17 +97,38 @@ describe('PulseScheduler', () => {
 
   it('should handle a large number of items', () => {
     const data = prepareData(100);
-    scheduler.addAll(data);
+    scheduler.push(...data);
     scheduler.start();
     jest.advanceTimersByTime(10);
     ensureExecution(data);
   });
 
+  it('should process items according to the schedule twice', () => {
+    const data = prepareData(10);
+    scheduler.push(...data);
+    scheduler.start();
+    jest.advanceTimersByTime(20);
+    expect(mockProcessor).toHaveBeenCalledTimes(data.length * 2);
+    for (let i = 0; i < data.length; i++) {
+      expect(mockProcessor).toHaveBeenNthCalledWith(i + 1, data[i]);
+      expect(mockProcessor).toHaveBeenNthCalledWith((i + 1) + 10, data[i]);
+    }
+  });
+
   it('should handle odd numbers of items compared to the tick interval', () => {
     const data = prepareData(13);
-    scheduler.addAll(data);
+    scheduler.push(...data);
     scheduler.start();
     jest.advanceTimersByTime(10);
     ensureExecution(data);
+  });
+
+  it('should handle one element multiple times', () => {
+    scheduler.push(1);
+    scheduler.start();
+    jest.advanceTimersByTime(20);
+    expect(mockProcessor).toHaveBeenCalledTimes(2);
+    expect(mockProcessor).toHaveBeenNthCalledWith(1, 1);	
+    expect(mockProcessor).toHaveBeenNthCalledWith(2, 1);	
   });
 });
