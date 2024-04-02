@@ -4,29 +4,34 @@ import PulseScheduler from "./PulseScheduler";
  * Represents a PulseScheduler that only adds unique items to the schedule.
  */
 export default class UniquePulseScheduler<T> extends PulseScheduler<T> {
-  
+
   /**
    * Creates a new UniquePulseScheduler instance.
    * @param period The period of the scheduler.
    */
-  constructor(processor: (t: T) => void, period: number, private equalityFunction: (a: T, b: T) => boolean = (a, b) => a === b){
+  constructor(processor: (t: T) => void, period: number, private equalityFunction: (a: T, b: T) => boolean = (a, b) => a === b) {
     super(processor, period);
   }
 
 
-  add(item: T) {
-    if (this.items.some((i) => this.equalityFunction(i, item))) {
-      return;
-    }
-    super.add(item);
+  push(...items: T[]): number {
+    const filtered = items.filter(item => !this.items.some(existingItem => this.equalityFunction(existingItem, item)));
+    return super.push(...filtered);
   }
 
-  addAll(items: T[]): void {
-    const newItems = items.filter((i) => !this.items.some((j) => this.equalityFunction(i, j)));
-    if (newItems.length === 0) {
-      return;
+  unshift(...items: T[]): number {
+    const filtered = items.filter(item => !this.items.some(existingItem => this.equalityFunction(existingItem, item)));
+    return super.unshift(...filtered);
+  }
+
+  splice(start: number, deleteCount?: number | undefined): T[];
+  splice(start: number, deleteCount: number, ...items: T[]): T[];
+  splice(start: number, deleteCount?: number, ...items: T[]): T[] {
+    if (deleteCount === void 0) {
+      return super.splice(start);
     }
-    super.addAll(newItems);
+    const filtered = items.filter(item => !this.items.some(existingItem => this.equalityFunction(existingItem, item)));
+    return super.splice(start, deleteCount, ...filtered);
   }
 
 }
