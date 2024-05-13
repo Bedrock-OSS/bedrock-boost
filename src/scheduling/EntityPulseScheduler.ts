@@ -34,6 +34,11 @@ export default class EntityPulseScheduler extends PulseScheduler<Entity> {
         this.push(event.entity);
       }
     });
+    world.afterEvents.entitySpawn.subscribe((event) => {
+      if (event.entity.matches(this.queryOptions)) {
+        this.push(event.entity);
+      }
+    });
     world.afterEvents.entityRemove.subscribe((event) => {
       this.removeIf((entity) => !entity.isValid() || entity.id === event.removedEntityId);
     });
