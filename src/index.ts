@@ -1,7 +1,7 @@
 import Vec3 from "./Vec3";
 import Timings from "./Timings";
 import { addIdleDummy, clearIdleDummy } from "./ProfilingUtils";
-import { getDimension, getDimensionHeightRange } from "./Cache";
+import { getDimension, getDimensionHeightRange, getBlockPermutation } from "./Cache";
 import { Logger, LogLevel } from "./Logging";
 import ChatColor from "./ChatColor";
 import ColorJSON from "./ColorJSON";
@@ -11,6 +11,9 @@ import { isValidLocation } from "./BlockUtils";
 import { consumeDurability } from "./ItemUtils";
 import PulseScheduler from "./scheduling/PulseScheduler";
 import TaskPulseScheduler from "./scheduling/TaskPulseScheduler";
+import UniquePulseScheduler from "./scheduling/UniquePulseScheduler";
+import EntityPulseScheduler from "./scheduling/EntityPulseScheduler";
+import PlayerPulseScheduler from "./scheduling/PlayerPulseScheduler";
 import CommandUtils, { CameraShakeType, InputPermission } from "./CommandUtils";
 
 
@@ -21,6 +24,7 @@ export {
   clearIdleDummy,
   getDimension,
   getDimensionHeightRange,
+  getBlockPermutation,
   LogLevel,
   Logger,
   ChatColor,
@@ -34,5 +38,8 @@ export {
   TaskPulseScheduler,
   CommandUtils,
   CameraShakeType,
-  InputPermission
+  InputPermission,
+  EntityPulseScheduler,
+  PlayerPulseScheduler,
+  UniquePulseScheduler
 };
