@@ -52,7 +52,7 @@ taskScheduler.add(greet);
 taskScheduler.start();
 ```
 
-### A Variant: TaskPulseScheduler
+### TaskPulseScheduler
 
 `TaskPulseScheduler` extends `PulseScheduler` by predefining the processor function to execute tasks (functions with no parameters). This specialization makes it straightforward to schedule and execute simple tasks without defining a custom processor function. 
 
@@ -71,3 +71,51 @@ myTaskScheduler.start();
 ```
 
 This variant simplifies the creation of schedulers for tasks, focusing on the execution of no-argument functions at set intervals, ideal for most scheduling needs without the complexities of managing item lists or defining custom processing logic.
+
+### UniquePulseScheduler
+
+`UniquePulseScheduler` extends `PulseScheduler` by ensuring, that all items are unique based on provided equality function. This specialization makes it straightforward to process items without duplicates.
+
+```typescript
+import { UniquePulseScheduler } from "@bedrock-oss/bedrock-boost"
+
+// Create a new TaskScheduler instance
+const myUniqueScheduler = new UniquePulseScheduler<string>((item) => process(item), 20, (a, b) => a === b);
+
+// Add items to be processed at a 20-tick interval
+myUniqueScheduler.add("hello");
+myUniqueScheduler.add("world");
+// The following item will not be added, because it is equal to the first one
+myUniqueScheduler.add("hello");
+
+// Start processing
+myUniqueScheduler.start();
+```
+
+### EntityPulseScheduler
+
+`EntityPulseScheduler` is a variant, that accepts processing function, period and `EntityQueryOptions`. It will automatically add and remove entities based on the query.
+
+```typescript
+import { EntityPulseScheduler } from "@bedrock-oss/bedrock-boost"
+
+// Create a new EntityPulseScheduler instance
+const myEntityScheduler = new EntityPulseScheduler((entity) => process(entity), 20, { type: "minecraft:pig" });
+
+// Start processing
+myEntityScheduler.start();
+```
+
+### PlayerPulseScheduler
+
+`PlayerPulseScheduler` is a variant, that will automatically add and remove players.
+
+```typescript
+import { PlayerPulseScheduler } from "@bedrock-oss/bedrock-boost"
+
+// Create a new PlayerPulseScheduler instance
+const myPlayerScheduler = new PlayerPulseScheduler((player) => process(player), 20);
+
+// Start processing
+myPlayerScheduler.start();
+```
