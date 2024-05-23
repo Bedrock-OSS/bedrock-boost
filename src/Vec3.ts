@@ -646,10 +646,11 @@ export default class Vec3 implements Vector3 {
    * Returns a new vector with the X, Y, and Z components rounded to the nearest block location.
    */
   toBlockLocation(): Vec3 {
+    // At this point I'm not sure if it wouldn't be better to use Math.floor instead
     return Vec3.from(
-      (this.x << 0) - (this.x < 0 ? 1 : 0),
-      (this.y << 0) - (this.y < 0 ? 1 : 0),
-      (this.z << 0) - (this.z < 0 ? 1 : 0)
+      (this.x << 0) - (this.x < 0 && this.x !== (this.x << 0) ? 1 : 0),
+      (this.y << 0) - (this.y < 0 && this.y !== (this.y << 0) ? 1 : 0),
+      (this.z << 0) - (this.z < 0 && this.z !== (this.z << 0) ? 1 : 0)
     );
   }
   /**
