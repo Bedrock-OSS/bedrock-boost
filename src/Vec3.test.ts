@@ -711,5 +711,22 @@ describe('Vec3', () => {
     expect(result.z).toEqual(2);
   });
 
+  it('should return true when Vec3 instance is within delta of another Vec3 instance', () => {
+    const vec1 = new Vec3(1, 2, 3);
+    const vec2 = new Vec3(1.1, 2.1, 3.1);
+    expect(vec1.almostEqual(vec2, 0.2)).toBe(true);
+  });
+
+  it('should return false when Vec3 instance is not within delta of another Vec3 instance', () => {
+    const vec1 = new Vec3(1, 2, 3);
+    const vec2 = new Vec3(1.1, 2.1, 3.1);
+    expect(vec1.almostEqual(vec2, 0.05)).toBe(false);
+  });
+
+  it('should return true when Vec3 instance is within delta of another location', () => {
+    const vec1 = new Vec3(1, 2, 3);
+    expect(vec1.almostEqual(1.1, 2.1, 3.1, 0.2)).toBe(true);
+  });
+
 
 });

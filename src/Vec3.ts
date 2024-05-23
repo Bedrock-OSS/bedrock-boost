@@ -643,6 +643,39 @@ export default class Vec3 implements Vector3 {
     throw new Error("Cannot convert vector to direction");
   }
   /**
+   * Returns a new vector with the X, Y, and Z components rounded to the nearest block location.
+   */
+  toBlockLocation(): Vec3 {
+    return Vec3.from(
+      (this.x << 0) - (this.x < 0 ? 1 : 0),
+      (this.y << 0) - (this.y < 0 ? 1 : 0),
+      (this.z << 0) - (this.z < 0 ? 1 : 0)
+    );
+  }
+  /**
+   * Checks if the current vector is equal to another vector.
+   * @param other
+   */
+  almostEqual(x: number, y: number, z: number, delta: number): boolean;
+  almostEqual(x: Vec3, delta: number): boolean;
+  almostEqual(x: Vector3, delta: number): boolean;
+  almostEqual(x: Direction, delta: number): boolean;
+  almostEqual(x: number[], delta: number): boolean;
+  almostEqual(x: VectorLike, y: number, z?: number, delta?: number) {
+    try {
+      let other: Vec3;
+      if (typeof x !== 'number' && z === undefined) {
+        other = Vec3._from(x, undefined, undefined);
+        delta = y!;
+      } else {
+        other = Vec3._from(x, y, z);
+      }
+      return Math.abs(this.x - other.x) <= delta! && Math.abs(this.y - other.y) <= delta! && Math.abs(this.z - other.z) <= delta!;
+    } catch (e) {
+      return false;
+    }
+  }
+  /**
    * Checks if the current vector is equal to another vector.
    * @param other
    */
