@@ -626,9 +626,29 @@ describe('Vec3', () => {
 
   // toDirection tests
   it('should convert a non-zero Vec3 instance to Direction', () => {
-    const vec = new Vec3(1, 0, 0);
-    const direction = vec.toDirection();
+    let vec = new Vec3(1, 0, 0);
+    let direction = vec.toDirection();
     expect(direction).toEqual(Direction.East);
+    vec = new Vec3(0, 1, 0);
+    direction = vec.toDirection();
+    expect(direction).toEqual(Direction.Up);
+    vec = new Vec3(0, 0, 1);
+    direction = vec.toDirection();
+    expect(direction).toEqual(Direction.North);
+    vec = new Vec3(-1, 0, 0);
+    direction = vec.toDirection();
+    expect(direction).toEqual(Direction.West);
+    vec = new Vec3(0, -1, 0);
+    direction = vec.toDirection();
+    expect(direction).toEqual(Direction.Down);
+    vec = new Vec3(0, 0, -1);
+    direction = vec.toDirection();
+    expect(direction).toEqual(Direction.South);
+
+    // Weird cases
+    vec = new Vec3(0.5, 0.7, 0.5);
+    direction = vec.toDirection();
+    expect(direction).toEqual(Direction.Up);
   });
 
   it('should throw an error when converting a zero-length Vec3 instance to Direction', () => {

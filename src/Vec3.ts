@@ -631,13 +631,13 @@ export default class Vec3 implements Vector3 {
       throw new Error("Cannot convert zero-length vector to direction");
     }
     const normalized = this.normalize();
-    const rounded = new Vec3(Math.round(normalized.x), Math.round(normalized.y), Math.round(normalized.z));
-    if (rounded.x === 1) return Direction.East;
-    if (rounded.x === -1) return Direction.West;
-    if (rounded.y === 1) return Direction.Up;
-    if (rounded.y === -1) return Direction.Down;
-    if (rounded.z === 1) return Direction.North;
-    if (rounded.z === -1) return Direction.South;
+    const maxValue = Math.max(Math.abs(normalized.x), Math.abs(normalized.y), Math.abs(normalized.z));
+    if (maxValue === normalized.x) return Direction.East;
+    if (maxValue === -normalized.x) return Direction.West;
+    if (maxValue === normalized.y) return Direction.Up;
+    if (maxValue === -normalized.y) return Direction.Down;
+    if (maxValue === normalized.z) return Direction.North;
+    if (maxValue === -normalized.z) return Direction.South;
     // This should never happen
     log.error(new Error("Cannot convert vector to direction"), this);
     throw new Error("Cannot convert vector to direction");
