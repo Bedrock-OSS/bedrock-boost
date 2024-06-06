@@ -89,8 +89,8 @@ Calculates the shortest distance from the vector to a line segment.
 ### `equals(other)`
 Checks if the current vector is equal to another vector.
 
-### `toString()`
-Returns a string representation of the vector.
+### `toString(format, separator)`
+Returns a string representation of the vector. Format being either `short` *"x, y, z"* or `long` *"Vec3(x, y, z)"* default being `long` with `", "` as a separator.
 
 ## Usage Example
 ```javascript

@@ -748,5 +748,24 @@ describe('Vec3', () => {
     expect(vec1.almostEqual(1.1, 2.1, 3.1, 0.2)).toBe(true);
   });
 
+  it('should return "Vec3(1, 1, 1)" when `Vec3.toString()` is called with default values', () => {
+    const vec = new Vec3(1, 1, 1);
+    expect(vec.toString()).toEqual('Vec3(1, 1, 1)');
+  });
+
+  it('should return "Vec3(1;2;3)" when `Vec3.toString()` is called with "long" format and ";" as separator', () => {
+    const vec = new Vec3(1, 2, 3);
+    expect(vec.toString('long', ';')).toEqual('Vec3(1;2;3)');
+  });
+
+  it('should return "1, 1, 1" when `Vec3.toString()` is called with "short" format', () => {
+    const vec = new Vec3(1, 1, 1);
+    expect(vec.toString('short')).toEqual('1, 1, 1');
+  });
+
+  it('should return "1;2;3" when `Vec3.toString()` is called with "short" format and ";" as separator', () => {
+    const vec = new Vec3(1, 2, 3);
+    expect(vec.toString('short', ';')).toEqual('1;2;3');
+  });
 
 });

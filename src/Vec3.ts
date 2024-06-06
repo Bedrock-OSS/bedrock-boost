@@ -694,7 +694,8 @@ export default class Vec3 implements Vector3 {
     }
   }
 
-  toString() {
-    return `Vec3(${this.x}, ${this.y}, ${this.z})`;
+  toString(format: 'long'|'short' = 'long', separator: string = ', '): string {
+    const result = `${this.x + separator + this.y + separator + this.z}`;
+    return format === 'long' ? `Vec3(${result})` : result;
   }
 }
