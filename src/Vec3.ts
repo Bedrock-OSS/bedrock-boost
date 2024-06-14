@@ -233,7 +233,7 @@ export default class Vec3 implements Vector3 {
    * @returns The length of the vector.
    */
   length(): number {
-    return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
+    return Math.sqrt(this.lengthSquared());
   }
   /**
    * Computes the squared length of the vector.
@@ -362,7 +362,7 @@ export default class Vec3 implements Vector3 {
   angleBetween(x: VectorLike, y?: number, z?: number): number {
     const v: Vec3 = Vec3._from(x, y, z);
     const dotProduct = this.dot(v);
-    const lengths = this.length() * new Vec3(v.x, v.y, v.z).length();
+    const lengths = this.length() * v.length();
     if (lengths === 0) {
       return 0;
     }
@@ -384,7 +384,7 @@ export default class Vec3 implements Vector3 {
     const v: Vec3 = Vec3._from(x, y, z);
     // If the vector is zero-length, then the projection is the zero vector.
     if (v.isZero()) {
-      return Vec3.from(0, 0, 0);
+      return Vec3.Zero;
     }
     const scale = this.dot(v) / v.dot(v);
     return Vec3.from(v.x * scale, v.y * scale, v.z * scale);
