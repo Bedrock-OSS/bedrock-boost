@@ -2,12 +2,12 @@ import { Player, system, world } from "@minecraft/server";
 import PulseScheduler from "./PulseScheduler";
 import { Logger } from "../Logging";
 
-const log = Logger.getLogger("PlayerPulseScheduler", "bedrock-boost", "player-pulse-scheduler");
-
 /**
  * Represents a PulseScheduler that processes players.
  */
 export default class PlayerPulseScheduler extends PulseScheduler<Player> {
+
+  private static readonly log = Logger.getLogger("PlayerPulseScheduler", "bedrock-boost", "player-pulse-scheduler");
 
   /**
    * Creates a new EntityPulseScheduler instance.
@@ -35,7 +35,7 @@ export default class PlayerPulseScheduler extends PulseScheduler<Player> {
       const pushPlayer = () => {
         attempts++;
         if (attempts > 10) {
-          log.warn("Failed to push player to scheduler after 10 attempts.");
+          PlayerPulseScheduler.log.warn("Failed to push player to scheduler after 10 attempts.");
           return;
         }
         try {
@@ -47,7 +47,7 @@ export default class PlayerPulseScheduler extends PulseScheduler<Player> {
             this.push(player);
           }
         } catch (e) {
-          log.debug("Failed to push player to scheduler.", e);
+          PlayerPulseScheduler.log.debug("Failed to push player to scheduler.", e);
           system.runTimeout(pushPlayer, 1);
         }
       }

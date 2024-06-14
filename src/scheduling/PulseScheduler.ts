@@ -1,13 +1,13 @@
 import { system } from "@minecraft/server";
 import { Logger } from "../Logging";
 
-const log: Logger = Logger.getLogger("PulseScheduler", "bedrock-boost", "pulse-scheduler");
-
 /**
  * Represents a scheduler that executes a processor function at regular intervals for each item in the list.
  * @template T The type of items in the scheduler.
  */
 export default class PulseScheduler<T> {
+
+  private static readonly log: Logger = Logger.getLogger("PulseScheduler", "bedrock-boost", "pulse-scheduler");
   protected items: T[] = [];
   private period: number;
   private currentTick: number = 0;
@@ -120,13 +120,13 @@ export default class PulseScheduler<T> {
 
   private tick() {
     if (this.items.length === 0) {
-      log.trace("No items to process.");
+      PulseScheduler.log.trace("No items to process.");
       return;
     }
     // Number of items to process this tick
     const scheduledExecutions = this.executionSchedule[this.currentTick];
     if (scheduledExecutions === 0) {
-      log.trace("No items to process this tick.");
+      PulseScheduler.log.trace("No items to process this tick.");
       // Increment the tick counter
       this.currentTick = (this.currentTick + 1) % this.period;
       // Reset the index if we're at the end of the period
@@ -145,7 +145,7 @@ export default class PulseScheduler<T> {
       try {
         this.processor(this.items[this.nextIndex]);
       } catch (e) {
-        log.error("Error processing item", e);
+        PulseScheduler.log.error("Error processing item", e);
       }
       executed++;
     }

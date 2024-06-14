@@ -1,11 +1,10 @@
 import { Vector3, Direction } from "@minecraft/server";
 import { Logger } from "./Logging";
 
-const log = Logger.getLogger("vec3", "vec3", "bedrock-boost");
-
 type VectorLike = Vector3 | Vec3 | Direction | number[] | number
 
 export default class Vec3 implements Vector3 {
+  private static readonly log = Logger.getLogger("vec3", "vec3", "bedrock-boost");
   public static readonly Zero = new Vec3(0, 0, 0);
   public static readonly Down = new Vec3(Direction.Down);
   public static readonly Up = new Vec3(Direction.Up);
@@ -61,7 +60,7 @@ export default class Vec3 implements Vector3 {
       this.z = x.z;
     } else {
       if (!x || (!x.x && x.x !== 0) || (!x.y && x.y !== 0) || (!x.z && x.z !== 0)) {
-        log.error(new Error("Invalid vector"), x);
+        Vec3.log.error(new Error("Invalid vector"), x);
         throw new Error("Invalid vector");
       }
       this.x = x.x;
@@ -93,7 +92,7 @@ export default class Vec3 implements Vector3 {
     if (x === Direction.East) return Vec3.East;
     if (x === Direction.West) return Vec3.West;
     if (!x || (!(x as any).x && (x as any).x !== 0) || (!(x as any).y && (x as any).y !== 0) || (!(x as any).z && (x as any).z !== 0)) {
-      log.error(new Error('Invalid arguments'), x, y, z);
+      Vec3.log.error(new Error('Invalid arguments'), x, y, z);
       throw new Error('Invalid arguments');
     }
     return new Vec3((x as any).x as number, (x as any).y as number, (x as any).z as number);
@@ -113,7 +112,7 @@ export default class Vec3 implements Vector3 {
     if (x === Direction.East) return Vec3.East;
     if (x === Direction.West) return Vec3.West;
     if (!x || (!(x as any).x && (x as any).x !== 0) || (!(x as any).y && (x as any).y !== 0) || (!(x as any).z && (x as any).z !== 0)) {
-      log.error(new Error('Invalid arguments'), x, y, z);
+      Vec3.log.error(new Error('Invalid arguments'), x, y, z);
       throw new Error('Invalid arguments');
     }
     return new Vec3((x as any).x as number, (x as any).y as number, (x as any).z as number);
@@ -221,7 +220,7 @@ export default class Vec3 implements Vector3 {
    */
   normalize(): Vec3 {
     if (this.isZero()) {
-      log.error(new Error("Cannot normalize zero-length vector"));
+      Vec3.log.error(new Error("Cannot normalize zero-length vector"));
       throw new Error("Cannot normalize zero-length vector");
     }
     const len = this.length();
@@ -627,7 +626,7 @@ export default class Vec3 implements Vector3 {
    */
   toDirection(): Direction {
     if (this.isZero()) {
-      log.error(new Error("Cannot convert zero-length vector to direction"));
+      Vec3.log.error(new Error("Cannot convert zero-length vector to direction"));
       throw new Error("Cannot convert zero-length vector to direction");
     }
     const normalized = this.normalize();
@@ -639,7 +638,7 @@ export default class Vec3 implements Vector3 {
     if (maxValue === normalized.z) return Direction.North;
     if (maxValue === -normalized.z) return Direction.South;
     // This should never happen
-    log.error(new Error("Cannot convert vector to direction"), this);
+    Vec3.log.error(new Error("Cannot convert vector to direction"), this);
     throw new Error("Cannot convert vector to direction");
   }
   /**
