@@ -202,6 +202,15 @@ export default class Vec3 implements Vector3 {
     return Vec3.from(v.x * this.x, v.y * this.y, v.z * this.z);
   }
   /**
+   * Scales the current vector by a scalar.
+   *
+   * @param v - The scalar to scale by.
+   * @returns The updated vector after scaling.
+   */
+  scale(scalar: number): Vec3 {
+    return Vec3.from(this.x * scalar, this.y * scalar, this.z * scalar);
+  }
+  /**
    * Divides the current vector by another vector or scalar.
    *
    * @param v - The vector or scalar to divide by.
