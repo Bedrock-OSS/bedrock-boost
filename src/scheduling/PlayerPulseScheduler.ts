@@ -7,7 +7,7 @@ import { Logger } from "../Logging";
  */
 export default class PlayerPulseScheduler extends PulseScheduler<Player> {
 
-  private static readonly log = Logger.getLogger("PlayerPulseScheduler", "bedrock-boost", "player-pulse-scheduler");
+  private static readonly logger = Logger.getLogger("PlayerPulseScheduler", "bedrock-boost", "player-pulse-scheduler");
 
   /**
    * Creates a new EntityPulseScheduler instance.
@@ -35,7 +35,7 @@ export default class PlayerPulseScheduler extends PulseScheduler<Player> {
       const pushPlayer = () => {
         attempts++;
         if (attempts > 10) {
-          PlayerPulseScheduler.log.warn("Failed to push player to scheduler after 10 attempts.");
+          PlayerPulseScheduler.logger.warn("Failed to push player to scheduler after 10 attempts.");
           return;
         }
         try {
@@ -47,7 +47,7 @@ export default class PlayerPulseScheduler extends PulseScheduler<Player> {
             this.push(player);
           }
         } catch (e) {
-          PlayerPulseScheduler.log.debug("Failed to push player to scheduler.", e);
+          PlayerPulseScheduler.logger.debug("Failed to push player to scheduler.", e);
           system.runTimeout(pushPlayer, 1);
         }
       }
