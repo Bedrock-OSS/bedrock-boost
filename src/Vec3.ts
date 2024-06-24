@@ -1,4 +1,4 @@
-import { Vector3, Direction } from "@minecraft/server";
+import { Vector3, Direction, Vector2 } from "@minecraft/server";
 import { Logger } from "./Logging";
 
 type VectorLike = Vector3 | Vec3 | Direction | number[] | number
@@ -132,7 +132,17 @@ export default class Vec3 implements Vector3 {
    * @param pitch - The pitch value in degrees.
    * @returns A new vector representing the direction.
    */
-  static fromYawPitch(yaw: number, pitch: number): Vec3 {
+  static fromYawPitch(rotation: Vector2): Vec3;
+  static fromYawPitch(yaw: number, pitch: number): Vec3;
+  static fromYawPitch(yawOrRotation: number|Vector2, pitch?: number): Vec3 {
+    let yaw: number;
+    if (typeof yawOrRotation === 'number') {
+      yaw = yawOrRotation as number;
+      pitch = pitch!;
+    } else {
+      yaw = yawOrRotation.y;
+      pitch = yawOrRotation.x;
+    }
     // Convert degrees to radians
     const psi = yaw * (Math.PI / 180);
     const theta = pitch * (Math.PI / 180);

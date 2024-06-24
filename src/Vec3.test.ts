@@ -92,8 +92,15 @@ describe('Vec3', () => {
   });
 
   // fromYawPitch tests
-  it('should create a Vec3 instance with correct values for fromYawPitch method', () => {
+  it('should convert yaw and pitch to a normal vector', () => {
     const vec = Vec3.fromYawPitch(45, 30);
+    expect(vec.x).toBeCloseTo(0.6123724356957945);
+    expect(vec.y).toBeCloseTo(0.5);
+    expect(vec.z).toBeCloseTo(0.6123724356957945);
+  });
+  
+  it('should convert Vector2 with rotations to a normal vector', () => {
+    const vec = Vec3.fromYawPitch({x: 30, y: 45});
     expect(vec.x).toBeCloseTo(0.6123724356957945);
     expect(vec.y).toBeCloseTo(0.5);
     expect(vec.z).toBeCloseTo(0.6123724356957945);
