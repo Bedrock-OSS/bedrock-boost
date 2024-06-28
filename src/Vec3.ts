@@ -152,6 +152,25 @@ export default class Vec3 implements Vector3 {
     const z = Math.cos(theta) * Math.cos(psi);
     return new Vec3(x, y, z);
   }
+
+  /**
+   * Converts the normal vector to yaw and pitch values.
+   * 
+   * @returns A Vector2 containing the yaw and pitch values.
+   */
+  toYawPitch(): Vector2 {
+    if (this.isZero()) {
+      Vec3.log.error(new Error("Cannot convert zero-length vector to direction"));
+      throw new Error("Cannot convert zero-length vector to direction");
+    }
+    const direction = this.normalize();
+    const yaw = Math.atan2(direction.x, direction.z) * (180 / Math.PI);
+    const pitch = Math.asin(direction.y) * (180 / Math.PI);
+    return {
+      x: pitch,
+      y: yaw
+    }
+  }
   /**
    * Adds another vector to the current vector.
    *

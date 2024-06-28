@@ -106,6 +106,14 @@ describe('Vec3', () => {
     expect(vec.z).toBeCloseTo(0.6123724356957945);
   });
 
+  //toYawPitch tests
+  it('should convert a normal vector to yaw and pitch', () => {
+    const vec = new Vec3(0.6123724356957945, 0.5, 0.6123724356957945);
+    const yawPitch = vec.toYawPitch();
+    expect(yawPitch.x).toBeCloseTo(30);
+    expect(yawPitch.y).toBeCloseTo(45);
+  });
+
   // normalize tests
   it('should normalize a Vec3 instance', () => {
     const vec = new Vec3(1, 2, 3).normalize();
