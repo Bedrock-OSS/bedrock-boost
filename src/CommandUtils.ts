@@ -31,7 +31,7 @@ export default class CommandUtils {
    * @param duration - The duration of the camera shake effect in seconds.
    */
   public static addCameraShake(player: Player, type: CameraShakeType, intensity: number, duration: number): void {
-    player.runCommand(`camerashake add @s ${intensity} ${duration} ${type}`);
+    player.runCommand(`camerashake add @s ${intensity.toFixed(20)} ${duration.toFixed(20)} ${type}`);
   }
   /**
    * Stops the camera shake for the specified player.
