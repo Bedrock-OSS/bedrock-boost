@@ -30,6 +30,7 @@ The `init` method initializes the logging system, setting up commands and defaul
 - **setLevel**: Sets the global logging level. By default, info and higher levels are enabled.
 - **setFilter**: Sets a filter to control which loggers are active. By default, all loggers are active.
 - **setFormatFunction**: Customizes how log messages are formatted.
+- **setTagsOutputVisibility**: When true, the tags of the logger will be appended next to its name. By default, this is disabled.
 - **setJsonFormatter**: Sets a JSON formatter for stringifying objects and arrays. By default, `ColorJSON.DEFAULT` is used.
 
 ### Logging Methods
