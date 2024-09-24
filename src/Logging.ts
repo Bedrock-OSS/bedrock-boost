@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-labels */
 import { system, world } from "@minecraft/server"
 import ChatColor from "./ChatColor";
 import ColorJSON from "./ColorJSON";
@@ -122,9 +123,10 @@ function starMatch(pattern: string, str: string): boolean {
 }
 
 type LoggingSettings = {
-  filter: string[],
+  filter: '*' | string[],
   level: LogLevel,
-  formatFunction: (level: LogLevel, logger: Logger, message: string) => string
+  outputTags: boolean,
+  formatFunction: (level: LogLevel, logger: Logger, message: string, tags?: string[] | undefined) => string
   messagesJoinFunction: (messages: string[]) => string
   jsonFormatter: ColorJSON,
   outputConfig: OutputConfig
@@ -133,8 +135,10 @@ type LoggingSettings = {
 const loggingSettings: LoggingSettings = {
   level: LogLevel.Info,
   filter: ['*'],
-  formatFunction: (level: LogLevel, logger: Logger, message: string) => {
-    return `[${level}][${ChatColor.MATERIAL_EMERALD}${logger.name}${ChatColor.RESET}] ${message}`
+  outputTags: false,
+  formatFunction: (level: LogLevel, logger: Logger, message: string, tags=undefined) => {
+    const _tags = tags !== undefined ? `§7${tags.map(tag => `[${tag}]`).join('')}§r` : '';
+    return `[${level}][${ChatColor.MATERIAL_EMERALD}${logger.name}${ChatColor.RESET}]${_tags} ${message}`
   },
   messagesJoinFunction: (messages: string[]) => {
     return messages.join(' ')
@@ -195,9 +199,9 @@ export class Logger {
   }
   /**
   * Filter the loggers by the given tags. Tags can use the `*` wildcard.
-  * @param {array} filter - The filter to set.
+  * @param {'*' | string[]} filter - The filter to set.
   */
-  static setFilter(filter: string[]) {
+  static setFilter(filter: '*' | string[]) {
     loggingSettings.filter = filter;
   }
   /**
@@ -213,6 +217,13 @@ export class Logger {
   */
   static setMessagesJoinFunction(func: (messages: string[]) => string) {
     loggingSettings.messagesJoinFunction = func;
+  }
+  /**
+   * Set the tag visibility for the logger. When true, tags will be printed in the log. Disabled by default.
+   * @param visible 
+   */
+  static setTagsOutputVisibility(visible: boolean) {
+    loggingSettings.outputTags = visible;
   }
   /**
   * Set the JSON formatter for the logger.
@@ -232,7 +243,7 @@ export class Logger {
   * Returns a new Logger.
   *
   * @param {string} name - The name of the Logger.
-  * @param {array} tags - The tags for the Logger as strings.
+  * @param {string[]} tags - The tags for the Logger as strings.
   *
   * @returns {Logger} A new Logger.
   */
@@ -248,7 +259,7 @@ export class Logger {
   * Construct a new Logger
   *
   * @param {string} name - The name of the Logger.
-  * @param {array} tags - The tags for the logger as strings.
+  * @param {string[]} tags - The tags for the logger as strings.
   */
   private constructor(public name: string, public tags: string[] = []) {
   }
@@ -298,7 +309,7 @@ export class Logger {
         }
         return x.toString() + ChatColor.RESET;
       });
-      const formatted = loggingSettings.formatFunction(level, this, loggingSettings.messagesJoinFunction(msgs));
+      const formatted = loggingSettings.formatFunction(level, this, loggingSettings.messagesJoinFunction(msgs), loggingSettings.outputTags ? this.tags : undefined);
       const outputs = loggingSettings.outputConfig[level.level] || [OutputType.Chat, OutputType.ConsoleInfo];
       if (outputs.includes(OutputType.Chat)) {
         world.sendMessage(formatted);
