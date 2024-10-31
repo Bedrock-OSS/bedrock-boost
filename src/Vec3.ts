@@ -123,7 +123,7 @@ export default class Vec3 implements Vector3 {
    * @returns A new vector with the same values as the current vector.
    */
   copy(): Vec3 {
-    return Vec3.from(this);
+    return new Vec3(this.x, this.y, this.z);
   }
   /**
    * Creates a new direction vector from yaw and pitch values.
