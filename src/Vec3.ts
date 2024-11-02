@@ -1,5 +1,6 @@
 import { Vector3, Direction, Vector2 } from "@minecraft/server";
 import { Logger } from "./Logging";
+import Vec2 from "./Vec2";
 
 type VectorLike = Vector3 | Vec3 | Direction | number[] | number
 
@@ -74,11 +75,13 @@ export default class Vec3 implements Vector3 {
    */
   static from(x: number, y: number, z: number): Vec3;
   static from(x: Vec3): Vec3;
+  static from(x: Vec2, z?: number | undefined): Vec3;
   static from(x: Vector3): Vec3;
   static from(x: Direction): Vec3;
   static from(x: number[]): Vec3;
   static from(x: VectorLike, y?: number, z?: number): Vec3 {
     if (x instanceof Vec3) return x;
+    if (x instanceof Vec2) return x.toVec3(z); 
     if (typeof x === 'number' && y !== undefined && z !== undefined) {
       return new Vec3(x, y, z);
     }
