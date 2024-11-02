@@ -1,5 +1,6 @@
 import { Vector2, Direction, VectorXZ } from "@minecraft/server";
 import { Logger } from "./Logging";
+import Vec3 from "./Vec3";
 
 type VectorLike = VectorXZ | Vector2 | Vec2 | Direction | number[] | number
 
@@ -430,6 +431,15 @@ export default class Vec2 implements Vector2 {
       rotatedX + axis.x,
       rotatedY + axis.y
     );
+  }
+  /**
+   * Converts the current vector to a 3d vetor with the given y-value.
+   * 
+   * @param z - The optional z value for the 3d vetor.
+   * @returns The converted vector.
+   */
+  toVec3(z = 0): Vec3 {
+    return new Vec3(this.x, this.y, z);
   }
   /**
    * Sets the X component of the vector.
