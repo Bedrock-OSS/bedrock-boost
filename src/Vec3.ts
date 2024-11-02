@@ -134,6 +134,14 @@ export default class Vec3 implements Vector3 {
     return new Vec3(this.x, this.y, this.z);
   }
   /**
+   * Converts the current vector to a 2d vetor.
+   * 
+   * @returns The converted vector.
+   */
+  toVec2(): Vec2 {
+    return new Vec2(this.x, this.z);
+  }
+  /**
    * Creates a new direction vector from yaw and pitch values.
    * 
    * @param yaw - The yaw value in degrees.

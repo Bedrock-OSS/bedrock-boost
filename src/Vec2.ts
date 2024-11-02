@@ -2,7 +2,7 @@ import { Vector2, Direction, VectorXZ } from "@minecraft/server";
 import { Logger } from "./Logging";
 import Vec3 from "./Vec3";
 
-type VectorLike = VectorXZ | Vector2 | Vec2 | Direction | number[] | number
+type VectorLike = VectorXZ | Vector2 | Vec2 | Vec3 | Direction | number[] | number
 
 export default class Vec2 implements Vector2 {
   private static readonly log = Logger.getLogger("vec2", "vec2", "bedrock-boost");
@@ -16,6 +16,7 @@ export default class Vec2 implements Vector2 {
   readonly y: number;
   constructor(x: number, y: number);
   constructor(x: Vec2);
+  constructor(x: Vec3);
   constructor(x: Vector2);
   constructor(x: Direction);
   constructor(x: number[]);
@@ -44,6 +45,9 @@ export default class Vec2 implements Vector2 {
     } else if (x instanceof Vec2) {
       this.x = x.x;
       this.y = x.y;
+    } else if (x instanceof Vec3) {
+      this.x = x.x;
+      this.y = x.y;
     } else {
       const anyX = x as any;
       if (!anyX || (!anyX.x && anyX.x !== 0) || ((!anyX.y && anyX.y !== 0) && (!anyX.z && anyX.z !== 0))) {
@@ -67,12 +71,14 @@ export default class Vec2 implements Vector2 {
    */
   static from(x: number, y: number): Vec2;
   static from(x: Vec2): Vec2;
+  static from(x: Vec3): Vec2;
   static from(x: Vector2): Vec2;
   static from(x: VectorXZ): Vec2;
   static from(x: Direction): Vec2;
   static from(x: number[]): Vec2;
   static from(x: VectorLike, y?: number): Vec2 {
     if (x instanceof Vec2) return x;
+    if (x instanceof Vec3) return 
     if (typeof x === 'number' && y !== undefined) {
       return new Vec2(x, y);
     }
