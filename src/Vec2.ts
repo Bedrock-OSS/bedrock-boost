@@ -438,8 +438,8 @@ export default class Vec2 implements Vector2 {
    * @param z - The optional z value for the 3d vetor.
    * @returns The converted vector.
    */
-  toVec3(z = 0): Vec3 {
-    return new Vec3(this.x, this.y, z);
+  toVec3(z?: number | undefined): Vec3 {
+    return new Vec3(this.x, this.y, z ? z : 0);
   }
   /**
    * Sets the X component of the vector.
