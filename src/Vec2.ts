@@ -402,6 +402,36 @@ export default class Vec2 implements Vector2 {
     return this.subtract(proj.multiply(2));
   }
   /**
+   * Rotates the current normalized vector by a given angle around a given axis.
+   * 
+   * @param axis - The axis of rotation.
+   * @param angle - The angle of rotation in degrees.
+   * @returns The rotated vector.
+   */
+  rotate(axis: Vector2, angle: number): Vec2 {
+    // Convert angle from degrees to radians
+    const radians = angle * (Math.PI / 180);
+
+    // Translate the vector to the origin relative to the pivot (axis)
+    let translatedX = this.x - axis.x;
+    let translatedY = this.y - axis.y;
+    
+    // Use complex number rotation (Euler's formula)
+    // New x = x * cos(radians) - y * sin(radians)
+    // New y = x * sin(radians) + y * cos(radians)
+    const cos = Math.cos(radians);
+    const sin = Math.sin(radians);
+    
+    const rotatedX = translatedX * cos - translatedY * sin;
+    const rotatedY = translatedX * sin + translatedY * cos;
+    
+    // Translate the rotated vector back relative to the pivot (axis) and return it  
+    return new Vec2(
+      rotatedX + axis.x,
+      rotatedY + axis.y
+    );
+  }
+  /**
    * Sets the X component of the vector.
    *
    * @param value - The new X value.
