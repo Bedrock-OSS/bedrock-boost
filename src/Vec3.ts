@@ -476,8 +476,13 @@ export default class Vec3 implements Vector3 {
    * @param value - The new X value.
    * @returns The updated vector with the new X value.
    */
-  setX(value: number): Vec3 {
-    return new Vec3(value, this.y, this.z);
+  setX(value: number): Vec3;
+  setX(value: (x:number) => number): Vec3;
+  setX(value: number | ((x:number) => number)): Vec3 {
+    if (typeof value === 'number') {
+      return new Vec3(value, this.y, this.z);
+    }
+    return new Vec3(value(this.x), this.y, this.z);
   }
   /**
    * Sets the Y component of the vector.
@@ -485,8 +490,13 @@ export default class Vec3 implements Vector3 {
    * @param value - The new Y value.
    * @returns The updated vector with the new Y value.
    */
-  setY(value: number): Vec3 {
-    return new Vec3(this.x, value, this.z);
+  setY(value: number): Vec3;
+  setY(value: (y:number) => number): Vec3;
+  setY(value: number | ((y:number) => number)): Vec3 {
+    if (typeof value === 'number') {
+      return new Vec3(this.x, value, this.z);
+    }
+    return new Vec3(this.x, value(this.y), this.z);
   }
   /**
    * Sets the Z component of the vector.
@@ -494,8 +504,13 @@ export default class Vec3 implements Vector3 {
    * @param value - The new Z value.
    * @returns The updated vector with the new Z value.
    */
-  setZ(value: number): Vec3 {
-    return new Vec3(this.x, this.y, value);
+  setZ(value: number): Vec3;
+  setZ(value: (z:number) => number): Vec3;
+  setZ(value: number | ((z:number) => number)): Vec3 {
+    if (typeof value === 'number') {
+      return new Vec3(this.x, this.y, value);
+    }
+    return new Vec3(this.x, this.y, value(this.z));
   }
   /**
    * Calculates the shortest distance between a point (represented by this Vector3 instance) and a line segment.
@@ -530,21 +545,21 @@ export default class Vec3 implements Vector3 {
    * @returns A new vector with the floored X component.
    */
   floorX(): Vec3 {
-    return new Vec3(Math.floor(this.x), this.y, this.z);
+    return this.setX(Math.floor);
   }
   /**
    * Floors the Y component of the vector.
    * @returns A new vector with the floored Y component.
    */
   floorY(): Vec3 {
-    return new Vec3(this.x, Math.floor(this.y), this.z);
+    return this.setY(Math.floor);
   }
   /**
    * Floors the Z component of the vector.
    * @returns A new vector with the floored Z component.
    */
   floorZ(): Vec3 {
-    return new Vec3(this.x, this.y, Math.floor(this.z));
+    return this.setZ(Math.floor);
   }
   /**
    * Ceils the X, Y, and Z components of the vector.
@@ -558,21 +573,21 @@ export default class Vec3 implements Vector3 {
    * @returns A new vector with the ceiled X component.
    */
   ceilX(): Vec3 {
-    return new Vec3(Math.ceil(this.x), this.y, this.z);
+    return this.setX(Math.ceil);
   }
   /**
    * Ceils the Y component of the vector.
    * @returns A new vector with the ceiled Y component.
    */
   ceilY(): Vec3 {
-    return new Vec3(this.x, Math.ceil(this.y), this.z);
+    return this.setY(Math.ceil);
   }
   /**
    * Ceils the Z component of the vector.
    * @returns A new vector with the ceiled Z component.
    */
   ceilZ(): Vec3 {
-    return new Vec3(this.x, this.y, Math.ceil(this.z));
+    return this.setZ(Math.ceil);
   }
   /**
    * Rounds the X, Y, and Z components of the vector.
@@ -586,21 +601,21 @@ export default class Vec3 implements Vector3 {
    * @returns A new vector with the rounded X component.
    */
   roundX(): Vec3 {
-    return new Vec3(Math.round(this.x), this.y, this.z);
+    return this.setX(Math.round);
   }
   /**
    * Rounds the Y component of the vector.
    * @returns A new vector with the rounded Y component.
    */
   roundY(): Vec3 {
-    return new Vec3(this.x, Math.round(this.y), this.z);
+    return this.setY(Math.round);
   }
   /**
    * Rounds the Z component of the vector.
    * @returns A new vector with the rounded Z component.
    */
   roundZ(): Vec3 {
-    return new Vec3(this.x, this.y, Math.round(this.z));
+    return this.setZ(Math.round);
   }
   /**
    * Returns a new vector offset from the current vector up by 1 block.

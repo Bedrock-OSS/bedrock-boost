@@ -407,8 +407,13 @@ export default class Vec2 implements Vector2 {
    * @param value - The new X value.
    * @returns The updated vector with the new X value.
    */
-  setX(value: number): Vec2 {
-    return new Vec2(value, this.y);
+  setX(value: number): Vec2;
+  setX(value: (x:number) => number): Vec2;
+  setX(value: number | ((x:number) => number)): Vec2 {
+    if (typeof value === 'number') {
+      return new Vec2(value, this.y);
+    }
+    return new Vec2(value(this.x), this.y);
   }
   /**
    * Sets the Y component of the vector.
@@ -416,8 +421,13 @@ export default class Vec2 implements Vector2 {
    * @param value - The new Y value.
    * @returns The updated vector with the new Y value.
    */
-  setY(value: number): Vec2 {
-    return new Vec2(this.x, value);
+  setY(value: number): Vec2;
+  setY(value: (y:number) => number): Vec2;
+  setY(value: number | ((y:number) => number)): Vec2 {
+    if (typeof value === 'number') {
+      return new Vec2(this.x, value);
+    }
+    return new Vec2(this.x, value(this.y));
   }
   /**
    * Calculates the shortest distance between a point (represented by this Vector3 instance) and a line segment.
@@ -452,14 +462,14 @@ export default class Vec2 implements Vector2 {
    * @returns A new vector with the floored X component.
    */
   floorX(): Vec2 {
-    return new Vec2(Math.floor(this.x), this.y);
+    return this.setX(Math.floor);
   }
   /**
    * Floors the Y component of the vector.
    * @returns A new vector with the floored Y component.
    */
   floorY(): Vec2 {
-    return new Vec2(this.x, Math.floor(this.y));
+    return this.setY(Math.floor);
   }
   /**
    * Ceils the X, Y, and Z components of the vector.
@@ -473,14 +483,14 @@ export default class Vec2 implements Vector2 {
    * @returns A new vector with the ceiled X component.
    */
   ceilX(): Vec2 {
-    return new Vec2(Math.ceil(this.x), this.y);
+    return this.setX(Math.ceil);
   }
   /**
    * Ceils the Y component of the vector.
    * @returns A new vector with the ceiled Y component.
    */
   ceilY(): Vec2 {
-    return new Vec2(this.x, Math.ceil(this.y));
+    return this.setY(Math.ceil);
   }
   /**
    * Rounds the X, Y, and Z components of the vector.
@@ -494,14 +504,14 @@ export default class Vec2 implements Vector2 {
    * @returns A new vector with the rounded X component.
    */
   roundX(): Vec2 {
-    return new Vec2(Math.round(this.x), this.y);
+    return this.setX(Math.round);
   }
   /**
    * Rounds the Y component of the vector.
    * @returns A new vector with the rounded Y component.
    */
   roundY(): Vec2 {
-    return new Vec2(this.x, Math.round(this.y));
+    return this.setY(Math.round);
   }
   /**
    * Returns a new vector offset from the current vector north by 1 block.
