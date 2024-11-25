@@ -471,6 +471,26 @@ export default class Vec3 implements Vector3 {
     return new Vec3(qv_x, qv_y, qv_z);
   }
   /**
+   * Updates the X, Y, and Z components of the vector.
+   *
+   * @param x - The function to use to update the X value.
+   * @param y - The function to use to update the Y value.
+   * @param z - The function to use to update the Z value.
+   * @returns The updated vector with the new values.
+   */
+  update(x: ((x:number) => number) | undefined, y: ((y:number) => number) | undefined, z: ((z:number) => number) | undefined): Vec3 {
+    if (!x) {
+      x = (value: number) => value;
+    }
+    if (!y) {
+      y = (value: number) => value;
+    }
+    if (!z) {
+      z = (value: number) => value;
+    }
+    return new Vec3(x(this.x), y(this.y), z(this.z));
+  }
+  /**
    * Sets the X component of the vector.
    *
    * @param value - The new X value.
@@ -538,7 +558,7 @@ export default class Vec3 implements Vector3 {
    * @returns A new vector with the floored components.
    */
   floor(): Vec3 {
-    return new Vec3(Math.floor(this.x), Math.floor(this.y), Math.floor(this.z));
+    return this.update(Math.floor, Math.floor, Math.floor);
   }
   /**
    * Floors the X component of the vector.
@@ -594,7 +614,7 @@ export default class Vec3 implements Vector3 {
    * @returns A new vector with the rounded components.
    */
   round(): Vec3 {
-    return new Vec3(Math.round(this.x), Math.round(this.y), Math.round(this.z));
+    return this.update(Math.round, Math.round, Math.round);
   }
   /**
    * Rounds the X component of the vector.

@@ -402,6 +402,22 @@ export default class Vec2 implements Vector2 {
     return this.subtract(proj.multiply(2));
   }
   /**
+   * Updates the X and Y components of the vector.
+   *
+   * @param x - The function to use to update the X value.
+   * @param y - The function to use to update the Y value.
+   * @returns The updated vector with the new values.
+   */
+  update(x: ((x:number) => number) | undefined, y: ((y:number) => number) | undefined): Vec2 {
+    if (!x) {
+      x = (value: number) => value;
+    }
+    if (!y) {
+      y = (value: number) => value;
+    }
+    return new Vec2(x(this.x), y(this.y));
+  }
+  /**
    * Sets the X component of the vector.
    *
    * @param value - The new X value.
@@ -455,7 +471,7 @@ export default class Vec2 implements Vector2 {
    * @returns A new vector with the floored components.
    */
   floor(): Vec2 {
-    return new Vec2(Math.floor(this.x), Math.floor(this.y));
+    return this.update(Math.floor, Math.floor);
   }
   /**
    * Floors the X component of the vector.
@@ -476,7 +492,7 @@ export default class Vec2 implements Vector2 {
    * @returns A new vector with the ceiled components.
    */
   ceil(): Vec2 {
-    return new Vec2(Math.ceil(this.x), Math.ceil(this.y));
+    return this.update(Math.ceil, Math.ceil);
   }
   /**
    * Ceils the X component of the vector.
@@ -497,7 +513,7 @@ export default class Vec2 implements Vector2 {
    * @returns A new vector with the rounded components.
    */
   round(): Vec2 {
-    return new Vec2(Math.round(this.x), Math.round(this.y));
+    return this.update(Math.round, Math.round);
   }
   /**
    * Rounds the X component of the vector.
