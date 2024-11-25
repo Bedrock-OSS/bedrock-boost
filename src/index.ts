@@ -15,6 +15,7 @@ import UniquePulseScheduler from "./scheduling/UniquePulseScheduler";
 import EntityPulseScheduler from "./scheduling/EntityPulseScheduler";
 import PlayerPulseScheduler from "./scheduling/PlayerPulseScheduler";
 import CommandUtils, { CameraShakeType, InputPermission } from "./CommandUtils";
+import { MolangExpression, MolangValue, sendMolangData } from "./VariableSender";
 
 
 export {
@@ -41,5 +42,8 @@ export {
   InputPermission,
   EntityPulseScheduler,
   PlayerPulseScheduler,
-  UniquePulseScheduler
+  UniquePulseScheduler,
+  MolangExpression,
+  MolangValue,
+  sendMolangData
 };
