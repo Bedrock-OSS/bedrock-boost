@@ -1,7 +1,8 @@
 import { Vector3, Direction, Vector2 } from "@minecraft/server";
 import { Logger } from "./Logging";
+import Vec2 from "./Vec2";
 
-type VectorLike = Vector3 | Vec3 | Direction | number[] | number
+type VectorLike = Vector3 | Vec3 | Vec2 | Direction | number[] | number
 
 export default class Vec3 implements Vector3 {
   private static readonly log = Logger.getLogger("vec3", "vec3", "bedrock-boost");
@@ -18,6 +19,7 @@ export default class Vec3 implements Vector3 {
   readonly z: number;
   constructor(x: number, y: number, z: number);
   constructor(x: Vec3);
+  constructor(x: Vec2, z?: number);
   constructor(x: Vector3);
   constructor(x: Direction);
   constructor(x: number[]);
@@ -58,7 +60,11 @@ export default class Vec3 implements Vector3 {
       this.x = x.x;
       this.y = x.y;
       this.z = x.z;
-    } else {
+    } else if (x instanceof Vec2) {
+      this.x = x.x;
+      this.y = x.y;
+      this.z = z || 0;
+     }else {
       if (!x || (!x.x && x.x !== 0) || (!x.y && x.y !== 0) || (!x.z && x.z !== 0)) {
         Vec3.log.error(new Error("Invalid vector"), x);
         throw new Error("Invalid vector");
@@ -74,11 +80,13 @@ export default class Vec3 implements Vector3 {
    */
   static from(x: number, y: number, z: number): Vec3;
   static from(x: Vec3): Vec3;
+  static from(x: Vec2, z?: number): Vec3;
   static from(x: Vector3): Vec3;
   static from(x: Direction): Vec3;
   static from(x: number[]): Vec3;
   static from(x: VectorLike, y?: number, z?: number): Vec3 {
     if (x instanceof Vec3) return x;
+    if (x instanceof Vec2) return x.toVec3(z || 0); 
     if (typeof x === 'number' && y !== undefined && z !== undefined) {
       return new Vec3(x, y, z);
     }
@@ -124,6 +132,14 @@ export default class Vec3 implements Vector3 {
    */
   copy(): Vec3 {
     return new Vec3(this.x, this.y, this.z);
+  }
+  /**
+   * Converts the current vector to a 2d vetor.
+   * 
+   * @returns The converted vector.
+   */
+  toVec2(): Vec2 {
+    return new Vec2(this.x, this.z);
   }
   /**
    * Creates a new direction vector from yaw and pitch values.

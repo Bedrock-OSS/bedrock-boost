@@ -1,7 +1,8 @@
 import { Vector2, Direction, VectorXZ } from "@minecraft/server";
 import { Logger } from "./Logging";
+import Vec3 from "./Vec3";
 
-type VectorLike = VectorXZ | Vector2 | Vec2 | Direction | number[] | number
+type VectorLike = VectorXZ | Vector2 | Vec2 | Vec3 | Direction | number[] | number
 
 export default class Vec2 implements Vector2 {
   private static readonly log = Logger.getLogger("vec2", "vec2", "bedrock-boost");
@@ -15,6 +16,7 @@ export default class Vec2 implements Vector2 {
   readonly y: number;
   constructor(x: number, y: number);
   constructor(x: Vec2);
+  constructor(x: Vec3);
   constructor(x: Vector2);
   constructor(x: Direction);
   constructor(x: number[]);
@@ -43,6 +45,9 @@ export default class Vec2 implements Vector2 {
     } else if (x instanceof Vec2) {
       this.x = x.x;
       this.y = x.y;
+    } else if (x instanceof Vec3) {
+      this.x = x.x;
+      this.y = x.y;
     } else {
       const anyX = x as any;
       if (!anyX || (!anyX.x && anyX.x !== 0) || ((!anyX.y && anyX.y !== 0) && (!anyX.z && anyX.z !== 0))) {
@@ -66,12 +71,14 @@ export default class Vec2 implements Vector2 {
    */
   static from(x: number, y: number): Vec2;
   static from(x: Vec2): Vec2;
+  static from(x: Vec3): Vec2;
   static from(x: Vector2): Vec2;
   static from(x: VectorXZ): Vec2;
   static from(x: Direction): Vec2;
   static from(x: number[]): Vec2;
   static from(x: VectorLike, y?: number): Vec2 {
     if (x instanceof Vec2) return x;
+    if (x instanceof Vec3) return 
     if (typeof x === 'number' && y !== undefined) {
       return new Vec2(x, y);
     }
@@ -400,6 +407,45 @@ export default class Vec2 implements Vector2 {
     const normal: Vec2 = Vec2._from(x, y);
     const proj = this.projectOnto(normal);
     return this.subtract(proj.multiply(2));
+  }
+  /**
+   * Rotates the current normalized vector by a given angle around a given axis.
+   * 
+   * @param axis - The axis of rotation.
+   * @param angle - The angle of rotation in degrees.
+   * @returns The rotated vector.
+   */
+  rotate(axis: Vector2, angle: number): Vec2 {
+    // Convert angle from degrees to radians
+    const radians = angle * (Math.PI / 180);
+
+    // Translate the vector to the origin relative to the pivot (axis)
+    let translatedX = this.x - axis.x;
+    let translatedY = this.y - axis.y;
+    
+    // Use complex number rotation (Euler's formula)
+    // New x = x * cos(radians) - y * sin(radians)
+    // New y = x * sin(radians) + y * cos(radians)
+    const cos = Math.cos(radians);
+    const sin = Math.sin(radians);
+    
+    const rotatedX = translatedX * cos - translatedY * sin;
+    const rotatedY = translatedX * sin + translatedY * cos;
+    
+    // Translate the rotated vector back relative to the pivot (axis) and return it  
+    return new Vec2(
+      rotatedX + axis.x,
+      rotatedY + axis.y
+    );
+  }
+  /**
+   * Converts the current vector to a 3d vetor with the given y-value.
+   * 
+   * @param z - The optional z value for the 3d vetor.
+   * @returns The converted vector.
+   */
+  toVec3(z?: number): Vec3 {
+    return new Vec3(this.x, this.y, z || 0);
   }
   /**
    * Sets the X component of the vector.
