@@ -1,5 +1,5 @@
-import { EquipmentSlot, Player } from "@minecraft/server";
-import { Logger } from "./Logging";
+import { EntityEquippableComponent, EquipmentSlot, ItemDurabilityComponent, Player } from "@minecraft/server";
+import { Logger } from "../Logging";
 
 const log = Logger.getLogger("itemUtils", "bedrock-boost", "itemUtils");
 
@@ -15,7 +15,7 @@ export function consumeDurability(player: Player, value: number = 1, slot: Equip
     log.error("Invalid value or player");
     return false;
   }
-  const equippable = player.getComponent("minecraft:equippable");
+  const equippable = player.getComponent(EntityEquippableComponent.componentId) as EntityEquippableComponent;
   if (!equippable) {
     log.error("Player equippable component not found");
     return false;
@@ -25,7 +25,7 @@ export function consumeDurability(player: Player, value: number = 1, slot: Equip
     log.debug("No item in selected slot");
     return false;
   }
-  const durabilityComponent = item.getComponent("minecraft:durability");
+  const durabilityComponent = item.getComponent(ItemDurabilityComponent.componentId) as ItemDurabilityComponent;
   if (!durabilityComponent) {
     log.error("Item has no durability component");
     return false;

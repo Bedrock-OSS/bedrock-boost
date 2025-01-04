@@ -1,6 +1,6 @@
 /* eslint-disable no-constant-condition */
 import { system } from "@minecraft/server";
-import { Logger } from "./Logging";
+import { Logger } from "../Logging";
 
 const log = Logger.getLogger("jobUtils", "bedrock-boost", "jobUtils");
 
