@@ -23,8 +23,8 @@ export type MolangValue = number | boolean | MolangExpression;
  * @param receivers Players to send the data to. If not specified, the data will be sent to all players.
  */
 export function sendMolangData(entity: Entity, animation: string, data: { [key: string]: MolangValue }, receivers: Player[] = []) {
-  data['__time__'] = system.currentTick;
-  data['__random__'] = (Math.random() * 1000) << 0;
+  data['v.__time__'] = system.currentTick;
+  data['v.__random__'] = (Math.random() * 1000) << 0;
   const stopExpression = Object.entries(data).map(([key, value]) => {
     if (typeof value === "number") {
       return `${key}=${value}`;
@@ -33,7 +33,7 @@ export function sendMolangData(entity: Entity, animation: string, data: { [key: 
     } else {
       return `${key}=${value.value}`;
     }
-  }).join(";") + ";return 1;";
+  }).join(";") + ";return 0;";
   entity.playAnimation(animation, {
     stopExpression: stopExpression,
     controller: "__" + animation + "_send_data__",
