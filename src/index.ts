@@ -19,6 +19,7 @@ import { MolangExpression, MolangValue, sendMolangData } from "./VariableSender"
 import type VanillaBlockTags from "./vanilla/VanillaBlockTags.d.ts";
 import type VanillaItemTags from "./vanilla/VanillaItemTags.d.ts";
 import type TimeOfDay from "./vanilla/TimeOfDay.d.ts";
+import DirectionUtils from "./utils/DirectionUtils";
 
 export {
   Vec3,
@@ -51,4 +52,5 @@ export {
   VanillaBlockTags,
   VanillaItemTags,
   TimeOfDay,
+  DirectionUtils,
 };
