@@ -16,9 +16,9 @@ import EntityPulseScheduler from "./scheduling/EntityPulseScheduler";
 import PlayerPulseScheduler from "./scheduling/PlayerPulseScheduler";
 import CommandUtils, { CameraShakeType, InputPermission } from "./utils/CommandUtils";
 import { MolangExpression, MolangValue, sendMolangData } from "./VariableSender";
-import type VanillaBlockTags from "./vanilla/VanillaBlockTags.d.ts";
-import type VanillaItemTags from "./vanilla/VanillaItemTags.d.ts";
-import type TimeOfDay from "./vanilla/TimeOfDay.d.ts";
+import VanillaBlockTags from "./vanilla/VanillaBlockTags";
+import VanillaItemTags from "./vanilla/VanillaItemTags";
+import TimeOfDay from "./vanilla/TimeOfDay";
 import DirectionUtils from "./utils/DirectionUtils";
 
 export {

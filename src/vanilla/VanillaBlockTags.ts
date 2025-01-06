@@ -1,4 +1,4 @@
-declare class VanillaBlockTags {
+export default class VanillaBlockTags {
     public static readonly Acacia = 'acacia';
     public static readonly Birch = 'birch';
     public static readonly DarkOak = 'dark_oak';
@@ -38,5 +38,3 @@ declare class VanillaBlockTags {
     public static readonly Water = 'water';
     public static readonly Wood = 'wood';
 }
-
-export default VanillaBlockTags;

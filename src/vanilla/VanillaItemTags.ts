@@ -1,4 +1,4 @@
-declare class VanillaItemTags {
+export default class VanillaItemTags {
     public static readonly Arrow = 'minecraft:arrow';
     public static readonly Banner = 'minecraft:banner';
     public static readonly Boat = 'minecraft:boat';
@@ -58,5 +58,3 @@ declare class VanillaItemTags {
     public static readonly WoodenTier = 'minecraft:wooden_tier';
     public static readonly Wool = 'minecraft:wool';
 }
-
-export default VanillaItemTags;
