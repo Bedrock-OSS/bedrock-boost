@@ -33,11 +33,11 @@ export default class Vec3 implements Vector3 {
     } else if (x === Direction.North) {
       this.x = 0;
       this.y = 0;
-      this.z = 1;
+      this.z = -1;
     } else if (x === Direction.South) {
       this.x = 0;
       this.y = 0;
-      this.z = -1;
+      this.z = 1;
     } else if (x === Direction.East) {
       this.x = 1;
       this.y = 0;
@@ -708,8 +708,8 @@ export default class Vec3 implements Vector3 {
     if (maxValue === -normalized.x) return Direction.West;
     if (maxValue === normalized.y) return Direction.Up;
     if (maxValue === -normalized.y) return Direction.Down;
-    if (maxValue === normalized.z) return Direction.North;
-    if (maxValue === -normalized.z) return Direction.South;
+    if (maxValue === normalized.z) return Direction.South;
+    if (maxValue === -normalized.z) return Direction.North;
     // This should never happen
     Vec3.log.error(new Error("Cannot convert vector to direction"), this);
     throw new Error("Cannot convert vector to direction");
