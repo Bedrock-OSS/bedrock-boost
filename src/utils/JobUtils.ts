@@ -49,7 +49,7 @@ export function jobPromise<Result>(generator: Generator<void, Result, void>): Pr
         }
       }());
     } else {
-      log.warn("system.runJob is not available. Running job in an inefficient way.");
+      log.debug("system.runJob is not available. Running job in an inefficient way.");
       const run = () => {
         const startTime = Date.now();
         while (true) {
@@ -128,7 +128,7 @@ export function jobProgressPromise<Progress, Result>(generator: Generator<Progre
         }
       }());
     } else {
-      log.warn("system.runJob is not available. Running job in an inefficient way.");
+      log.debug("system.runJob is not available. Running job in an inefficient way.");
       const run = () => {
         const startTime = Date.now();
         let sentProgress = false;

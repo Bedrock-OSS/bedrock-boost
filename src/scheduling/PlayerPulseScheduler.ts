@@ -35,7 +35,7 @@ export default class PlayerPulseScheduler extends PulseScheduler<Player> {
       const pushPlayer = () => {
         attempts++;
         if (attempts > 10) {
-          PlayerPulseScheduler.logger.warn("Failed to push player to scheduler after 10 attempts.");
+          PlayerPulseScheduler.logger.debug("Failed to push player to scheduler after 10 attempts.");
           return;
         }
         try {
