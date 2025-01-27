@@ -20,6 +20,7 @@ import VanillaBlockTags from "./vanilla/VanillaBlockTags";
 import VanillaItemTags from "./vanilla/VanillaItemTags";
 import TimeOfDay from "./vanilla/TimeOfDay";
 import DirectionUtils from "./utils/DirectionUtils";
+import ColorUtils from "./ColorUtils";
 
 export {
   Vec3,
@@ -53,4 +54,5 @@ export {
   VanillaItemTags,
   TimeOfDay,
   DirectionUtils,
+  ColorUtils,
 };
