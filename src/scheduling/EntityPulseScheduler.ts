@@ -1,17 +1,28 @@
-import { Entity, EntityQueryOptions, MinecraftDimensionTypes, world } from "@minecraft/server";
+import {
+  Entity,
+  EntityQueryOptions,
+  MinecraftDimensionTypes,
+  world,
+} from "@minecraft/server";
 import PulseScheduler from "./PulseScheduler";
+import { Logger } from "../Logging";
 
 /**
  * Represents a PulseScheduler that processes entities matching a query.
  */
 export default class EntityPulseScheduler extends PulseScheduler<Entity> {
 
+  private static readonly logger = Logger.getLogger("EntityPulseScheduler", "bedrock-boost", "entity-pulse-scheduler");
   /**
    * Creates a new EntityPulseScheduler instance.
    * @param period The period of the scheduler.
    * @param queryOptions The query options to use when querying for entities.
    */
-  constructor(processor: (t: Entity) => void, period: number, private queryOptions: EntityQueryOptions) {
+  constructor(
+    processor: (t: Entity) => void,
+    period: number,
+    private queryOptions: EntityQueryOptions
+  ) {
     super((t: Entity) => {
       if (t.isValid()) {
         processor(t);
@@ -19,9 +30,21 @@ export default class EntityPulseScheduler extends PulseScheduler<Entity> {
         this.removeIf((entity) => !entity.isValid());
       }
     }, period);
-    this.push(...world.getDimension(MinecraftDimensionTypes.overworld).getEntities(this.queryOptions));
-    this.push(...world.getDimension(MinecraftDimensionTypes.nether).getEntities(this.queryOptions));
-    this.push(...world.getDimension(MinecraftDimensionTypes.theEnd).getEntities(this.queryOptions));
+    this.push(
+      ...world
+        .getDimension(MinecraftDimensionTypes.overworld)
+        .getEntities(this.queryOptions)
+    );
+    this.push(
+      ...world
+        .getDimension(MinecraftDimensionTypes.nether)
+        .getEntities(this.queryOptions)
+    );
+    this.push(
+      ...world
+        .getDimension(MinecraftDimensionTypes.theEnd)
+        .getEntities(this.queryOptions)
+    );
   }
 
   private compareEntities(a: Entity, b: Entity): boolean {
@@ -35,29 +58,42 @@ export default class EntityPulseScheduler extends PulseScheduler<Entity> {
       }
     });
     world.afterEvents.entitySpawn.subscribe((event) => {
-      let matches;
       try {
-        matches = event.entity.matches(this.queryOptions);
+        if (event.entity.matches(this.queryOptions)) {
+          this.push(event.entity);
+        }
       } catch (e) {
-        matches = false;
-      }
-      if (matches) {
-        this.push(event.entity);
+        //TODO: Maybe it should be scheduled for reprocessing?
+        EntityPulseScheduler.logger.debug("Failed to push entity to scheduler.", e);
       }
     });
     world.afterEvents.entityRemove.subscribe((event) => {
-      this.removeIf((entity) => !entity.isValid() || entity.id === event.removedEntityId);
+      this.removeIf(
+        (entity) => !entity.isValid() || entity.id === event.removedEntityId
+      );
     });
     super.start();
   }
 
   push(...items: Entity[]): number {
-    const filtered = items.filter(item => item.isValid() && !this.items.some(existingItem => this.compareEntities(existingItem, item)));
+    const filtered = items.filter(
+      (item) =>
+        item.isValid() &&
+        !this.items.some((existingItem) =>
+          this.compareEntities(existingItem, item)
+        )
+    );
     return super.push(...filtered);
   }
 
   unshift(...items: Entity[]): number {
-    const filtered = items.filter(item => item.isValid() && !this.items.some(existingItem => this.compareEntities(existingItem, item)));
+    const filtered = items.filter(
+      (item) =>
+        item.isValid() &&
+        !this.items.some((existingItem) =>
+          this.compareEntities(existingItem, item)
+        )
+    );
     return super.unshift(...filtered);
   }
 
@@ -67,7 +103,12 @@ export default class EntityPulseScheduler extends PulseScheduler<Entity> {
     if (deleteCount === void 0) {
       return super.splice(start);
     }
-    const filtered = items.filter(item => !this.items.some(existingItem => this.compareEntities(existingItem, item)));
+    const filtered = items.filter(
+      (item) =>
+        !this.items.some((existingItem) =>
+          this.compareEntities(existingItem, item)
+        )
+    );
     return super.splice(start, deleteCount, ...filtered);
   }
 }
