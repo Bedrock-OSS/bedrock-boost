@@ -35,7 +35,13 @@ export default class EntityPulseScheduler extends PulseScheduler<Entity> {
       }
     });
     world.afterEvents.entitySpawn.subscribe((event) => {
-      if (event.entity.matches(this.queryOptions)) {
+      let matches;
+      try {
+        matches = event.entity.matches(this.queryOptions);
+      } catch (e) {
+        matches = false;
+      }
+      if (matches) {
         this.push(event.entity);
       }
     });
