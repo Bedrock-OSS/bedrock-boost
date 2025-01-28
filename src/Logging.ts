@@ -278,7 +278,12 @@ export class Logger {
         return;
       }
       for (const filter of loggingSettings.filter) {
-        if (starMatch(filter, this.name)) {
+        if (filter.startsWith('!')) {
+          if (starMatch(filter.substring(1), this.name) || this.tags.some(tag => starMatch(filter.substring(1), tag))) {
+            return;
+          }
+        }
+        if (starMatch(filter, this.name) || this.tags.some(tag => starMatch(filter, tag))) {
           this.logRaw(level, ...message);
           return;
         }
