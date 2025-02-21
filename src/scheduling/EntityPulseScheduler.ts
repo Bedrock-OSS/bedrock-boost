@@ -2,6 +2,7 @@ import {
   Entity,
   EntityQueryOptions,
   MinecraftDimensionTypes,
+  system,
   world,
 } from "@minecraft/server";
 import PulseScheduler from "./PulseScheduler";
@@ -11,8 +12,11 @@ import { Logger } from "../Logging";
  * Represents a PulseScheduler that processes entities matching a query.
  */
 export default class EntityPulseScheduler extends PulseScheduler<Entity> {
-
-  private static readonly logger = Logger.getLogger("EntityPulseScheduler", "bedrock-boost", "entity-pulse-scheduler");
+  private static readonly logger = Logger.getLogger(
+    "EntityPulseScheduler",
+    "bedrock-boost",
+    "entity-pulse-scheduler"
+  );
   /**
    * Creates a new EntityPulseScheduler instance.
    * @param period The period of the scheduler.
@@ -53,19 +57,10 @@ export default class EntityPulseScheduler extends PulseScheduler<Entity> {
 
   start(): void {
     world.afterEvents.entityLoad.subscribe((event) => {
-      if (event.entity.matches(this.queryOptions)) {
-        this.push(event.entity);
-      }
+      this.addIfMatchesWithRetry(event.entity);
     });
     world.afterEvents.entitySpawn.subscribe((event) => {
-      try {
-        if (event.entity.matches(this.queryOptions)) {
-          this.push(event.entity);
-        }
-      } catch (e) {
-        //TODO: Maybe it should be scheduled for reprocessing?
-        EntityPulseScheduler.logger.debug("Failed to push entity to scheduler.", e);
-      }
+      this.addIfMatchesWithRetry(event.entity);
     });
     world.afterEvents.entityRemove.subscribe((event) => {
       this.removeIf(
@@ -73,6 +68,34 @@ export default class EntityPulseScheduler extends PulseScheduler<Entity> {
       );
     });
     super.start();
+  }
+
+  /**
+   * Adds an entity to the scheduler if it matches the query options. In case the entity is not valid, it will retry a tick later.
+   * @param entity The entity to add.
+   */
+  private addIfMatchesWithRetry(entity: Entity): void {
+    try {
+      if (!entity) {
+        return;
+      }
+      // Special case for when the entity is loaded from a structure and removed the same tick
+      if (!entity.isValid()) {
+        system.runInterval(() => {
+          if (entity.isValid() && entity.matches(this.queryOptions)) {
+            this.push(entity);
+          }
+        }, 1);
+      } else if (entity.matches(this.queryOptions)) {
+        this.push(entity);
+      }
+    } catch (e) {
+      //TODO: Maybe it should be scheduled for reprocessing?
+      EntityPulseScheduler.logger.debug(
+        "Failed to push entity to scheduler.",
+        e
+      );
+    }
   }
 
   push(...items: Entity[]): number {
