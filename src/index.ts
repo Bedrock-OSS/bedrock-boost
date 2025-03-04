@@ -21,6 +21,7 @@ import VanillaItemTags from "./vanilla/VanillaItemTags";
 import TimeOfDay from "./vanilla/TimeOfDay";
 import DirectionUtils from "./utils/DirectionUtils";
 import ColorUtils from "./ColorUtils";
+import EntitySaver from "./utils/EntitySaver";
 
 export {
   Vec3,
@@ -55,4 +56,5 @@ export {
   TimeOfDay,
   DirectionUtils,
   ColorUtils,
+  EntitySaver,
 };
