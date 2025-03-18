@@ -22,7 +22,7 @@ export interface ConsumeDurabilityOptions {
   suppressSound?: boolean;
 }
 
-export default class ItemUtils {
+export class ItemUtils {
   /**
    * Consumes durability from the player's selected item.
    * @param player - The player whose item durability will be consumed.

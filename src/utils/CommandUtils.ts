@@ -58,7 +58,7 @@ export type ItemMatcher = {
  * This is a collection of utility methods for working with commands until a proper API is available.
  * Once a proper API is available and stable, I'll change function to use that instead and mark it as deprecated.
  */
-export default class CommandUtils {
+export class CommandUtils {
   /**
    * Sets the input permission for a player.
    * @param player The player for whom to set the input permission.
