@@ -17,9 +17,9 @@ export interface ConsumeDurabilityOptions {
    */
   slot?: EquipmentSlot;
   /**
-   * Whether to suppress playing a sound when item breaks.
+   * Whether to suppress playing a sound when item breaks. Defaults to "random.break". If set to an empty string, no sound will be played.
    */
-  suppressSound?: boolean;
+  breakSound?: string;
 }
 
 export class ItemUtils {
@@ -39,6 +39,9 @@ export class ItemUtils {
     }
     if (options.slot === void 0) {
       options.slot = EquipmentSlot.Mainhand;
+    }
+    if (options.breakSound === void 0) {
+      options.breakSound = 'random.break';
     }
     if (options.value < 1 || !player) {
       log.error("Invalid value or player");
@@ -71,8 +74,8 @@ export class ItemUtils {
     if (durabilityComponent.damage + options.value >= durabilityComponent.maxDurability) {
       log.trace("Item is broken");
       equippable.setEquipment(options.slot, undefined);
-      if (!options.suppressSound) {
-        player.playSound('random.break');
+      if (options.breakSound.length > 0) {
+        player.playSound(options.breakSound);
       }
       return true;
     }
@@ -108,6 +111,6 @@ export function consumeDurability(player: Player, value: number = 1, slot: Equip
     slot,
     value,
     ignoreEnchantments: true,
-    suppressSound: true,
+    breakSound: '',
   });
 }
