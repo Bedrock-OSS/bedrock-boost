@@ -26,8 +26,11 @@ export class ItemUtils {
   /**
    * Consumes durability from the player's selected item.
    * @param player - The player whose item durability will be consumed.
-   * @param value - The amount of durability to consume. Defaults to 1.
-   * @param slot - The slot to consume durability from. Defaults to the player's selected slot.
+   * @param options - The options for consuming durability.
+   * @param options.ignoreEnchantments - Whether to ignore enchantments when consuming durability. Defaults to true.
+   * @param options.value - The amount of durability to consume. Defaults to 1.
+   * @param options.slot - The slot to consume durability from. Defaults to the player's selected slot.
+   * @param options.breakSound - Whether to suppress playing a sound when item breaks. Defaults to "random.break". If set to an empty string, no sound will be played.
    * @returns True if the durability was consumed, false otherwise.
    * 
    * @remarks 

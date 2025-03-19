@@ -10,9 +10,8 @@ export default class PlayerPulseScheduler extends PulseScheduler<Player> {
   private static readonly logger = Logger.getLogger("PlayerPulseScheduler", "bedrock-boost", "player-pulse-scheduler");
 
   /**
-   * Creates a new EntityPulseScheduler instance.
+   * Creates a new PlayerPulseScheduler instance.
    * @param period The period of the scheduler.
-   * @param queryOptions The query options to use when querying for entities.
    */
   constructor(processor: (t: Player) => void, period: number) {
     super((t: Player) => {
