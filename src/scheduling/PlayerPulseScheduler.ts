@@ -1,6 +1,7 @@
 import { Player, system, world } from "@minecraft/server";
 import PulseScheduler from "./PulseScheduler";
 import { Logger } from "../Logging";
+import { isValid } from "../utils/VersionUtils";
 
 /**
  * Represents a PulseScheduler that processes players.
@@ -15,10 +16,10 @@ export default class PlayerPulseScheduler extends PulseScheduler<Player> {
    */
   constructor(processor: (t: Player) => void, period: number) {
     super((t: Player) => {
-      if (t.isValid()) {
+      if (isValid(t)) {
         processor(t);
       } else {
-        this.removeIf((entity) => !entity.isValid());
+        this.removeIf((entity) => !isValid(entity));
       }
     }, period);
     this.push(...world.getAllPlayers());
@@ -53,18 +54,18 @@ export default class PlayerPulseScheduler extends PulseScheduler<Player> {
       pushPlayer();
     });
     world.afterEvents.playerLeave.subscribe((event) => {
-      this.removeIf((entity) => !entity.isValid() || entity.id === event.playerId);
+      this.removeIf((entity) => !isValid(entity) || entity.id === event.playerId);
     });
     super.start();
   }
 
   push(...items: Player[]): number {
-    const filtered = items.filter(item => item.isValid() && !this.items.some(existingItem => this.compareEntities(existingItem, item)));
+    const filtered = items.filter(item => isValid(item) && !this.items.some(existingItem => this.compareEntities(existingItem, item)));
     return super.push(...filtered);
   }
 
   unshift(...items: Player[]): number {
-    const filtered = items.filter(item => item.isValid() && !this.items.some(existingItem => this.compareEntities(existingItem, item)));
+    const filtered = items.filter(item => isValid(item) && !this.items.some(existingItem => this.compareEntities(existingItem, item)));
     return super.unshift(...filtered);
   }
 

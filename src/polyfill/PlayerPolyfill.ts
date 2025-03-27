@@ -1,10 +1,11 @@
 import { Entity, Player, Vector3 } from "@minecraft/server";
+import { isVersion2 } from "../utils/VersionUtils";
 
 /**
  * Applies an impulse to a player.
  * @param player The player to apply the impulse to.
  * @param vector The vector of the impulse.
- * 
+ *
  * @author https://github.com/SIsilicon (https://github.com/JaylyDev/ScriptAPI/tree/main/scripts/player-impulse)
  */
 // function applyImpulse(player: Player, vector: Vector3) {
@@ -42,12 +43,21 @@ function applyImpulseNew(entity: Entity, vector: Vector3) {
   // The vertical component is directly taken as verticalStrength
   // The previous velocity is also taken into account, because normal impulse retains
   // the previous velocity and knockback does not
-  const verticalStrength = y + (previousVelocity.y * 0.9);
+  const verticalStrength = y + previousVelocity.y * 0.9;
 
   // Apply the knockback
-  entity.applyKnockback(directionX, directionZ, horizontalStrength, verticalStrength);
+  if (isVersion2(entity)) {
+    (entity as any).applyKnockback(
+      {
+        x: horizontalStrength * directionX,
+        z: horizontalStrength * directionZ,
+      },
+      verticalStrength
+    );
+  } else {
+    (entity as any).applyKnockback(directionX, directionZ, horizontalStrength, verticalStrength);
+  }
 }
-
 
 /**
  * Clears the velocity of an entity. This applies a knockback with the opposite
@@ -69,7 +79,17 @@ function clearVelocity(entity: Entity) {
   }
 
   // Apply the knockback
-  entity.applyKnockback(directionX, directionZ, horizontalNorm, 0);
+  if (isVersion2(entity)) {
+    (entity as any).applyKnockback(
+      {
+        x: horizontalNorm * directionX,
+        z: horizontalNorm * directionZ,
+      },
+      0
+    );
+  } else {
+    (entity as any).applyKnockback(directionX, directionZ, horizontalNorm, 0);
+  }
 }
 
 export function install() {

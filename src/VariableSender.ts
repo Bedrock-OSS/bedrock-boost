@@ -1,4 +1,4 @@
-import { Entity, Player, system, world } from "@minecraft/server";
+import { Entity, Player, system } from "@minecraft/server";
 
 /**
  * Represents a Molang expression. This will be injected into the variable value as Molang expression.
