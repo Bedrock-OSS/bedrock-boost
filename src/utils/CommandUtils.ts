@@ -158,4 +158,46 @@ export class CommandUtils {
     const result = entity.runCommand(cmd);
     return result.successCount > 0;
   }
+
+  /**
+   * Pushes a fog to the top of the player's fog stack with the specified user provided ID.
+   * @param player The player to push the fog to.
+   * @param fogId The ID of the fog to push.
+   * @param userProvidedId The user-provided ID of the fog to push.
+   * @returns True if the fog was pushed successfully, false otherwise.
+   * 
+   * @remarks
+   * This method uses the `fog` command and `push` subcommand.
+   */
+  public static pushFog(player: Player, fogId: string, userProvidedId: string): boolean {
+    return player.runCommand(`fog @s push ${fogId} ${userProvidedId}`).successCount > 0;
+  }
+
+  /**
+   * Pops a fog from the top of the player's fog stack matching the specified user provided ID.
+   * @param player The player to pop the fog from.
+   * @param fogId The ID of the fog to pop.
+   * @param userProvidedId The user-provided ID of the fog to pop.
+   * @returns True if the fog was popped successfully, false otherwise.
+   * 
+   * @remarks
+   * This method uses the `fog` command and `pop` subcommand.
+   */
+  public static popFog(player: Player, fogId: string, userProvidedId: string): boolean {
+    return player.runCommand(`fog @s pop ${fogId} ${userProvidedId}`).successCount > 0;
+  }
+
+  /**
+   * Removes all fogs from the player's fog stack matching the specified user provided ID.
+   * @param player The player to remove the fog from.
+   * @param fogId The ID of the fog to remove.
+   * @param userProvidedId The user-provided ID of the fog to remove.
+   * @returns True if the fog was removed successfully, false otherwise.
+   * 
+   * @remarks
+   * This method uses the `fog` command and `remove` subcommand.
+   */
+  public static removeFog(player: Player, fogId: string, userProvidedId: string): boolean {
+    return player.runCommand(`fog @s remove ${fogId} ${userProvidedId}`).successCount > 0;
+  }
 }
