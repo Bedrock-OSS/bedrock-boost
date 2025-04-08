@@ -8,11 +8,7 @@ import { Entity } from "@minecraft/server";
  * This function is a workaround, that checks whether isValid is a boolean or a function.
  */
 export function isVersion2(entity: Entity): boolean {
-    const isValid = entity.isValid;
-    if (isValid === true || isValid === false) {
-        return true;
-    }
-    return false;
+    return typeof Object.getPrototypeOf(entity).isValid === 'function';
 }
 
 /**
@@ -23,9 +19,9 @@ export function isVersion2(entity: Entity): boolean {
  * This function is a workaround, that checks isValid both as a boolean and a function.
  */
 export function isValid(entity: Entity): boolean {
-    const isValid = entity.isValid;
-    if (isValid === true || isValid === false) {
-        return isValid;
+    const f = Object.getPrototypeOf(entity).isValid;
+    if (typeof f === 'function') {
+        return f.call(entity) as boolean;
     }
-    return (isValid as any)();
+    return (entity.isValid as any) as boolean;
 }
