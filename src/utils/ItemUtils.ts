@@ -1,4 +1,4 @@
-import { EntityEquippableComponent, EquipmentSlot, ItemDurabilityComponent, ItemEnchantableComponent, Player } from "@minecraft/server";
+import { EntityEquippableComponent, EquipmentSlot, GameMode, ItemDurabilityComponent, ItemEnchantableComponent, Player } from "@minecraft/server";
 import { Logger } from "../Logging";
 
 const log = Logger.getLogger("itemUtils", "bedrock-boost", "itemUtils");
@@ -8,6 +8,10 @@ export interface ConsumeDurabilityOptions {
    * Whether to ignore enchantments when consuming durability.
    */
   ignoreEnchantments?: boolean;
+  /**
+   * Whether to ignore player's gamemode and consume durability anyways.
+   */
+  ignoreCreative?: boolean;
   /**
    * The amount of durability to consume. Defaults to 1.
    */
@@ -37,6 +41,10 @@ export class ItemUtils {
    * Return value `false` does not always mean that the function failed. It can also mean that the item was not damaged due to unbreaking enchantment.
    */
   public static consumeDurability(player: Player, options: ConsumeDurabilityOptions = {}): boolean {
+    // Compare player's game mode as a string to handle both V1 and V2
+    if (!options.ignoreCreative && player.getGameMode().toLowerCase() === 'creative') {
+      return false;
+    }
     if (options.value === void 0) {
       options.value = 1;
     }
@@ -113,7 +121,9 @@ export function consumeDurability(player: Player, value: number = 1, slot: Equip
   return ItemUtils.consumeDurability(player, {
     slot,
     value,
+    // These settings are set so that the function will work the same way as before
     ignoreEnchantments: true,
     breakSound: '',
+    ignoreCreative: true,
   });
 }
