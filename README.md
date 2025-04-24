@@ -5,21 +5,19 @@
 A utility library to streamline the development process for Minecraft Bedrock's Script API, providing essential tools for vector operations, polyfills, and time measurements.
 
 ## Features
-
-1. **Vec3 Class**: Simplify and enhance vector operations.
-2. **playerPolyfill**: Implements unsupported functions in Player class. Currently supports:
-   - `applyImpulse`: Apply an impulse to a player.
-   - `clearVelocity`: Clears the velocity of a player.
-3. **consolePolyfill**: Enhance `console.log` to display messages in the chat as well.
-4. **Timings Class**: Granular time measurement made easy. Functions include:
-   - `begin(operation:string)`: Begin a timing operation.
-   - `end()`: Conclude the timing operation.
-5. **Logging**: Log messages with different levels and filters:
-   - Adds a way to filter messages by tags (e.g. `player`, `entity`, `block`).
-   - Adds a way to filter messages by levels (e.g. `info`, `warn`, `error`).
-6. **ChatColor Class**: Simplifies chat color formatting.
-7. **ColorJSON Class**: JSON formatter for usage in chat messages. Simply use `ColorJSON.DEFAULT.stringify` function to convert any value to a JSON string with color formatting.
-8. **PulseScheduler**: A simple scheduler, that processes all items once in a set period of time to avoid load spikes.
+- **Vec3 Class**: Simplify and enhance 3D vector operations. [Documentation](docs/vec3.md)
+- **Cache Module**: Caches dimension lookups, dimension height ranges, and block permutations to reduce costly native calls. [Documentation](docs/cache.md)
+- **Polyfills**: 
+  - `playerPolyfill`: Adds `applyImpulse` and `clearVelocity` methods to the Player class.
+  - `consolePolyfill`: Overrides `console.log` to send messages to game chat.
+- **Profiling Utilities**: `addIdleDummy` and `clearIdleDummy` improve profiling accuracy by grouping idle time. [Documentation](docs/profilingDummy.md)
+- **Timings Class**: Granular time measurement with `begin()` and `end()`. 
+- **Logging System**: Flexible logging with levels, tags, filters, and scriptevent commands. [Documentation](docs/logging.md)
+- **ChatColor Class**: Simplify chat color formatting.
+- **ColorJSON Class**: Generate colored JSON for chat messages. [Documentation](docs/colorJson.md)
+- **Scheduling**: `PulseScheduler`, `TaskPulseScheduler`, `UniquePulseScheduler`, `EntityPulseScheduler`, and `PlayerPulseScheduler` for distributed task execution. [Documentation](docs/scheduler.md)
+- **Utility Modules**: Common utilities including `BlockUtils`, `CommandUtils`, `DirectionUtils`, `EntitySaver`, `ItemUtils`, `JobUtils`, `VersionUtils`, and `VariableSender`.
+- **Vanilla Wrappers**: Constants and helpers such as `VanillaBlockTags`, `VanillaItemTags`, and `TimeOfDay`.
 
 ## Installation
 
