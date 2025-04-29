@@ -748,11 +748,18 @@ export default class Vec3 implements Vector3 {
   angleBetween(x: VectorLike, y?: number, z?: number): number {
     const v: Vec3 = Vec3._from(x, y, z);
     const dotProduct = this.dot(v);
-    const lengths = this.length() * v.length();
-    if (lengths === 0) {
+    const lenSq1 = this.lengthSquared();
+    if (lenSq1 === 0) {
       return 0;
     }
-    return Math.acos(dotProduct / lengths);
+    const lenSq2 = v.lengthSquared();
+    if (lenSq2 === 0) {
+      return 0;
+    }
+    const denom = Math.sqrt(lenSq1 * lenSq2);
+    // Clamp for numerical stability
+    const cosAngle = Math.min(1, Math.max(-1, dotProduct / denom));
+    return Math.acos(cosAngle);
   }
 
   /**
@@ -808,7 +815,11 @@ export default class Vec3 implements Vector3 {
     if (v.isZero()) {
       return Vec3.Zero;
     }
-    const scale = this.dot(v) / v.dot(v);
+    const denom = v.dot(v);
+    if (denom === 0) {
+      return Vec3.Zero;
+    }
+    const scale = this.dot(v) / denom;
     return Vec3.from(v.x * scale, v.y * scale, v.z * scale);
   }
 
