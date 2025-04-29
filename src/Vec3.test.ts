@@ -21,14 +21,14 @@ describe('Vec3', () => {
     const vec = new Vec3(Direction.North);
     expect(vec.x).toEqual(0);
     expect(vec.y).toEqual(0);
-    expect(vec.z).toEqual(1);
+    expect(vec.z).toEqual(-1);
   });
 
   it('should create a Vec3 instance with correct values for Direction.South', () => {
     const vec = new Vec3(Direction.South);
     expect(vec.x).toEqual(0);
     expect(vec.y).toEqual(0);
-    expect(vec.z).toEqual(-1);
+    expect(vec.z).toEqual(1);
   });
 
   it('should create a Vec3 instance with correct values for Direction.East', () => {
@@ -649,7 +649,7 @@ describe('Vec3', () => {
     expect(direction).toEqual(Direction.Up);
     vec = new Vec3(0, 0, 1);
     direction = vec.toDirection();
-    expect(direction).toEqual(Direction.North);
+    expect(direction).toEqual(Direction.South);
     vec = new Vec3(-1, 0, 0);
     direction = vec.toDirection();
     expect(direction).toEqual(Direction.West);
@@ -658,7 +658,7 @@ describe('Vec3', () => {
     expect(direction).toEqual(Direction.Down);
     vec = new Vec3(0, 0, -1);
     direction = vec.toDirection();
-    expect(direction).toEqual(Direction.South);
+    expect(direction).toEqual(Direction.North);
 
     // Weird cases
     vec = new Vec3(0.5, 0.7, 0.5);
@@ -689,14 +689,14 @@ describe('Vec3', () => {
     const vec = Vec3.Zero.north();
     expect(vec.x).toEqual(0);
     expect(vec.y).toEqual(0);
-    expect(vec.z).toEqual(1);
+    expect(vec.z).toEqual(-1);
   })
 
   it('should return vector offset south when using south function', () => {
     const vec = Vec3.Zero.south();
     expect(vec.x).toEqual(0);
     expect(vec.y).toEqual(0);
-    expect(vec.z).toEqual(-1);
+    expect(vec.z).toEqual(1);
   })
 
   it('should return vector offset east when using east function', () => {
