@@ -448,7 +448,7 @@ export default class Vec3 implements Vector3 {
    * @returns The length of the vector.
    */
   length(): number {
-    return Math.sqrt(this.lengthSquared());
+    return Math.hypot(this.x, this.y, this.z);
   }
   /**
    * Computes the squared length of the vector.
@@ -564,7 +564,7 @@ export default class Vec3 implements Vector3 {
 
   distance(x: VectorLike, y?: number, z?: number): number {
     const v: Vec3 = Vec3._from(x, y, z);
-    return Math.sqrt(this.distanceSquared(v));
+    return this.subtract(v).length();
   }
 
   /**
