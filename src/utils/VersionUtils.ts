@@ -8,7 +8,7 @@ import { Entity } from "@minecraft/server";
  * This function is a workaround, that checks whether isValid is a boolean or a function.
  */
 export function isVersion2(entity: Entity): boolean {
-    return typeof Object.getPrototypeOf(entity).isValid === 'function';
+    return typeof Object.getPrototypeOf(entity).isValid !== 'function';
 }
 
 /**
