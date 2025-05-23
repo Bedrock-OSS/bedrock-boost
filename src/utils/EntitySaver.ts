@@ -16,11 +16,11 @@ export default class EntitySaver {
     removeEntity: boolean = true
   ): number {
     // Find a free ID
-    let id = Math.random() * 1000000 + 1;
+    let id = (Math.random() * 1000000 + 1) << 0;
     const structureManager = world.structureManager;
     let i = 0;
     while (structureManager.get(prefix + id)) {
-      id = Math.random() * 1000000 + 1;
+      id = (Math.random() * 1000000 + 1) << 0;
       i++;
       if (i > 1000) {
         // Should NEVER happen
