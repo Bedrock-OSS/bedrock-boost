@@ -200,8 +200,8 @@ export default class Vec3 implements Vector3 {
     const psi = yaw * (Math.PI / 180);
     const theta = pitch * (Math.PI / 180);
 
-    const x = Math.cos(theta) * Math.sin(psi);
-    const y = Math.sin(theta);
+    const x = -Math.cos(theta) * Math.sin(psi);
+    const y = -Math.sin(theta);
     const z = Math.cos(theta) * Math.cos(psi);
     return new Vec3(x, y, z);
   }
@@ -220,8 +220,8 @@ export default class Vec3 implements Vector3 {
       throw new Error("Cannot convert zero-length vector to direction");
     }
     const direction = this.normalize();
-    const yaw = Math.atan2(direction.x, direction.z) * (180 / Math.PI);
-    const pitch = Math.asin(direction.y) * (180 / Math.PI);
+    const yaw = Math.atan2(-direction.x, direction.z) * (180 / Math.PI);
+    const pitch = Math.asin(-direction.y) * (180 / Math.PI);
     return {
       x: pitch,
       y: yaw,
