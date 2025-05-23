@@ -9,12 +9,33 @@ export default class Vec3 implements Vector3 {
     "vec3",
     "bedrock-boost"
   );
+  /**
+   * Zero vector
+   */
   public static readonly Zero = new Vec3(0, 0, 0);
+  /**
+   * Down vector, negative towards Y
+   */
   public static readonly Down = new Vec3(Direction.Down);
+  /**
+   * Up vector, positive towards Y
+   */
   public static readonly Up = new Vec3(Direction.Up);
+  /**
+   * North vector, negative towards Z
+   */
   public static readonly North = new Vec3(Direction.North);
+  /**
+   * South vector, positive towards Z
+   */
   public static readonly South = new Vec3(Direction.South);
+  /**
+   * East vector, positive towards X
+   */
   public static readonly East = new Vec3(Direction.East);
+  /**
+   * West vector, negative towards X
+   */
   public static readonly West = new Vec3(Direction.West);
 
   readonly x: number;
@@ -189,6 +210,7 @@ export default class Vec3 implements Vector3 {
    * Converts the normal vector to yaw and pitch values.
    *
    * @returns A Vector2 containing the yaw and pitch values.
+   * @deprecated Use toRotation() instead. This method returns inverted values and will be removed in the future.
    */
   toYawPitch(): Vector2 {
     if (this.isZero()) {
@@ -200,6 +222,27 @@ export default class Vec3 implements Vector3 {
     const direction = this.normalize();
     const yaw = Math.atan2(direction.x, direction.z) * (180 / Math.PI);
     const pitch = Math.asin(direction.y) * (180 / Math.PI);
+    return {
+      x: pitch,
+      y: yaw,
+    };
+  }
+
+  /**
+   * Converts the normal vector to yaw and pitch values.
+   *
+   * @returns A Vector2 containing the yaw and pitch values.
+   */
+  toRotation(): Vector2 {
+    if (this.isZero()) {
+      Vec3.log.error(
+        new Error("Cannot convert zero-length vector to direction")
+      );
+      throw new Error("Cannot convert zero-length vector to direction");
+    }
+    const direction = this.normalize();
+    const yaw = -Math.atan2(direction.x, direction.z) * (180 / Math.PI);
+    const pitch = Math.asin(-direction.y) * (180 / Math.PI);
     return {
       x: pitch,
       y: yaw,

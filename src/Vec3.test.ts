@@ -783,4 +783,21 @@ describe('Vec3', () => {
     expect(vec.toString('short', ';')).toEqual('1;2;3');
   });
 
+  it('should return correct rotation values', () => {
+    const cases = [
+      {"normal":{"x":0,"y":1,"z":0},"rotation":{"x":-90,"y":0}},
+      {"normal":{"x":0,"y":-1,"z":0},"rotation":{"x":90,"y":0}},
+      {"normal":{"x":0,"y":0,"z":-1},"rotation":{"x":0,"y":-180}},
+      {"normal":{"x":0,"y":0,"z":1},"rotation":{"x":0,"y":0}},
+      {"normal":{"x":1,"y":0,"z":0},"rotation":{"x":0,"y":-90}},
+      {"normal":{"x":-1,"y":0,"z":0},"rotation":{"x":0,"y":90}},
+    ];
+    for (const testCase of cases) {
+      const vec = Vec3.from(testCase.normal.x, testCase.normal.y, testCase.normal.z);
+      const rotation = vec.toRotation();
+      expect(rotation.x).toBeCloseTo(testCase.rotation.x, 1);
+      expect(rotation.y).toBeCloseTo(testCase.rotation.y, 1);
+    }
+  });
+
 });
