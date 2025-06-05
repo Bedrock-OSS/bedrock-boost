@@ -35,16 +35,17 @@ export default class ColorUtils {
       if (g !== void 0 && b !== void 0) {
         return {
           red: hex / 255.0,
-          green: g  / 255.0,
-          blue: b  / 255.0,
-          alpha: a === void 0 ? 1 : (a / 255.0),
+          green: g / 255.0,
+          blue: b / 255.0,
+          alpha: a === void 0 ? 1 : a / 255.0,
         };
       }
+      const hasAlpha = hex > 0xffffff;
       return {
         red: ((hex & 0xff0000) >> 16) / 255.0,
         green: ((hex & 0xff00) >> 8) / 255.0,
-        blue: ((hex & 0xff) >> 0) / 255.0,
-        alpha: ((hex & 0xff000000) >>> 24) / 255.0,
+        blue: (hex & 0xff) / 255.0,
+        alpha: hasAlpha ? ((hex & 0xff000000) >>> 24) / 255.0 : 1,
       };
     }
     if (hex.startsWith("#")) {
