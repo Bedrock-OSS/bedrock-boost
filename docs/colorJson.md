@@ -51,8 +51,8 @@ jsonFormatter.OpenObject = '{';
 jsonFormatter.CloseObject = '}';
 jsonFormatter.OpenArray = '[';
 jsonFormatter.CloseArray = ']';
-jsonFormatter.NameValueSeparator = ':';
-jsonFormatter.ItemSeparator = ',';
+jsonFormatter.KeyValueSeparator = ':';
+jsonFormatter.Comma = ',';
 ```
 
 #### Inline Threshold
@@ -155,9 +155,9 @@ The class automatically detects cycles within objects and arrays to prevent infi
 - `ColorJSON.DEFAULT` — Shared default formatter.
 
 ### Instance Properties
-- Tokens: `OpenObject`, `CloseObject`, `OpenArray`, `CloseArray`, `NameValueSeparator`, `ItemSeparator`
+- Tokens: `OpenObject`, `CloseObject`, `OpenArray`, `CloseArray`, `KeyValueSeparator`, `Comma`
 - Thresholds: `InlineThreshold`, `MaxDepth`, `IncludeClassNames`
-- Colors: `OpenCloseObjectColor`, `OpenCloseArrayColor`, `NameValueSeparatorColor`, `ItemSeparatorColor`, `KeyColor`, `StringColor`, `NumberColor`, `BooleanColor`, `NullColor`, `UndefinedColor`, `FunctionColor`, `ClassNameColor`, `CycleColor`
+- Colors: `OpenCloseObjectColor`, `OpenCloseArrayColor`, `KeyValueSeparatorColor`, `CommaColor`, `KeyColor`, `StringColor`, `NumberColor`, `BooleanColor`, `NullColor`, `UndefinedColor`, `FunctionColor`, `ClassNameColor`, `CycleColor`
 
 ### Methods
 - `stringify(value: any): string` — Main entry point for JSON stringification.
