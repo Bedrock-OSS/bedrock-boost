@@ -565,8 +565,8 @@ export default class Vec2 implements Vector2 {
     return this.x === 0 && this.y === 0;
   }
   /**
-   * Converts the vector to an array containing the X, Y, and Z components of the vector.
-   * @returns An array containing the X, Y, and Z components of the vector.
+   * Converts the vector to an array containing the X and Y components of the vector.
+   * @returns An array containing the X and Y components of the vector.
    */
   toArray(): number[] {
     return [this.x, this.y];
@@ -591,7 +591,7 @@ export default class Vec2 implements Vector2 {
     throw new Error("Cannot convert vector to direction");
   }
   /**
-   * Returns a new vector with the X, Y, and Z components rounded to the nearest block location.
+   * Returns a new vector with the X and Y components rounded to the nearest block location.
    */
   toBlockLocation(): Vec2 {
     // At this point I'm not sure if it wouldn't be better to use Math.floor instead
