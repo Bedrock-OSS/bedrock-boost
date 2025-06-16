@@ -412,7 +412,9 @@ export class Logger {
         OutputType.ConsoleInfo,
       ];
       if (outputs.includes(OutputType.Chat)) {
-        world.sendMessage(formatted);
+        system.run(() => {
+          world.sendMessage(formatted);
+        })
       }
       if (outputs.includes(OutputType.ConsoleInfo)) {
         if ((console as any).originalLog) {
