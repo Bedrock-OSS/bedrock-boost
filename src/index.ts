@@ -22,3 +22,4 @@ export { default as DirectionUtils } from "./utils/DirectionUtils";
 export { default as ColorUtils } from "./ColorUtils";
 export { default as EntitySaver } from "./utils/EntitySaver";
 export * from "./utils/ItemUtils";
+export * from "./utils/EntityUtils";

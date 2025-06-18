@@ -1,4 +1,10 @@
-import { Entity, Vector3 } from "@minecraft/server";
+import { Entity } from "@minecraft/server";
+import Vec3 from "../Vec3";
+
+export interface EntityHitbox {
+    bound: Vec3;
+    location: Vec3;
+}
 
 export class EntityUtils {
     /**
@@ -12,7 +18,7 @@ export class EntityUtils {
         entity: Entity,
         maxWidth: number = 5,
         maxHeight: number = 5
-    ): { bound: Vector3; location: Vector3 } {
+    ): EntityHitbox {
         const { location: { x, y, z }, dimension } = entity;
 
         const getRaycastHitDistance = (
@@ -38,12 +44,8 @@ export class EntityUtils {
         const length = getRaycastHitDistance(x, yMid, z - maxWidth, 0, 0, 1, maxWidth);
 
         return {
-            bound: { x: width * 2, y: height, z: length * 2 },
-            location: { x: x - width, y: y, z: z - length }
+            bound: Vec3.from(width * 2, height, length * 2),
+            location: Vec3.from(x - width, y, z - length),
         };
     }
-
-    // Additional utility methods can be added here
-    // Example:
-    // static isGrounded(entity: Entity): boolean { ... }
 }
