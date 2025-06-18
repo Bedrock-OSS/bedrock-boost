@@ -36,20 +36,45 @@ export default class ColorJSON {
     public TruncatedObjectValue: string = '{...}';
 
     // Colors
-    public OpenCloseObjectColor: ChatColor = ChatColor.YELLOW;
-    public OpenCloseArrayColor: ChatColor = ChatColor.AQUA;
-    public NumberColor: ChatColor = ChatColor.DARK_AQUA;
-    public StringColor: ChatColor = ChatColor.DARK_GREEN;
-    public BooleanColor: ChatColor = ChatColor.GOLD;
-    public NullColor: ChatColor = ChatColor.GOLD;
-    public KeyColor: ChatColor = ChatColor.GRAY;
-    public EscapeColor: ChatColor = ChatColor.GOLD;
-    public FunctionColor: ChatColor = ChatColor.GRAY;
-    public ClassColor: ChatColor = ChatColor.GRAY;
-    public ClassStyle: ChatColor = ChatColor.BOLD;
-    public CycleColor: ChatColor = ChatColor.DARK_RED;
+    public OpenCloseObjectColor: ChatColor | string = ChatColor.YELLOW;
+    public OpenCloseArrayColor: ChatColor | string = ChatColor.AQUA;
+    public NumberColor: ChatColor | string = ChatColor.DARK_AQUA;
+    public StringColor: ChatColor | string = ChatColor.DARK_GREEN;
+    public BooleanColor: ChatColor | string = ChatColor.GOLD;
+    public NullColor: ChatColor | string = ChatColor.GOLD;
+    public KeyColor: ChatColor | string = ChatColor.GRAY;
+    public EscapeColor: ChatColor | string = ChatColor.GOLD;
+    public FunctionColor: ChatColor | string = ChatColor.GRAY;
+    public ClassColor: ChatColor | string = ChatColor.GRAY;
+    public ClassStyle: ChatColor | string = ChatColor.BOLD;
+    public CycleColor: ChatColor | string = ChatColor.DARK_RED;
 
+    /**
+     * The default ColorJSON instance
+     */
     public static readonly DEFAULT: ColorJSON = new ColorJSON();
+
+    private static createPlain(): ColorJSON {
+        const plain = new ColorJSON();
+        plain.OpenCloseObjectColor = '';
+        plain.OpenCloseArrayColor = '';
+        plain.NumberColor = '';
+        plain.StringColor = '';
+        plain.BooleanColor = '';
+        plain.NullColor = '';
+        plain.KeyColor = '';
+        plain.EscapeColor = '';
+        plain.FunctionColor = '';
+        plain.ClassColor = '';
+        plain.ClassStyle = '';
+        plain.CycleColor = '';
+        return plain;
+    }
+
+    /**
+     * A ColorJSON instance that does not colorize anything.
+     */
+    public static readonly PLAIN: ColorJSON = this.createPlain();
 
     /**
      * Transforms a value into a chat-friendly, colored JSON representation.
