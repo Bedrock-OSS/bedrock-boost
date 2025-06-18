@@ -1,5 +1,10 @@
 import ChatColor from "./ChatColor";
 
+interface Context {
+    indentLevel: number;
+    visited: WeakSet<any>;
+}
+
 export default class ColorJSON {
     // Tokens
     public OpenObject: string = '{';
@@ -51,7 +56,10 @@ export default class ColorJSON {
      * @param value - The value to transform.
      */
     public stringify(value: unknown): string {
-        return this.stringifyValue(value);
+        return this.stringifyValue(value, {
+            indentLevel: 0,
+            visited: new WeakSet<any>(),
+        });
     }
 
     /**
@@ -119,8 +127,8 @@ export default class ColorJSON {
      * @param value - The array to transform.
      * @param indentLevel - The indentation level for pretty-printing.
      */
-    protected stringifyArray(value: unknown[], indentLevel: number = 0): string {
-        const indentSpace = this.Indent.repeat(indentLevel);
+    protected stringifyArray(value: unknown[], ctx: Context): string {
+        const indentSpace = this.Indent.repeat(ctx.indentLevel);
         // If array is empty, just returns colored `[]`
         if (value.length === 0) {
             return this.OpenCloseArrayColor + this.OpenArray + this.CloseArray + ChatColor.RESET;
@@ -128,10 +136,10 @@ export default class ColorJSON {
         let result = this.OpenCloseArrayColor + this.OpenArray + ChatColor.RESET + this.NewLine;
         let compactResult = this.OpenCloseArrayColor + this.OpenArray + ChatColor.RESET;
         value.forEach((item, index) => {
-            result += indentSpace + this.Indent + this.stringifyValue(item, indentLevel + 1);
+            result += indentSpace + this.Indent + this.stringifyValue(item, this.indent(ctx));
             result += (index < value.length - 1 ? this.Comma + this.NewLine : this.NewLine);
 
-            compactResult += this.stringifyValue(item, indentLevel + 1);
+            compactResult += this.stringifyValue(item, this.indent(ctx));
             compactResult += (index < value.length - 1 ? this.Comma + this.Space : '');
         });
         result += indentSpace + this.OpenCloseArrayColor + this.CloseArray + ChatColor.RESET;
@@ -150,7 +158,7 @@ export default class ColorJSON {
      * @param className - Class Name of the object.
      * @param indentLevel - The indentation level for pretty-printing.
      */
-    protected stringifyTruncatedObject(value: object, className: string, indentLevel: number = 0): string {
+    protected stringifyTruncatedObject(value: object, className: string, ctx: Context): string {
         return (this.IncludeClassNames ? this.ClassColor + '' + this.ClassStyle + className + ChatColor.RESET + this.Space : '') + this.TruncatedObjectValue;
     }
 
@@ -161,8 +169,8 @@ export default class ColorJSON {
      * @param entries - Entries of the object to transform.
      * @param indentLevel - The indentation level for pretty-printing.
      */
-    protected stringifyObject(value: object, className: string, entries: any[][], indentLevel: number = 0): string {
-        const indentSpace = this.Indent.repeat(indentLevel);
+    protected stringifyObject(value: object, className: string, entries: any[][], ctx: Context): string {
+        const indentSpace = this.Indent.repeat(ctx.indentLevel);
         const prefix = (this.IncludeClassNames && className !== 'Object' ? this.ClassColor + '' + this.ClassStyle + className + ChatColor.RESET + this.Space : '');
         // If object has no entries, just return `{}` possibly preceded by class name
         if (entries.length === 0) {
@@ -174,7 +182,7 @@ export default class ColorJSON {
 
         // Stringify each entry
         entries.forEach(([key, val], index) => {
-            const compactVal = this.stringifyValue(val, indentLevel + 1);
+            const compactVal = this.stringifyValue(val, this.indent(ctx));
             result += indentSpace + this.Indent + this.KeyColor + this.KeyDelimiter + key + this.KeyDelimiter + ChatColor.RESET + this.KeyValueSeparator + this.Space + compactVal;
             result += (index < entries.length - 1) ? this.Comma + this.NewLine : this.NewLine;
 
@@ -192,8 +200,8 @@ export default class ColorJSON {
         return result;
     }
 
-    protected shouldTruncateObject(value: object, className: string, indentLevel: number = 0): boolean {
-        return !(className === 'Object' || indentLevel <= this.MaxDepth || this.MaxDepth <= 0);
+    protected shouldTruncateObject(value: object, className: string, ctx: Context): boolean {
+        return !(className === 'Object' || ctx.indentLevel <= this.MaxDepth || this.MaxDepth <= 0);
     }
 
     /**
@@ -201,7 +209,7 @@ export default class ColorJSON {
      * @param value - The value to transform.
      * @param indentLevel - The indentation level for pretty-printing.
      */
-    protected stringifyValue(value: unknown, indentLevel: number = 0): string {
+    protected stringifyValue(value: unknown, ctx: Context): string {
         // Stringify primitives like null, undefined, number, string, boolean
         if (value === null) return this.stringifyNull();
         if (value === void 0) return this.stringifyUndefined();
@@ -211,15 +219,15 @@ export default class ColorJSON {
         if (typeof value === 'function') return this.stringifyFunction(value);
 
         // Check for cycles
-        if (this.isCycle(value)) {
+        if (this.isCycle(value, ctx)) {
             return this.stringifyCycle();
         }
-        this.markCycle(value);
+        this.markCycle(value, ctx);
 
         // Stringify arrays
         if (Array.isArray(value)) {
-            const result = this.stringifyArray(value, indentLevel ? indentLevel + 1 : 0);
-            this.clearCycle(value);
+            const result = this.stringifyArray(value, ctx.indentLevel ? this.indent(ctx) : ctx);
+            this.clearCycle(value, ctx);
             return result;
         }
 
@@ -228,7 +236,7 @@ export default class ColorJSON {
             // Get class name
             const name = value.constructor.name;
             // If it's a plain object, or we haven't reached the max depth, stringify it
-            if (!this.shouldTruncateObject(value, name, indentLevel)) {
+            if (!this.shouldTruncateObject(value, name, ctx)) {
                 // Get all keys
                 const keySet: Set<string> = new Set();
                 // Get all keys from the prototype chain
@@ -252,16 +260,16 @@ export default class ColorJSON {
                         return [key, void 0];
                     }
                 }).filter(([, val]) => typeof val !== 'function' && val !== void 0);
-                const result = this.stringifyObject(value, name, entries, indentLevel);
-                this.clearCycle(value);
+                const result = this.stringifyObject(value, name, entries, ctx);
+                this.clearCycle(value, ctx);
                 return result;
             } else {
-                const result = this.stringifyTruncatedObject(value, name, indentLevel);
-                this.clearCycle(value);
+                const result = this.stringifyTruncatedObject(value, name, ctx);
+                this.clearCycle(value, ctx);
                 return result;
             }
         }
-        this.clearCycle(value);
+        this.clearCycle(value, ctx);
 
         // Stringify unknowns
         return ChatColor.RESET + value.toString();
@@ -279,15 +287,19 @@ export default class ColorJSON {
             .replace(/\t/g, this.EscapeColor + '\\t' + this.StringColor);
     }
 
-    private markCycle(value: any) {
-        value.__cycleDetection__ = true;
+    private markCycle(value: any, ctx: Context) {
+        ctx.visited.add(value);
     }
 
-    private isCycle(value: any) {
-        return !!value.__cycleDetection__;
+    private isCycle(value: any, ctx: Context) {
+        return ctx.visited.has(value);
     }
 
-    private clearCycle(value: any) {
-        delete value.__cycleDetection__;
+    private clearCycle(value: any, ctx: Context) {
+        ctx.visited.delete(value);
+    }
+
+    private indent(ctx: Context): Context {
+        return { ...ctx, indentLevel: ctx.indentLevel + 1 };
     }
 }

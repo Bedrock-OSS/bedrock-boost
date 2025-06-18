@@ -136,4 +136,33 @@ describe('ColorJSON', () => {
     expect(result).toEqual(expected);
   });
 
+  it('should work on frozen objects', () => {
+    const value = { name: 'John', age: 30 };
+    Object.freeze(value);
+    const expected = `{age: 30, name: "John"}`;
+    const result = ChatColor.stripColor(colorJson.stringify(value));
+    expect(result).toEqual(expected);
+  });
+
+  it('should work on frozen arrays', () => {
+    const value = [1, 2, 3];
+    Object.freeze(value);
+    const expected = `[1, 2, 3]`;
+    const result = ChatColor.stripColor(colorJson.stringify(value));
+    expect(result).toEqual(expected);
+  });
+
+  it('should work on frozen nested objects', () => {
+    const value: any = { name: 'John', age: 30 };
+    value.self = value;
+    Object.freeze(value);
+    const expected = `{
+  age: 30,
+  name: "John",
+  self: [...cycle...]
+}`;
+    const result = ChatColor.stripColor(colorJson.stringify(value));
+    expect(result).toEqual(expected);
+  });
+
 });
