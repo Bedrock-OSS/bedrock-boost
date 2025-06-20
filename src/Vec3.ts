@@ -1414,4 +1414,33 @@ export default class Vec3 implements Vector3 {
     const result = `${this.x + separator + this.y + separator + this.z}`;
     return format === "long" ? `Vec3(${result})` : result;
   }
+
+  /**
+   * Parses a string representation of a vector.
+   *
+   * @param str - The string representation of the vector.
+   * @param format - The format of the string representation. Defaults to "long".
+   * @param separator - The separator to use between components. Defaults to ", ".
+   * @returns The vector parsed from the string.
+   * @throws {Error} If the string format is invalid.
+   */
+  static fromString(str: string, format: "long" | "short" = "long", separator: string = ", "): Vec3 {
+    if (format === "long") {
+      const match = str.match(/^Vec3\((.*)\)$/);
+      if (!match) {
+        throw new Error("Invalid string format");
+      }
+      const components = match[1].split(separator);
+      if (components.length !== 3) {
+        throw new Error("Invalid string format");
+      }
+      return Vec3.from(Number(components[0]), Number(components[1]), Number(components[2]));
+    } else {
+      const components = str.split(separator);
+      if (components.length !== 3) {
+        throw new Error("Invalid string format");
+      }
+      return Vec3.from(Number(components[0]), Number(components[1]), Number(components[2]));
+    }
+  }
 }
