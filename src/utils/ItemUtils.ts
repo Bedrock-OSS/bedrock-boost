@@ -1,4 +1,4 @@
-import { EntityEquippableComponent, EquipmentSlot, GameMode, ItemDurabilityComponent, ItemEnchantableComponent, Player } from "@minecraft/server";
+import { EntityEquippableComponent, EquipmentSlot, ItemDurabilityComponent, ItemEnchantableComponent, Player } from "@minecraft/server";
 import { Logger } from "../Logging";
 
 const log = Logger.getLogger("itemUtils", "bedrock-boost", "itemUtils");
