@@ -1,4 +1,4 @@
-import { Vector3, Direction, Vector2 } from "@minecraft/server";
+import { Vector3, Direction, Vector2, StructureRotation } from "@minecraft/server";
 import { Logger } from "./Logging";
 
 type VectorLike = Vector3 | Vec3 | Direction | number[] | number;
@@ -1266,6 +1266,27 @@ export default class Vec3 implements Vector3 {
     // This should never happen
     Vec3.log.error(new Error("Cannot convert vector to direction"), this);
     throw new Error("Cannot convert vector to direction");
+  }
+  /**
+   * Converts the vector to a structure rotation.
+   * If the vector is not a unit vector, then it will be normalized and rounded to the nearest 90 degrees rotation.
+   */
+  toStructureRotation(): StructureRotation {
+    const rotation = this.toRotation();
+    let aligned = Math.round(rotation.y / 90) * 90;
+    if (aligned < 0) {
+      aligned += 360;
+    }
+    if (aligned >= 360) {
+      aligned -= 360;
+    }
+    if (aligned === 0) return StructureRotation.None;
+    if (aligned === 90) return StructureRotation.Rotate90;
+    if (aligned === 180) return StructureRotation.Rotate180;
+    if (aligned === 270) return StructureRotation.Rotate270;
+    // This should never happen
+    Vec3.log.error(new Error("Cannot convert vector to structure rotation"), this);
+    throw new Error("Cannot convert vector to structure rotation");
   }
   /**
    * Returns a new vector with the X, Y, and Z components rounded to the nearest block location.

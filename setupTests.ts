@@ -11,6 +11,12 @@ jest.mock('@minecraft/server', () => {
       Up: 'Up',
       West: 'West',
     },
+    StructureRotation: {
+      None: 'None',
+      Rotate90: 'Rotate90',
+      Rotate180: 'Rotate180',
+      Rotate270: 'Rotate270',
+    },
     system: {
       afterEvents: {
         scriptEventReceive: {

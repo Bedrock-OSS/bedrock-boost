@@ -1,5 +1,5 @@
 import Vec3 from './Vec3';
-import { Direction } from '@minecraft/server';
+import { Direction, StructureRotation } from '@minecraft/server';
 
 describe('Vec3', () => {
   // Constructor tests
@@ -798,6 +798,53 @@ describe('Vec3', () => {
       expect(rotation.x).toBeCloseTo(testCase.rotation.x, 1);
       expect(rotation.y).toBeCloseTo(testCase.rotation.y, 1);
     }
+  });
+
+  describe('toStructureRotation', () => {
+    it('should return StructureRotation.None when aligned rotation is 0', () => {
+      const vec = Vec3.fromRotation({
+        x: 0,
+        y: 0,
+      });
+      expect(vec.toStructureRotation()).toEqual(StructureRotation.None);
+    });
+
+    it('should return StructureRotation.Rotate90 when aligned rotation is 90', () => {
+      const vec = Vec3.fromRotation({
+        x: 0,
+        y: 90,
+      });
+      expect(vec.toStructureRotation()).toEqual(StructureRotation.Rotate90);
+    });
+
+    it('should return StructureRotation.Rotate180 when aligned rotation is 180', () => {
+      const vec = Vec3.fromRotation({
+        x: 0,
+        y: 180,
+      });
+      expect(vec.toStructureRotation()).toEqual(StructureRotation.Rotate180);
+    });
+
+    it('should return StructureRotation.Rotate270 when aligned rotation is -90', () => {
+      const vec = Vec3.fromRotation({
+        x: 0,
+        y: -90,
+      });
+      expect(vec.toStructureRotation()).toEqual(StructureRotation.Rotate270);
+    });
+
+    it('should return StructureRotation.Rotate90 when aligned rotation is 120 degrees', () => {
+      const vec = Vec3.fromRotation({
+        x: 0,
+        y: 120,
+      });
+      expect(vec.toStructureRotation()).toEqual(StructureRotation.Rotate90);
+    });
+
+    it('should throw an error when the vector is a zero vector', () => {
+      const vec = new Vec3(0, 0, 0);
+      expect(() => vec.toStructureRotation()).toThrow('Cannot convert zero-length vector to direction');
+    });
   });
 
 });
