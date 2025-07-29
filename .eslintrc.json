@@ -1,24 +1,16 @@
 {
     "root": true,
-    "extends": [
-        "eslint:recommended",
-        "plugin:@typescript-eslint/recommended"
-    ],
+    "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
         "ecmaVersion": "latest",
         "sourceType": "module",
         "project": "./tsconfig.json"
     },
-    "plugins": [
-        "@typescript-eslint",
-        "minecraft-linting"
-    ],
+    "plugins": ["@typescript-eslint", "minecraft-linting"],
     "overrides": [
         {
-            "files": [
-                "*.ts"
-            ]
+            "files": ["*.ts"]
         }
     ],
     "rules": {

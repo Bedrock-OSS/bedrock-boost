@@ -1,4 +1,4 @@
-import ChatColor from "./ChatColor";
+import ChatColor from './ChatColor';
 
 interface Context {
     indentLevel: number;
@@ -93,7 +93,13 @@ export default class ColorJSON {
      */
     protected stringifyString(value: string): string {
         // Escaping and concatenating with color, and delimiter
-        return this.StringColor + this.StringDelimiter + this.escapeString(value) + this.StringDelimiter + ChatColor.RESET;
+        return (
+            this.StringColor +
+            this.StringDelimiter +
+            this.escapeString(value) +
+            this.StringDelimiter +
+            ChatColor.RESET
+        );
     }
 
     /**
@@ -111,7 +117,11 @@ export default class ColorJSON {
      */
     protected stringifyBoolean(value: boolean): string {
         // Boolean to string transformation along with colors
-        return this.BooleanColor + (value ? this.TrueValue : this.FalseValue) + ChatColor.RESET;
+        return (
+            this.BooleanColor +
+            (value ? this.TrueValue : this.FalseValue) +
+            ChatColor.RESET
+        );
     }
 
     /**
@@ -156,19 +166,41 @@ export default class ColorJSON {
         const indentSpace = this.Indent.repeat(ctx.indentLevel);
         // If array is empty, just returns colored `[]`
         if (value.length === 0) {
-            return this.OpenCloseArrayColor + this.OpenArray + this.CloseArray + ChatColor.RESET;
+            return (
+                this.OpenCloseArrayColor +
+                this.OpenArray +
+                this.CloseArray +
+                ChatColor.RESET
+            );
         }
-        let result = this.OpenCloseArrayColor + this.OpenArray + ChatColor.RESET + this.NewLine;
-        let compactResult = this.OpenCloseArrayColor + this.OpenArray + ChatColor.RESET;
+        let result =
+            this.OpenCloseArrayColor +
+            this.OpenArray +
+            ChatColor.RESET +
+            this.NewLine;
+        let compactResult =
+            this.OpenCloseArrayColor + this.OpenArray + ChatColor.RESET;
         value.forEach((item, index) => {
-            result += indentSpace + this.Indent + this.stringifyValue(item, this.indent(ctx));
-            result += (index < value.length - 1 ? this.Comma + this.NewLine : this.NewLine);
+            result +=
+                indentSpace +
+                this.Indent +
+                this.stringifyValue(item, this.indent(ctx));
+            result +=
+                index < value.length - 1
+                    ? this.Comma + this.NewLine
+                    : this.NewLine;
 
             compactResult += this.stringifyValue(item, this.indent(ctx));
-            compactResult += (index < value.length - 1 ? this.Comma + this.Space : '');
+            compactResult +=
+                index < value.length - 1 ? this.Comma + this.Space : '';
         });
-        result += indentSpace + this.OpenCloseArrayColor + this.CloseArray + ChatColor.RESET;
-        compactResult += this.OpenCloseArrayColor + this.CloseArray + ChatColor.RESET;
+        result +=
+            indentSpace +
+            this.OpenCloseArrayColor +
+            this.CloseArray +
+            ChatColor.RESET;
+        compactResult +=
+            this.OpenCloseArrayColor + this.CloseArray + ChatColor.RESET;
 
         // If the compact representation is small enough, use it
         if (compactResult.length < this.InlineThreshold) {
@@ -183,8 +215,21 @@ export default class ColorJSON {
      * @param className - Class Name of the object.
      * @param indentLevel - The indentation level for pretty-printing.
      */
-    protected stringifyTruncatedObject(value: object, className: string, ctx: Context): string {
-        return (this.IncludeClassNames ? this.ClassColor + '' + this.ClassStyle + className + ChatColor.RESET + this.Space : '') + this.TruncatedObjectValue;
+    protected stringifyTruncatedObject(
+        value: object,
+        className: string,
+        ctx: Context
+    ): string {
+        return (
+            (this.IncludeClassNames
+                ? this.ClassColor +
+                  '' +
+                  this.ClassStyle +
+                  className +
+                  ChatColor.RESET +
+                  this.Space
+                : '') + this.TruncatedObjectValue
+        );
     }
 
     /**
@@ -194,29 +239,82 @@ export default class ColorJSON {
      * @param entries - Entries of the object to transform.
      * @param indentLevel - The indentation level for pretty-printing.
      */
-    protected stringifyObject(value: object, className: string, entries: any[][], ctx: Context): string {
+    protected stringifyObject(
+        value: object,
+        className: string,
+        entries: any[][],
+        ctx: Context
+    ): string {
         const indentSpace = this.Indent.repeat(ctx.indentLevel);
-        const prefix = (this.IncludeClassNames && className !== 'Object' ? this.ClassColor + '' + this.ClassStyle + className + ChatColor.RESET + this.Space : '');
+        const prefix =
+            this.IncludeClassNames && className !== 'Object'
+                ? this.ClassColor +
+                  '' +
+                  this.ClassStyle +
+                  className +
+                  ChatColor.RESET +
+                  this.Space
+                : '';
         // If object has no entries, just return `{}` possibly preceded by class name
         if (entries.length === 0) {
-            return prefix + this.OpenCloseObjectColor + this.OpenObject + this.CloseObject + ChatColor.RESET;
+            return (
+                prefix +
+                this.OpenCloseObjectColor +
+                this.OpenObject +
+                this.CloseObject +
+                ChatColor.RESET
+            );
         }
         // Create both a compact and a multi-line representation
-        let result = prefix + this.OpenCloseObjectColor + this.OpenObject + ChatColor.RESET + this.NewLine;
-        let compactResult = prefix + this.OpenCloseObjectColor + this.OpenObject + ChatColor.RESET;
+        let result =
+            prefix +
+            this.OpenCloseObjectColor +
+            this.OpenObject +
+            ChatColor.RESET +
+            this.NewLine;
+        let compactResult =
+            prefix +
+            this.OpenCloseObjectColor +
+            this.OpenObject +
+            ChatColor.RESET;
 
         // Stringify each entry
         entries.forEach(([key, val], index) => {
             const compactVal = this.stringifyValue(val, this.indent(ctx));
-            result += indentSpace + this.Indent + this.KeyColor + this.KeyDelimiter + key + this.KeyDelimiter + ChatColor.RESET + this.KeyValueSeparator + this.Space + compactVal;
-            result += (index < entries.length - 1) ? this.Comma + this.NewLine : this.NewLine;
+            result +=
+                indentSpace +
+                this.Indent +
+                this.KeyColor +
+                this.KeyDelimiter +
+                key +
+                this.KeyDelimiter +
+                ChatColor.RESET +
+                this.KeyValueSeparator +
+                this.Space +
+                compactVal;
+            result +=
+                index < entries.length - 1
+                    ? this.Comma + this.NewLine
+                    : this.NewLine;
 
-            compactResult += this.KeyColor + key + ChatColor.RESET + this.KeyValueSeparator + this.Space + compactVal;
-            compactResult += (index < entries.length - 1) ? this.Comma + this.Space : '';
+            compactResult +=
+                this.KeyColor +
+                key +
+                ChatColor.RESET +
+                this.KeyValueSeparator +
+                this.Space +
+                compactVal;
+            compactResult +=
+                index < entries.length - 1 ? this.Comma + this.Space : '';
         });
         // Close the object
-        result += indentSpace + this.OpenCloseObjectColor + this.CloseObject + ChatColor.RESET;
-        compactResult += this.OpenCloseObjectColor + this.CloseObject + ChatColor.RESET;
+        result +=
+            indentSpace +
+            this.OpenCloseObjectColor +
+            this.CloseObject +
+            ChatColor.RESET;
+        compactResult +=
+            this.OpenCloseObjectColor + this.CloseObject + ChatColor.RESET;
 
         // If the compact representation is small enough, use it
         if (compactResult.length < this.InlineThreshold) {
@@ -225,8 +323,16 @@ export default class ColorJSON {
         return result;
     }
 
-    protected shouldTruncateObject(value: object, className: string, ctx: Context): boolean {
-        return !(className === 'Object' || ctx.indentLevel <= this.MaxDepth || this.MaxDepth <= 0);
+    protected shouldTruncateObject(
+        value: object,
+        className: string,
+        ctx: Context
+    ): boolean {
+        return !(
+            className === 'Object' ||
+            ctx.indentLevel <= this.MaxDepth ||
+            this.MaxDepth <= 0
+        );
     }
 
     /**
@@ -251,7 +357,10 @@ export default class ColorJSON {
 
         // Stringify arrays
         if (Array.isArray(value)) {
-            const result = this.stringifyArray(value, ctx.indentLevel ? this.indent(ctx) : ctx);
+            const result = this.stringifyArray(
+                value,
+                ctx.indentLevel ? this.indent(ctx) : ctx
+            );
             this.clearCycle(value, ctx);
             return result;
         }
@@ -268,23 +377,27 @@ export default class ColorJSON {
                 let prototype = Object.getPrototypeOf(value);
                 let keys = Object.keys(prototype);
                 while (keys.length > 0) {
-                    keys.forEach(key => keySet.add(key));
+                    keys.forEach((key) => keySet.add(key));
                     prototype = Object.getPrototypeOf(prototype);
                     keys = Object.keys(prototype);
                 }
                 // Get all keys from the object itself
-                Object.keys(value).forEach(key => keySet.add(key));
+                Object.keys(value).forEach((key) => keySet.add(key));
                 keySet.delete('__cycleDetection__');
                 // Sort the keys
                 const allKeys = [...keySet].sort();
                 // Get all entries
-                const entries = allKeys.map((key: string) => {
-                    try {
-                        return [key, (value as any)[key] ?? void 0];
-                    } catch(e) {
-                        return [key, void 0];
-                    }
-                }).filter(([, val]) => typeof val !== 'function' && val !== void 0);
+                const entries = allKeys
+                    .map((key: string) => {
+                        try {
+                            return [key, (value as any)[key] ?? void 0];
+                        } catch (e) {
+                            return [key, void 0];
+                        }
+                    })
+                    .filter(
+                        ([, val]) => typeof val !== 'function' && val !== void 0
+                    );
                 const result = this.stringifyObject(value, name, entries, ctx);
                 this.clearCycle(value, ctx);
                 return result;
@@ -305,7 +418,8 @@ export default class ColorJSON {
      * @param str - The string to escape.
      */
     protected escapeString(str: string): string {
-        return str.replace(/\\/g, this.EscapeColor + '\\\\' + this.StringColor)
+        return str
+            .replace(/\\/g, this.EscapeColor + '\\\\' + this.StringColor)
             .replace(/"/g, this.EscapeColor + '\\"' + this.StringColor)
             .replace(/\n/g, this.EscapeColor + '\\n' + this.StringColor)
             .replace(/\r/g, this.EscapeColor + '\\r' + this.StringColor)

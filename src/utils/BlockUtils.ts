@@ -1,5 +1,5 @@
-import { Dimension, Vector3 } from "@minecraft/server";
-import { getDimensionHeightRange } from "../Cache";
+import { Dimension, Vector3 } from '@minecraft/server';
+import { getDimensionHeightRange } from '../Cache';
 
 /**
  * Checks if a location is between the min and max height of a dimension.
@@ -7,8 +7,11 @@ import { getDimensionHeightRange } from "../Cache";
  * @param location The location to check.
  * @returns True if the location is valid, otherwise false.
  */
-export function isValidLocation(dimension:Dimension|string, location:Vector3):boolean {
-    if (typeof dimension !== "string") {
+export function isValidLocation(
+    dimension: Dimension | string,
+    location: Vector3
+): boolean {
+    if (typeof dimension !== 'string') {
         dimension = dimension.id;
     }
     const range = getDimensionHeightRange(dimension);

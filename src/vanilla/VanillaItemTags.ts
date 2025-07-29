@@ -7,7 +7,8 @@ export default class VanillaItemTags {
     public static readonly ChainmailTier = 'minecraft:chainmail_tier';
     public static readonly Coals = 'minecraft:coals';
     public static readonly CrimsonStems = 'minecraft:crimson_stems';
-    public static readonly DecoratedPotSherds = 'minecraft:decorated_pot_sherds';
+    public static readonly DecoratedPotSherds =
+        'minecraft:decorated_pot_sherds';
     public static readonly DiamondTier = 'minecraft:diamond_tier';
     public static readonly Digger = 'minecraft:digger';
     public static readonly Door = 'minecraft:door';
@@ -40,12 +41,15 @@ export default class VanillaItemTags {
     public static readonly Planks = 'minecraft:planks';
     public static readonly Sand = 'minecraft:sand';
     public static readonly Sign = 'minecraft:sign';
-    public static readonly SoulFireBaseBlocks = 'minecraft:soul_fire_base_blocks';
+    public static readonly SoulFireBaseBlocks =
+        'minecraft:soul_fire_base_blocks';
     public static readonly SpawnEgg = 'minecraft:spawn_egg';
     public static readonly StoneBricks = 'minecraft:stone_bricks';
-    public static readonly StoneCraftingMaterials = 'minecraft:stone_crafting_materials';
+    public static readonly StoneCraftingMaterials =
+        'minecraft:stone_crafting_materials';
     public static readonly StoneTier = 'minecraft:stone_tier';
-    public static readonly StoneToolMaterials = 'minecraft:stone_tool_materials';
+    public static readonly StoneToolMaterials =
+        'minecraft:stone_tool_materials';
     public static readonly TransformMaterials = 'minecraft:transform_materials';
     public static readonly TransformTemplates = 'minecraft:transform_templates';
     public static readonly TransformableItems = 'minecraft:transformable_items';

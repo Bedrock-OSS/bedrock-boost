@@ -1,49 +1,65 @@
-import { RawMessage } from "@minecraft/server";
-import { LogLevel, Logger } from "./src/Logging";
+import { RawMessage } from '@minecraft/server';
+import { LogLevel, Logger } from './src/Logging';
 
-jest.mock('@minecraft/server', () => {
-  return {
-    Direction: {
-      Down: 'Down',
-      East: 'East',
-      North: 'North',
-      South: 'South',
-      Up: 'Up',
-      West: 'West',
+jest.mock(
+    '@minecraft/server',
+    () => {
+        return {
+            Direction: {
+                Down: 'Down',
+                East: 'East',
+                North: 'North',
+                South: 'South',
+                Up: 'Up',
+                West: 'West',
+            },
+            StructureRotation: {
+                None: 'None',
+                Rotate90: 'Rotate90',
+                Rotate180: 'Rotate180',
+                Rotate270: 'Rotate270',
+            },
+            system: {
+                afterEvents: {
+                    scriptEventReceive: {
+                        subscribe: jest.fn(),
+                    },
+                },
+                clearRun: (id: number) => {
+                    clearInterval(id);
+                    clearTimeout(id);
+                },
+                run: (callback: () => void) => {
+                    return setTimeout(callback, 50);
+                },
+                runInterval: (
+                    callback: () => void,
+                    tickInterval?: number
+                ): number => {
+                    return setInterval(callback, tickInterval || 1)[
+                        Symbol.toPrimitive
+                    ]();
+                },
+                runTimeout: (
+                    callback: () => void,
+                    tickDelay?: number
+                ): number => {
+                    return setTimeout(callback, tickDelay || 1)[
+                        Symbol.toPrimitive
+                    ]();
+                },
+            },
+            world: {
+                sendMessage: (
+                    message: (RawMessage | string)[] | RawMessage | string
+                ): void => {
+                    console.log(message);
+                },
+            },
+        };
     },
-    StructureRotation: {
-      None: 'None',
-      Rotate90: 'Rotate90',
-      Rotate180: 'Rotate180',
-      Rotate270: 'Rotate270',
-    },
-    system: {
-      afterEvents: {
-        scriptEventReceive: {
-          subscribe: jest.fn(),
-        }
-      },
-      clearRun: (id:number) => {
-        clearInterval(id);
-        clearTimeout(id);
-      },
-      run: (callback: () => void) => {
-        return setTimeout(callback, 50);
-      },
-      runInterval: (callback: () => void, tickInterval?: number): number => {
-        return setInterval(callback, tickInterval || 1)[Symbol.toPrimitive]();
-      },
-      runTimeout: (callback: () => void, tickDelay?: number): number => {
-        return setTimeout(callback, tickDelay || 1)[Symbol.toPrimitive]();
-      },
-    },
-    world: {
-      sendMessage: (message: (RawMessage | string)[] | RawMessage | string): void => {
-        console.log(message);
-      }
-    }
-  };
-}, { virtual: true });
+    { virtual: true }
+);
 Logger.getOutputConfig()[LogLevel.Trace.level] = [];
 Logger.getOutputConfig()[LogLevel.Debug.level] = [];
 Logger.getOutputConfig()[LogLevel.Info.level] = [];

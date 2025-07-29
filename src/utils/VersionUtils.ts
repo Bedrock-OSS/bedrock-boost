@@ -1,4 +1,4 @@
-import { Entity } from "@minecraft/server";
+import { Entity } from '@minecraft/server';
 
 /**
  * Returns true if the script API version is 2.0.0 or higher, otherwise false.
@@ -23,5 +23,5 @@ export function isValid(entity: Entity): boolean {
     if (typeof f === 'function') {
         return f.call(entity) as boolean;
     }
-    return (entity.isValid as any) as boolean;
+    return entity.isValid as any as boolean;
 }
