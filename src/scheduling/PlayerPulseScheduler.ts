@@ -7,8 +7,11 @@ import { isValid } from "../utils/VersionUtils";
  * Represents a PulseScheduler that processes players.
  */
 export default class PlayerPulseScheduler extends PulseScheduler<Player> {
-
-  private static readonly logger = Logger.getLogger("PlayerPulseScheduler", "bedrock-boost", "player-pulse-scheduler");
+  private static readonly logger = Logger.getLogger(
+    "PlayerPulseScheduler",
+    "bedrock-boost",
+    "player-pulse-scheduler"
+  );
 
   /**
    * Creates a new PlayerPulseScheduler instance.
@@ -22,7 +25,13 @@ export default class PlayerPulseScheduler extends PulseScheduler<Player> {
         this.removeIf((entity) => !isValid(entity));
       }
     }, period);
-    this.push(...world.getAllPlayers());
+    try {
+      this.push(...world.getAllPlayers());
+    } catch (e) {
+      system.runTimeout(() => {
+        this.push(...world.getAllPlayers());
+      }, 1);
+    }
   }
 
   private compareEntities(a: Player, b: Player): boolean {
@@ -35,7 +44,9 @@ export default class PlayerPulseScheduler extends PulseScheduler<Player> {
       const pushPlayer = () => {
         attempts++;
         if (attempts > 10) {
-          PlayerPulseScheduler.logger.debug("Failed to push player to scheduler after 10 attempts.");
+          PlayerPulseScheduler.logger.debug(
+            "Failed to push player to scheduler after 10 attempts."
+          );
           return;
         }
         try {
@@ -47,25 +58,42 @@ export default class PlayerPulseScheduler extends PulseScheduler<Player> {
             this.push(player);
           }
         } catch (e) {
-          PlayerPulseScheduler.logger.debug("Failed to push player to scheduler.", e);
+          PlayerPulseScheduler.logger.debug(
+            "Failed to push player to scheduler.",
+            e
+          );
           system.runTimeout(pushPlayer, 1);
         }
-      }
+      };
       pushPlayer();
     });
     world.afterEvents.playerLeave.subscribe((event) => {
-      this.removeIf((entity) => !isValid(entity) || entity.id === event.playerId);
+      this.removeIf(
+        (entity) => !isValid(entity) || entity.id === event.playerId
+      );
     });
     super.start();
   }
 
   push(...items: Player[]): number {
-    const filtered = items.filter(item => isValid(item) && !this.items.some(existingItem => this.compareEntities(existingItem, item)));
+    const filtered = items.filter(
+      (item) =>
+        isValid(item) &&
+        !this.items.some((existingItem) =>
+          this.compareEntities(existingItem, item)
+        )
+    );
     return super.push(...filtered);
   }
 
   unshift(...items: Player[]): number {
-    const filtered = items.filter(item => isValid(item) && !this.items.some(existingItem => this.compareEntities(existingItem, item)));
+    const filtered = items.filter(
+      (item) =>
+        isValid(item) &&
+        !this.items.some((existingItem) =>
+          this.compareEntities(existingItem, item)
+        )
+    );
     return super.unshift(...filtered);
   }
 
@@ -75,7 +103,12 @@ export default class PlayerPulseScheduler extends PulseScheduler<Player> {
     if (deleteCount === void 0) {
       return super.splice(start);
     }
-    const filtered = items.filter(item => !this.items.some(existingItem => this.compareEntities(existingItem, item)));
+    const filtered = items.filter(
+      (item) =>
+        !this.items.some((existingItem) =>
+          this.compareEntities(existingItem, item)
+        )
+    );
     return super.splice(start, deleteCount, ...filtered);
   }
 }
