@@ -134,27 +134,3 @@ export class ItemUtils {
         return 1 / (unbreakingLevel + 1);
     }
 }
-
-/**
- * Consumes durability from the player's selected item.
- * @param player - The player whose item durability will be consumed.
- * @param value - The amount of durability to consume. Defaults to 1.
- * @param slot - The slot to consume durability from. Defaults to the player's selected slot.
- * @returns True if the durability was successfully consumed, false otherwise.
- *
- * @deprecated Use `ItemUtils.consumeDurability` instead.
- */
-export function consumeDurability(
-    player: Player,
-    value: number = 1,
-    slot: EquipmentSlot = EquipmentSlot.Mainhand
-): boolean {
-    return ItemUtils.consumeDurability(player, {
-        slot,
-        value,
-        // These settings are set so that the function will work the same way as before
-        ignoreEnchantments: true,
-        breakSound: '',
-        ignoreCreative: true,
-    });
-}

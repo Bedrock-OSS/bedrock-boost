@@ -177,41 +177,6 @@ export default class Vec3 implements Vector3 {
     copy(): Vec3 {
         return new Vec3(this.x, this.y, this.z);
     }
-    /**
-     * Creates a new direction vector from yaw and pitch values.
-     *
-     * @param rotation - The yaw and pitch values in degrees.
-     * @returns A new vector representing the direction.
-     * @deprecated Use fromRotation() instead. This method returns inverted values and will be removed in the future.
-     */
-    static fromYawPitch(rotation: Vector2): Vec3;
-    /**
-     * Creates a new direction vector from yaw and pitch values.
-     *
-     * @param yaw - The yaw value in degrees.
-     * @param pitch - The pitch value in degrees.
-     * @returns A new vector representing the direction.
-     * @deprecated Use fromRotation() instead. This method returns inverted values and will be removed in the future.
-     */
-    static fromYawPitch(yaw: number, pitch: number): Vec3;
-    static fromYawPitch(yawOrRotation: number | Vector2, pitch?: number): Vec3 {
-        let yaw: number;
-        if (typeof yawOrRotation === 'number') {
-            yaw = yawOrRotation as number;
-            pitch = pitch!;
-        } else {
-            yaw = yawOrRotation.y;
-            pitch = yawOrRotation.x;
-        }
-        // Convert degrees to radians
-        const psi = yaw * (Math.PI / 180);
-        const theta = pitch * (Math.PI / 180);
-
-        const x = Math.cos(theta) * Math.sin(psi);
-        const y = Math.sin(theta);
-        const z = Math.cos(theta) * Math.cos(psi);
-        return new Vec3(x, y, z);
-    }
 
     /**
      * Creates a new direction vector from yaw and pitch values.
@@ -245,28 +210,6 @@ export default class Vec3 implements Vector3 {
         const y = -Math.sin(theta);
         const z = Math.cos(theta) * Math.cos(psi);
         return new Vec3(x, y, z);
-    }
-
-    /**
-     * Converts the normal vector to yaw and pitch values.
-     *
-     * @returns A Vector2 containing the yaw and pitch values.
-     * @deprecated Use toRotation() instead. This method returns inverted values and will be removed in the future.
-     */
-    toYawPitch(): Vector2 {
-        if (this.isZero()) {
-            Vec3.log.error(
-                new Error('Cannot convert zero-length vector to direction')
-            );
-            throw new Error('Cannot convert zero-length vector to direction');
-        }
-        const direction = this.normalize();
-        const yaw = Math.atan2(direction.x, direction.z) * (180 / Math.PI);
-        const pitch = Math.asin(direction.y) * (180 / Math.PI);
-        return {
-            x: pitch,
-            y: yaw,
-        };
     }
 
     /**

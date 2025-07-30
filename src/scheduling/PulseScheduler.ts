@@ -35,25 +35,6 @@ export default class PulseScheduler<T> {
     }
 
     /**
-     * Adds an item to the schedule.
-     * @param item The item to be added.
-     * @deprecated Use `push` instead.
-     */
-    add(item: T) {
-        this.push(item);
-    }
-
-    /**
-     * Adds multiple items to the schedule.
-     *
-     * @param items - The items to be added.
-     * @deprecated Use `push` instead.
-     */
-    addAll(items: T[]) {
-        this.push(...items);
-    }
-
-    /**
      * Removes an item from the schedule at the specified index.
      * @param index - The index of the item to remove.
      */

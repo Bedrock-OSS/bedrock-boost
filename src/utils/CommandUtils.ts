@@ -60,26 +60,6 @@ export type ItemMatcher = {
  */
 export class CommandUtils {
     /**
-     * Sets the input permission for a player.
-     * @param player The player for whom to set the input permission.
-     * @param permission The input permission to set.
-     * @param value The value to set the input permission to.
-     *
-     * @deprecated Use `player.inputPermissions.setPermissionCategory` instead.
-     */
-    public static setInputPermission(
-        player: Player,
-        permission: InputPermission,
-        value: boolean
-    ): void {
-        player.inputPermissions.setPermissionCategory(
-            permission === InputPermission.Movement
-                ? InputPermissionCategory.Movement
-                : InputPermissionCategory.Camera,
-            value
-        );
-    }
-    /**
      * Adds camera shake effect to the specified player.
      * @param player - The player to apply the camera shake effect to.
      * @param type - The type of camera shake effect.

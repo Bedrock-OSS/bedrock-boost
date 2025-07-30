@@ -91,29 +91,6 @@ describe('Vec3', () => {
         expect(copyVec.z).toEqual(vec.z);
     });
 
-    // fromYawPitch tests
-    it('should convert yaw and pitch to a normal vector', () => {
-        const vec = Vec3.fromYawPitch(45, 30);
-        expect(vec.x).toBeCloseTo(0.6123724356957945);
-        expect(vec.y).toBeCloseTo(0.5);
-        expect(vec.z).toBeCloseTo(0.6123724356957945);
-    });
-
-    it('should convert Vector2 with rotations to a normal vector', () => {
-        const vec = Vec3.fromYawPitch({ x: 30, y: 45 });
-        expect(vec.x).toBeCloseTo(0.6123724356957945);
-        expect(vec.y).toBeCloseTo(0.5);
-        expect(vec.z).toBeCloseTo(0.6123724356957945);
-    });
-
-    //toYawPitch tests
-    it('should convert a normal vector to yaw and pitch', () => {
-        const vec = new Vec3(0.6123724356957945, 0.5, 0.6123724356957945);
-        const yawPitch = vec.toYawPitch();
-        expect(yawPitch.x).toBeCloseTo(30);
-        expect(yawPitch.y).toBeCloseTo(45);
-    });
-
     // normalize tests
     it('should normalize a Vec3 instance', () => {
         const vec = new Vec3(1, 2, 3).normalize();
@@ -453,53 +430,6 @@ describe('Vec3', () => {
         expect(result.x).toEqual(7);
         expect(result.y).toEqual(8);
         expect(result.z).toEqual(9);
-    });
-
-    // slerp tests
-    it('should perform slerp interpolation correctly', () => {
-        const vec1 = Vec3.fromYawPitch(0, 0);
-        const vec2 = Vec3.fromYawPitch(90, 0);
-        const t = 0.5;
-        const result = vec1.slerp(vec2, t);
-        expect(result.x).toBeCloseTo(0.7071067811865476);
-        expect(result.y).toBeCloseTo(0);
-        expect(result.z).toBeCloseTo(0.7071067811865476);
-    });
-
-    it('should return a copy of the original Vec3 instance when t is 0', () => {
-        const vec1 = Vec3.fromYawPitch(0, 0);
-        const vec2 = Vec3.fromYawPitch(90, 0);
-        const t = 0;
-        const result = vec1.slerp(vec2, t);
-        expect(result).toEqual(vec1);
-    });
-
-    it('should return a copy of the target Vec3 instance when t is 1', () => {
-        const vec1 = Vec3.fromYawPitch(0, 0);
-        const vec2 = Vec3.fromYawPitch(90, 0);
-        const t = 1;
-        const result = vec1.slerp(vec2, t);
-        expect(result).toEqual(vec2);
-    });
-
-    it('should return an extrapolation when t is less than 0', () => {
-        const vec1 = Vec3.fromYawPitch(0, 0);
-        const vec2 = Vec3.fromYawPitch(90, 0);
-        const t = -1;
-        const result = vec1.slerp(vec2, t);
-        expect(result.x).toBeCloseTo(-1);
-        expect(result.y).toBeCloseTo(0);
-        expect(result.z).toBeCloseTo(0);
-    });
-
-    it('should return an extrapolation when t is greater than 1', () => {
-        const vec1 = Vec3.fromYawPitch(0, 0);
-        const vec2 = Vec3.fromYawPitch(90, 0);
-        const t = 2;
-        const result = vec1.slerp(vec2, t);
-        expect(result.x).toBeCloseTo(0);
-        expect(result.y).toBeCloseTo(0);
-        expect(result.z).toBeCloseTo(-1);
     });
 
     // dot tests
