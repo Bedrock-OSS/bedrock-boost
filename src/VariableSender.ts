@@ -1,5 +1,4 @@
 import { Entity, Player, system } from '@minecraft/server';
-import { isVersion2 } from './utils/VersionUtils';
 
 /**
  * Represents a Molang expression. This will be injected into the variable value as Molang expression.
@@ -46,10 +45,6 @@ export function sendMolangData(
     entity.playAnimation(animation, {
         stopExpression: stopExpression,
         controller: '__' + animation + '_send_data__',
-        players: (isVersion2(entity)
-            ? receivers
-            : receivers.length
-              ? receivers.map((player) => player.name)
-              : undefined) as any,
+        players: receivers,
     });
 }

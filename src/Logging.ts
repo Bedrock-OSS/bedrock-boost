@@ -202,41 +202,43 @@ export class Logger {
         LOGGING: {
             if (Logger.initialized) return;
             Logger.initialized = true;
-            system.afterEvents.scriptEventReceive.subscribe((ev) => {
-                if (ev.id === 'logging:level' || ev.id === 'log:level') {
-                    if (!ev.message) {
-                        loggingSettings.level = LogLevel.Info;
-                        world.sendMessage(
-                            `${ChatColor.AQUA}Logging level set to ${ChatColor.BOLD}${loggingSettings.level}`
-                        );
-                    } else {
-                        const level = LogLevel.parse(ev.message);
-                        if (level) {
-                            loggingSettings.level = level;
+            system.beforeEvents.startup.subscribe(() => {
+                system.afterEvents.scriptEventReceive.subscribe((ev) => {
+                    if (ev.id === 'logging:level' || ev.id === 'log:level') {
+                        if (!ev.message) {
+                            loggingSettings.level = LogLevel.Info;
                             world.sendMessage(
                                 `${ChatColor.AQUA}Logging level set to ${ChatColor.BOLD}${loggingSettings.level}`
                             );
                         } else {
-                            world.sendMessage(
-                                `${ChatColor.DARK_RED}Invalid logging level: ${ev.message}`
-                            );
+                            const level = LogLevel.parse(ev.message);
+                            if (level) {
+                                loggingSettings.level = level;
+                                world.sendMessage(
+                                    `${ChatColor.AQUA}Logging level set to ${ChatColor.BOLD}${loggingSettings.level}`
+                                );
+                            } else {
+                                world.sendMessage(
+                                    `${ChatColor.DARK_RED}Invalid logging level: ${ev.message}`
+                                );
+                            }
                         }
+                    } else if (
+                        ev.id === 'logging:filter' ||
+                        ev.id === 'log:filter'
+                    ) {
+                        if (!ev.message) {
+                            loggingSettings.filter = ['*'];
+                        } else {
+                            loggingSettings.filter = ev.message.split(',');
+                        }
+                        world.sendMessage(
+                            `${ChatColor.AQUA}Logging filter set to ${
+                                ChatColor.BOLD
+                            }${loggingSettings.filter.join(', ')}`
+                        );
                     }
-                } else if (
-                    ev.id === 'logging:filter' ||
-                    ev.id === 'log:filter'
-                ) {
-                    if (!ev.message) {
-                        loggingSettings.filter = ['*'];
-                    } else {
-                        loggingSettings.filter = ev.message.split(',');
-                    }
-                    world.sendMessage(
-                        `${ChatColor.AQUA}Logging filter set to ${
-                            ChatColor.BOLD
-                        }${loggingSettings.filter.join(', ')}`
-                    );
-                }
+                });
             });
         }
     }

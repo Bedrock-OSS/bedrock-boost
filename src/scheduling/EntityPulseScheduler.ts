@@ -1,7 +1,6 @@
 import { Entity, EntityQueryOptions, system, world } from '@minecraft/server';
 import PulseScheduler from './PulseScheduler';
 import { Logger } from '../Logging';
-import { isValid } from '../utils/VersionUtils';
 
 /**
  * Represents a PulseScheduler that processes entities matching a query.
@@ -23,10 +22,10 @@ export default class EntityPulseScheduler extends PulseScheduler<Entity> {
         private queryOptions: EntityQueryOptions
     ) {
         super((t: Entity) => {
-            if (isValid(t)) {
+            if (t.isValid) {
                 processor(t);
             } else {
-                this.removeIf((entity) => !isValid(entity));
+                this.removeIf((entity) => !entity.isValid);
             }
         }, period);
         this.push(
@@ -60,7 +59,7 @@ export default class EntityPulseScheduler extends PulseScheduler<Entity> {
         world.afterEvents.entityRemove.subscribe((event) => {
             this.removeIf(
                 (entity) =>
-                    !isValid(entity) || entity.id === event.removedEntityId
+                    !entity.isValid || entity.id === event.removedEntityId
             );
         });
         super.start();
@@ -76,9 +75,9 @@ export default class EntityPulseScheduler extends PulseScheduler<Entity> {
                 return;
             }
             // Special case for when the entity is loaded from a structure and removed the same tick
-            if (!isValid(entity)) {
+            if (!entity.isValid) {
                 system.runInterval(() => {
-                    if (isValid(entity) && entity.matches(this.queryOptions)) {
+                    if (entity.isValid && entity.matches(this.queryOptions)) {
                         this.push(entity);
                     }
                 }, 1);
@@ -97,7 +96,7 @@ export default class EntityPulseScheduler extends PulseScheduler<Entity> {
     push(...items: Entity[]): number {
         const filtered = items.filter(
             (item) =>
-                isValid(item) &&
+                item.isValid &&
                 !this.items.some((existingItem) =>
                     this.compareEntities(existingItem, item)
                 )
@@ -108,7 +107,7 @@ export default class EntityPulseScheduler extends PulseScheduler<Entity> {
     unshift(...items: Entity[]): number {
         const filtered = items.filter(
             (item) =>
-                isValid(item) &&
+                item.isValid &&
                 !this.items.some((existingItem) =>
                     this.compareEntities(existingItem, item)
                 )

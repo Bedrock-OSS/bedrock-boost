@@ -1,5 +1,4 @@
 import { Entity, Player, Vector3 } from '@minecraft/server';
-import { isVersion2 } from '../utils/VersionUtils';
 
 /**
  * Applies an impulse to a player.
@@ -46,22 +45,13 @@ function applyImpulseNew(entity: Entity, vector: Vector3) {
     const verticalStrength = y + previousVelocity.y * 0.9;
 
     // Apply the knockback
-    if (isVersion2(entity)) {
-        (entity as any).applyKnockback(
-            {
-                x: horizontalStrength * directionX,
-                z: horizontalStrength * directionZ,
-            },
-            verticalStrength
-        );
-    } else {
-        (entity as any).applyKnockback(
-            directionX,
-            directionZ,
-            horizontalStrength,
-            verticalStrength
-        );
-    }
+    entity.applyKnockback(
+        {
+            x: horizontalStrength * directionX,
+            z: horizontalStrength * directionZ,
+        },
+        verticalStrength
+    );
 }
 
 /**
@@ -84,22 +74,13 @@ function clearVelocity(entity: Entity) {
     }
 
     // Apply the knockback
-    if (isVersion2(entity)) {
-        (entity as any).applyKnockback(
-            {
-                x: horizontalNorm * directionX,
-                z: horizontalNorm * directionZ,
-            },
-            0
-        );
-    } else {
-        (entity as any).applyKnockback(
-            directionX,
-            directionZ,
-            horizontalNorm,
-            0
-        );
-    }
+    entity.applyKnockback(
+        {
+            x: horizontalNorm * directionX,
+            z: horizontalNorm * directionZ,
+        },
+        0
+    );
 }
 
 export function install() {
