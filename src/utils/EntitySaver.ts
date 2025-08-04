@@ -121,4 +121,13 @@ export default class EntitySaver {
                 structureManager.delete(id);
             });
     }
+    /**
+     * Deletes the structure with the specified ID.
+     * @param id The ID of the structure to delete.
+     * @param prefix The prefix used for the structure.
+     */
+    public static delete(id: number, prefix: string) {
+        const structureManager = world.structureManager;
+        structureManager.delete(prefix + id);
+    }
 }
