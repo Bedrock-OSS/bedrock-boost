@@ -1,10 +1,4 @@
-import {
-    Dimension,
-    Entity,
-    InputPermissionCategory,
-    Player,
-    Vector3,
-} from '@minecraft/server';
+import { Dimension, Entity, Player, Vector3 } from '@minecraft/server';
 
 export enum InputPermission {
     Movement = 'movement',
@@ -114,11 +108,11 @@ export class CommandUtils {
                 if (typeof matcher.quantity === 'number') {
                     cmd += matcher.quantity;
                 } else {
-                    if (matcher.quantity.min != void 0) {
+                    if (matcher.quantity.min !== void 0) {
                         cmd += matcher.quantity.min;
                     }
                     cmd += '..';
-                    if (matcher.quantity.max != void 0) {
+                    if (matcher.quantity.max !== void 0) {
                         cmd += matcher.quantity.max;
                     }
                 }
@@ -127,7 +121,7 @@ export class CommandUtils {
                 cmd += `,data=${matcher.data}`;
             }
             if (matcher.slotLocation !== void 0) {
-                cmd += `,${matcher.slotLocation}=${matcher.slot}`;
+                cmd += `,location=${matcher.slotLocation}`;
                 if (matcher.slot !== void 0) {
                     cmd += `,slot=${matcher.slot}`;
                 }
