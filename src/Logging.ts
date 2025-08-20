@@ -137,10 +137,12 @@ type LoggingSettings = {
     filter: '*' | string[];
     level: LogLevel;
     outputTags: boolean;
+    timestampFormatter: (timestamp: Date) => string;
     formatFunction: (
         level: LogLevel,
         logger: Logger,
         message: string,
+        timestamp: string,
         tags?: string[] | undefined
     ) => string;
     messagesJoinFunction: (messages: string[]) => string;
@@ -152,17 +154,23 @@ const loggingSettings: LoggingSettings = {
     level: LogLevel.Info,
     filter: ['*'],
     outputTags: false,
+    timestampFormatter: (timestamp: Date) => {
+        // Hidden by default
+        return '';
+    },
     formatFunction: (
         level: LogLevel,
         logger: Logger,
         message: string,
+        timestamp: string,
         tags = undefined
     ) => {
         const _tags =
             tags !== undefined
                 ? `§7${tags.map((tag) => `[${tag}]`).join('')}§r`
                 : '';
-        return `[${level}][${ChatColor.MATERIAL_EMERALD}${logger.name}${ChatColor.RESET}]${_tags} ${message}`;
+        const time = timestamp ? `[${timestamp}]` : '';
+        return `${time}[${level}][${ChatColor.MATERIAL_EMERALD}${logger.name}${ChatColor.RESET}]${_tags} ${message}`;
     },
     messagesJoinFunction: (messages: string[]) => {
         return messages.join(' ');
@@ -260,7 +268,13 @@ export class Logger {
      * @param {function} func - The function to set.
      */
     static setFormatFunction(
-        func: (level: LogLevel, logger: Logger, message: string) => string
+        func: (
+            level: LogLevel,
+            logger: Logger,
+            message: string,
+            timestamp: string,
+            tags?: string[] | undefined
+        ) => string
     ) {
         loggingSettings.formatFunction = func;
     }
@@ -277,6 +291,27 @@ export class Logger {
      */
     static setTagsOutputVisibility(visible: boolean) {
         loggingSettings.outputTags = visible;
+    }
+    /**
+     * Set the timestamp formatter for the logger.
+     * @param formatter - The function used to format the timestamp.
+     */
+    static setTimestampFormatter(formatter: (timestamp: Date) => string) {
+        loggingSettings.timestampFormatter = formatter;
+    }
+    /**
+     * Set the basic timestamp formatter for the logger in HH:mm:ss.SS format.
+     */
+    static setBasicTimestampFormatter() {
+        loggingSettings.timestampFormatter = (timestamp: Date) => {
+            const hours = timestamp.getHours().toString().padStart(2, '0');
+            const minutes = timestamp.getMinutes().toString().padStart(2, '0');
+            const seconds = timestamp.getSeconds().toString().padStart(2, '0');
+            const centiseconds = Math.floor(timestamp.getMilliseconds() / 10)
+                .toString()
+                .padStart(2, '0');
+            return `${hours}:${minutes}:${seconds}.${centiseconds}`;
+        };
     }
     /**
      * Set the JSON formatter for the logger.
@@ -424,10 +459,13 @@ export class Logger {
                 }
                 return x.toString() + ChatColor.RESET;
             });
+            const now = new Date();
+            const formattedTimestamp = loggingSettings.timestampFormatter(now);
             const formatted = loggingSettings.formatFunction(
                 level,
                 this,
                 loggingSettings.messagesJoinFunction(msgs),
+                formattedTimestamp,
                 loggingSettings.outputTags ? this.tags : undefined
             );
             const outputs = loggingSettings.outputConfig[level.level] || [

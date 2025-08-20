@@ -29,8 +29,10 @@ The `init` method initializes the logging system, setting up commands and defaul
 
 - **setLevel**: Sets the global logging level. By default, info and higher levels are enabled.
 - **setFilter**: Sets a filter to control which loggers are active. By default, all loggers are active.
-- **setFormatFunction**: Customizes how log messages are formatted.
+- **setFormatFunction**: Customizes how log messages are formatted. The function receives the log level, logger instance, message, formatted timestamp, and any tags.
 - **setTagsOutputVisibility**: When true, the tags of the logger will be appended next to its name. By default, this is disabled.
+- **setTimestampFormatter**: Supplies a function that formats a provided `Date` timestamp into a string. The formatted value is passed to the format function. Returning an empty string will omit the timestamp. By default, timestamps are disabled.
+- **setBasicTimestampFormatter**: Sets a basic timestamp formatter, that formats the timestamp in `HH:mm:ss.SS` format.
 - **setJsonFormatter**: Sets a JSON formatter for stringifying objects and arrays. By default, `ColorJSON.DEFAULT` is used.
 
 ### Logging Methods
@@ -44,11 +46,11 @@ To use the logging system, create a `Logger` instance with a specific name and t
 ### Example
 
 ```typescript
-import { Logger } from "@bedrock-oss/bedrock-boost";
+import { Logger } from '@bedrock-oss/bedrock-boost';
 
-const logger = new Logger("myLogger", "myTag", "anotherTag");
+const logger = new Logger('myLogger', 'myTag', 'anotherTag');
 
-logger.info("Hello, world!", { foo: "bar"});
+logger.info('Hello, world!', { foo: 'bar' });
 ```
 
 ## Commands
@@ -70,16 +72,17 @@ scriptevent log:filter <comma separated tags>
 When using esbuild, you can use `dropLabels` option with `LOGGING` label to remove all logging code from the final bundle.
 
 When using [gametests regolith filter](https://github.com/Bedrock-OSS/regolith-filters/tree/master/gametests), you can configure it like this:
+
 ```json
 {
-  "filter": "gametests",
-  "settings": {
-    "modules": [
-      // ...
-    ],
-    "buildOptions": {
-      "dropLabels": ["LOGGING"]
+    "filter": "gametests",
+    "settings": {
+        "modules": [
+            // ...
+        ],
+        "buildOptions": {
+            "dropLabels": ["LOGGING"]
+        }
     }
-  }
 }
 ```
