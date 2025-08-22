@@ -12,15 +12,24 @@ export default class VanillaBlockTags {
     public static readonly Log = 'log';
     public static readonly Metal = 'metal';
     public static readonly Crop = 'minecraft:crop';
-    public static readonly DiamondTierDestructible = 'minecraft:diamond_tier_destructible';
-    public static readonly IronTierDestructible = 'minecraft:iron_tier_destructible';
-    public static readonly IsAxeItemDestructible = 'minecraft:is_axe_item_destructible';
-    public static readonly IsHoeItemDestructible = 'minecraft:is_hoe_item_destructible';
-    public static readonly IsPickaxeItemDestructible = 'minecraft:is_pickaxe_item_destructible';
-    public static readonly IsShearsItemDestructible = 'minecraft:is_shears_item_destructible';
-    public static readonly IsShovelItemDestructible = 'minecraft:is_shovel_item_destructible';
-    public static readonly IsSwordItemDestructible = 'minecraft:is_sword_item_destructible';
-    public static readonly StoneTierDestructible = 'minecraft:stone_tier_destructible';
+    public static readonly DiamondTierDestructible =
+        'minecraft:diamond_tier_destructible';
+    public static readonly IronTierDestructible =
+        'minecraft:iron_tier_destructible';
+    public static readonly IsAxeItemDestructible =
+        'minecraft:is_axe_item_destructible';
+    public static readonly IsHoeItemDestructible =
+        'minecraft:is_hoe_item_destructible';
+    public static readonly IsPickaxeItemDestructible =
+        'minecraft:is_pickaxe_item_destructible';
+    public static readonly IsShearsItemDestructible =
+        'minecraft:is_shears_item_destructible';
+    public static readonly IsShovelItemDestructible =
+        'minecraft:is_shovel_item_destructible';
+    public static readonly IsSwordItemDestructible =
+        'minecraft:is_sword_item_destructible';
+    public static readonly StoneTierDestructible =
+        'minecraft:stone_tier_destructible';
     public static readonly MobSpawner = 'mob_spawner';
     public static readonly NotFeatureReplaceable = 'not_feature_replaceable';
     public static readonly Oak = 'oak';

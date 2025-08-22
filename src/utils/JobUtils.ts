@@ -1,8 +1,8 @@
 /* eslint-disable no-constant-condition */
-import { system } from "@minecraft/server";
-import { Logger } from "../Logging";
+import { system } from '@minecraft/server';
+import { Logger } from '../Logging';
 
-const log = Logger.getLogger("jobUtils", "bedrock-boost", "jobUtils");
+const log = Logger.getLogger('jobUtils', 'bedrock-boost', 'jobUtils');
 
 /**
  * Runs a job and returns a promise that resolves when the job is done.
@@ -29,50 +29,56 @@ const log = Logger.getLogger("jobUtils", "bedrock-boost", "jobUtils");
  *   .then(console.log);
  * ```
  */
-export function jobPromise<Result>(generator: Generator<void, Result, void>): Promise<Result> {
-  return new Promise((resolve, reject) => {
-    if (system.runJob) {
-      system.runJob(function* () {
-        while (true) {
-          try {
-            const { done: d, value } = generator.next();
-            if (d) {
-              resolve(value as Result);
-              return;
-            } else {
-              yield;
-            }
-          } catch (err) {
-            reject(err);
-            return;
-          }
+export function jobPromise<Result>(
+    generator: Generator<void, Result, void>
+): Promise<Result> {
+    return new Promise((resolve, reject) => {
+        if (system.runJob) {
+            system.runJob(
+                (function* () {
+                    while (true) {
+                        try {
+                            const { done: d, value } = generator.next();
+                            if (d) {
+                                resolve(value as Result);
+                                return;
+                            } else {
+                                yield;
+                            }
+                        } catch (err) {
+                            reject(err);
+                            return;
+                        }
+                    }
+                })()
+            );
+        } else {
+            log.debug(
+                'system.runJob is not available. Running job in an inefficient way.'
+            );
+            const run = () => {
+                const startTime = Date.now();
+                while (true) {
+                    try {
+                        const { done: d, value } = generator.next();
+                        if (d) {
+                            resolve(value as Result);
+                            return;
+                        } else {
+                            if (Date.now() - startTime > 4) {
+                                system.runTimeout(run, 1);
+                                return;
+                            }
+                        }
+                    } catch (err) {
+                        reject(err);
+                        return;
+                    }
+                }
+            };
+            run();
         }
-      }());
-    } else {
-      log.debug("system.runJob is not available. Running job in an inefficient way.");
-      const run = () => {
-        const startTime = Date.now();
-        while (true) {
-          try {
-            const { done: d, value } = generator.next();
-            if (d) {
-              resolve(value as Result);
-              return;
-            } else {
-              if (Date.now() - startTime > 4) {
-                system.runTimeout(run, 1);
-                return;
-              }
-            }
-          } catch (err) {
-            reject(err);
-            return;
-          }
-        }
-      }
-      run();
-    }
-  });
+    });
 }
 
 /**
@@ -102,60 +108,67 @@ export function jobPromise<Result>(generator: Generator<void, Result, void>): Pr
  *   .then(console.log);
  * ```
  */
-export function jobProgressPromise<Progress, Result>(generator: Generator<Progress, Result, void>, onProgress: (progress: Progress) => void): Promise<Result> {
-  return new Promise((resolve, reject) => {
-    if (system.runJob) {
-      system.runJob(function* () {
-        let lastTick = 0;
-        while (true) {
-          try {
-            const { done: d, value } = generator.next();
-            if (d) {
-              resolve(value as Result);
-              return;
-            } else {
-              // Limit progress updates to once per tick.
-              if (system.currentTick !== lastTick) {
-                onProgress(value as Progress);
-                lastTick = system.currentTick;
-              }
-              yield;
-            }
-          } catch (err) {
-            reject(err);
-            return;
-          }
+export function jobProgressPromise<Progress, Result>(
+    generator: Generator<Progress, Result, void>,
+    onProgress: (progress: Progress) => void
+): Promise<Result> {
+    return new Promise((resolve, reject) => {
+        if (system.runJob) {
+            system.runJob(
+                (function* () {
+                    let lastTick = 0;
+                    while (true) {
+                        try {
+                            const { done: d, value } = generator.next();
+                            if (d) {
+                                resolve(value as Result);
+                                return;
+                            } else {
+                                // Limit progress updates to once per tick.
+                                if (system.currentTick !== lastTick) {
+                                    onProgress(value as Progress);
+                                    lastTick = system.currentTick;
+                                }
+                                yield;
+                            }
+                        } catch (err) {
+                            reject(err);
+                            return;
+                        }
+                    }
+                })()
+            );
+        } else {
+            log.debug(
+                'system.runJob is not available. Running job in an inefficient way.'
+            );
+            const run = () => {
+                const startTime = Date.now();
+                let sentProgress = false;
+                while (true) {
+                    try {
+                        const { done: d, value } = generator.next();
+                        if (d) {
+                            resolve(value as Result);
+                            return;
+                        } else {
+                            // Limit progress updates to once per tick.
+                            if (!sentProgress) {
+                                onProgress(value as Progress);
+                                sentProgress = true;
+                            }
+                            if (Date.now() - startTime > 4) {
+                                system.runTimeout(run, 1);
+                                return;
+                            }
+                        }
+                    } catch (err) {
+                        reject(err);
+                        return;
+                    }
+                }
+            };
+            run();
         }
-      }());
-    } else {
-      log.debug("system.runJob is not available. Running job in an inefficient way.");
-      const run = () => {
-        const startTime = Date.now();
-        let sentProgress = false;
-        while (true) {
-          try {
-            const { done: d, value } = generator.next();
-            if (d) {
-              resolve(value as Result);
-              return;
-            } else {
-              // Limit progress updates to once per tick.
-              if (!sentProgress) {
-                onProgress(value as Progress);
-                sentProgress = true;
-              }
-              if (Date.now() - startTime > 4) {
-                system.runTimeout(run, 1);
-                return;
-              }
-            }
-          } catch (err) {
-            reject(err);
-            return;
-          }
-        }
-      }
-      run();
-    }
-  });
+    });
 }

@@ -1,5 +1,5 @@
 module.exports = {
-  preset: "ts-jest",
-  testEnvironment: "node",
-  setupFiles: ["<rootDir>/setupTests.ts"],
+    preset: '@bedrock-oss/minecraft-server-jest',
+    testEnvironment: 'node',
+    setupFiles: ['<rootDir>/setupTests.ts'],
 };
