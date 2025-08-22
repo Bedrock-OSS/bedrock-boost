@@ -5,12 +5,16 @@ import Vec3 from "./Vec3";
 type VectorLike = VectorXZ | Vector2 | Vec2 | Vec3 | Direction | number[] | number
 
 export default class Vec2 implements Vector2 {
-  private static readonly log = Logger.getLogger("vec2", "vec2", "bedrock-boost");
-  public static readonly Zero = new Vec2(0, 0);
-  public static readonly North = new Vec2(Direction.North);
-  public static readonly South = new Vec2(Direction.South);
-  public static readonly East = new Vec2(Direction.East);
-  public static readonly West = new Vec2(Direction.West);
+    private static readonly log = Logger.getLogger(
+        'vec2',
+        'vec2',
+        'bedrock-boost'
+    );
+    public static readonly Zero = new Vec2(0, 0);
+    public static readonly North = new Vec2(Direction.North);
+    public static readonly South = new Vec2(Direction.South);
+    public static readonly East = new Vec2(Direction.East);
+    public static readonly West = new Vec2(Direction.West);
 
   readonly x: number;
   readonly y: number;
@@ -64,6 +68,68 @@ export default class Vec2 implements Vector2 {
         throw new Error("Invalid vector");
       }
     }
+    /**
+     * Creates a new vector from the given values.
+     */
+    static from(x: number, y: number): Vec2;
+    static from(x: Vec2): Vec2;
+    static from(x: Vector2): Vec2;
+    static from(x: VectorXZ): Vec2;
+    static from(x: Direction): Vec2;
+    static from(x: number[]): Vec2;
+    static from(x: VectorLike, y?: number): Vec2 {
+        if (x instanceof Vec2) return x;
+        if (typeof x === 'number' && y !== undefined) {
+            return new Vec2(x, y);
+        }
+        if (Array.isArray(x)) {
+            return new Vec2(x);
+        }
+        if (x === Direction.Down || x === Direction.Up) {
+            Vec2.log.error(new Error('Invalid direction'), x);
+            throw new Error('Invalid direction');
+        }
+        if (x === Direction.North) return Vec2.North;
+        if (x === Direction.South) return Vec2.South;
+        if (x === Direction.East) return Vec2.East;
+        if (x === Direction.West) return Vec2.West;
+        return new Vec2(x as any, y as any);
+    }
+    private static _from(x: VectorLike, y?: number): Vec2 {
+        if (x instanceof Vec2) return x;
+        if (typeof x === 'number' && y !== undefined) {
+            return new Vec2(x, y);
+        }
+        if (Array.isArray(x)) {
+            return new Vec2(x);
+        }
+        if (x === Direction.Down || x === Direction.Up) {
+            Vec2.log.error(new Error('Invalid direction'), x);
+            throw new Error('Invalid direction');
+        }
+        if (x === Direction.North) return Vec2.North;
+        if (x === Direction.South) return Vec2.South;
+        if (x === Direction.East) return Vec2.East;
+        if (x === Direction.West) return Vec2.West;
+        return new Vec2(x as any, y as any);
+    }
+    /**
+     * Creates a copy of the current vector.
+     *
+     * @returns A new vector with the same values as the current vector.
+     */
+    copy(): Vec2 {
+        return new Vec2(this.x, this.y);
+    }
+    /**
+     * Creates a new direction vector from yaw rotation.
+     *
+     * @param yaw - The yaw value in degrees.
+     * @returns A new vector representing the direction.
+     */
+    static fromYaw(yaw: number): Vec2 {
+        // Convert degrees to radians
+        const psi = yaw * (Math.PI / 180);
 
   }
   /**
@@ -663,8 +729,11 @@ export default class Vec2 implements Vector2 {
     }
   }
 
-  toString(format: 'long'|'short' = 'long', separator: string = ', '): string {
-    const result = `${this.x + separator + this.y}`;
-    return format === 'long' ? `Vec2(${result})` : result;
-  }
+    toString(
+        format: 'long' | 'short' = 'long',
+        separator: string = ', '
+    ): string {
+        const result = `${this.x + separator + this.y}`;
+        return format === 'long' ? `Vec2(${result})` : result;
+    }
 }

@@ -1,5 +1,5 @@
-import { NumberRange } from "@minecraft/common";
-import { BlockPermutation, Dimension, world } from "@minecraft/server";
+import { NumberRange } from '@minecraft/common';
+import { BlockPermutation, Dimension, world } from '@minecraft/server';
 
 const dimensions: { [key: string]: Dimension } = {};
 
@@ -13,8 +13,8 @@ const permutations: { [key: string]: BlockPermutation } = {};
  * @returns The dimension.
  */
 export function getDimension(name: string) {
-  if (dimensions[name]) return dimensions[name];
-  return dimensions[name] = world.getDimension(name);
+    if (dimensions[name]) return dimensions[name];
+    return (dimensions[name] = world.getDimension(name));
 }
 
 /**
@@ -23,8 +23,8 @@ export function getDimension(name: string) {
  * @returns The dimension height range.
  */
 export function getDimensionHeightRange(name: string) {
-  if (dimensionHeightRanges[name]) return dimensionHeightRanges[name];
-  return dimensionHeightRanges[name] = getDimension(name).heightRange;
+    if (dimensionHeightRanges[name]) return dimensionHeightRanges[name];
+    return (dimensionHeightRanges[name] = getDimension(name).heightRange);
 }
 
 /**
@@ -33,8 +33,11 @@ export function getDimensionHeightRange(name: string) {
  * @param states The block states.
  * @returns The block permutation.
  */
-export function getBlockPermutation(blockName: string, states?: Record<string, boolean | number | string>): BlockPermutation {
-  const key = `${blockName}:${JSON.stringify(states)}`;
-  if (permutations[key]) return permutations[key];
-  return permutations[key] = BlockPermutation.resolve(blockName, states);
+export function getBlockPermutation(
+    blockName: string,
+    states?: Record<string, boolean | number | string>
+): BlockPermutation {
+    const key = `${blockName}:${JSON.stringify(states)}`;
+    if (permutations[key]) return permutations[key];
+    return (permutations[key] = BlockPermutation.resolve(blockName, states));
 }

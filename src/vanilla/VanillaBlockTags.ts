@@ -1,0 +1,49 @@
+export default class VanillaBlockTags {
+    public static readonly Acacia = 'acacia';
+    public static readonly Birch = 'birch';
+    public static readonly DarkOak = 'dark_oak';
+    public static readonly DiamondPickDiggable = 'diamond_pick_diggable';
+    public static readonly Dirt = 'dirt';
+    public static readonly FertilizeArea = 'fertilize_area';
+    public static readonly Grass = 'grass';
+    public static readonly Gravel = 'gravel';
+    public static readonly IronPickDiggable = 'iron_pick_diggable';
+    public static readonly Jungle = 'jungle';
+    public static readonly Log = 'log';
+    public static readonly Metal = 'metal';
+    public static readonly Crop = 'minecraft:crop';
+    public static readonly DiamondTierDestructible =
+        'minecraft:diamond_tier_destructible';
+    public static readonly IronTierDestructible =
+        'minecraft:iron_tier_destructible';
+    public static readonly IsAxeItemDestructible =
+        'minecraft:is_axe_item_destructible';
+    public static readonly IsHoeItemDestructible =
+        'minecraft:is_hoe_item_destructible';
+    public static readonly IsPickaxeItemDestructible =
+        'minecraft:is_pickaxe_item_destructible';
+    public static readonly IsShearsItemDestructible =
+        'minecraft:is_shears_item_destructible';
+    public static readonly IsShovelItemDestructible =
+        'minecraft:is_shovel_item_destructible';
+    public static readonly IsSwordItemDestructible =
+        'minecraft:is_sword_item_destructible';
+    public static readonly StoneTierDestructible =
+        'minecraft:stone_tier_destructible';
+    public static readonly MobSpawner = 'mob_spawner';
+    public static readonly NotFeatureReplaceable = 'not_feature_replaceable';
+    public static readonly Oak = 'oak';
+    public static readonly OneWayCollidable = 'one_way_collidable';
+    public static readonly Plant = 'plant';
+    public static readonly Pumpkin = 'pumpkin';
+    public static readonly Rail = 'rail';
+    public static readonly Sand = 'sand';
+    public static readonly Snow = 'snow';
+    public static readonly Spruce = 'spruce';
+    public static readonly Stone = 'stone';
+    public static readonly StonePickDiggable = 'stone_pick_diggable';
+    public static readonly TextSign = 'text_sign';
+    public static readonly Trapdoors = 'trapdoors';
+    public static readonly Water = 'water';
+    public static readonly Wood = 'wood';
+}

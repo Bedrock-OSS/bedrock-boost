@@ -1,25 +1,35 @@
 # ColorJSON
 
+## Table of Contents
+- [Overview](#overview)
+- [Default Instance](#default-instance)
+- [Usage](#usage)
+- [Customization](#customization)
+- [Customization through Method Overriding](#customization-through-method-overriding)
+- [API Reference](#api-reference)
+- [Examples](#examples)
+- [Performance Tips](#performance-tips)
+
 ## Overview
 
 The `ColorJSON` class is designed to transform various data types into a chat-friendly, colored JSON representation. It offers a range of customization options for the formatting and styling of JSON output. This documentation outlines how to use the `ColorJSON` class, including its properties and methods.
 
-### Key Features:
-
-- Color customization for different JSON elements.
-- Inline threshold settings for compact JSON representation.
-- Maximum depth control for object traversal.
-- Class name inclusion in output.
-- Ability to override methods for custom formatting.
-- Cycle detection and handling.
+## Default Instance
+Use the shared formatter via the `DEFAULT` static property:
+```javascript
+import ColorJSON from '@bedrock-oss/bedrock-boost';
+const jsonFormatter = ColorJSON.DEFAULT;
+```
 
 ## Usage
 
 ### Initialization
-
 ```javascript
 import ColorJSON from '@bedrock-oss/bedrock-boost';
-const jsonFormatter = new ColorJSON();// or use default instance `ColorJSON.DEFAULT`
+// Create a new formatter or use DEFAULT
+const jsonFormatter = new ColorJSON();
+// or
+const jsonFormatterDefault = ColorJSON.DEFAULT;
 ```
 
 ### Basic JSON Stringification
@@ -34,12 +44,15 @@ const result = jsonFormatter.stringify(yourValue);
 
 #### Tokens
 
-Customize JSON tokens like braces, brackets, comma, etc.:
+Customize JSON tokens like braces, brackets, comma, etc.: 
 
 ```javascript
 jsonFormatter.OpenObject = '{';
 jsonFormatter.CloseObject = '}';
-// ...similarly for other tokens
+jsonFormatter.OpenArray = '[';
+jsonFormatter.CloseArray = ']';
+jsonFormatter.KeyValueSeparator = ':';
+jsonFormatter.Comma = ',';
 ```
 
 #### Inline Threshold
@@ -132,6 +145,23 @@ const result = jsonFormatter.stringify(yourValue);
 ### Cycle Detection and Handling
 
 The class automatically detects cycles within objects and arrays to prevent infinite loops.
+
+## API Reference
+
+### Constructor
+- `new ColorJSON()` — Creates an independent formatter instance.
+
+### Static Properties
+- `ColorJSON.DEFAULT` — Shared default formatter.
+
+### Instance Properties
+- Tokens: `OpenObject`, `CloseObject`, `OpenArray`, `CloseArray`, `KeyValueSeparator`, `Comma`
+- Thresholds: `InlineThreshold`, `MaxDepth`, `IncludeClassNames`
+- Colors: `OpenCloseObjectColor`, `OpenCloseArrayColor`, `KeyValueSeparatorColor`, `CommaColor`, `KeyColor`, `StringColor`, `NumberColor`, `BooleanColor`, `NullColor`, `UndefinedColor`, `FunctionColor`, `ClassNameColor`, `CycleColor`
+
+### Methods
+- `stringify(value: any): string` — Main entry point for JSON stringification.
+- Overrideable type-specific methods: `stringifyString`, `stringifyNumber`, `stringifyBoolean`, `stringifyNull`, `stringifyUndefined`, `stringifyFunction`, `stringifyCycle`, `stringifyArray`, `stringifyObject`
 
 ## Examples
 
