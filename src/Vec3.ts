@@ -4,6 +4,7 @@ import {
     Vector2,
     StructureRotation,
 } from '@minecraft/server';
+import MutVec3 from './MutVec3';
 import { Logger } from './Logging';
 
 type VectorLike = Vector3 | Vec3 | Direction | number[] | number;
@@ -176,6 +177,13 @@ export default class Vec3 implements Vector3 {
      */
     copy(): Vec3 {
         return new Vec3(this.x, this.y, this.z);
+    }
+
+    /**
+     * Converts this immutable vector to a new mutable vector.
+     */
+    toMutable(): MutVec3 {
+        return new MutVec3(this.x, this.y, this.z);
     }
 
     /**
