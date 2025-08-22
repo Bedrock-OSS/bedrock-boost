@@ -5,13 +5,14 @@
 A utility library to streamline the development process for Minecraft Bedrock's Script API, providing essential tools for vector operations, polyfills, and time measurements.
 
 ## Features
+
 - **Vec3 Class**: Simplify and enhance 3D vector operations. [Documentation](docs/vec3.md)
 - **Cache Module**: Caches dimension lookups, dimension height ranges, and block permutations to reduce costly native calls. [Documentation](docs/cache.md)
-- **Polyfills**: 
+- **Polyfills**:
   - `playerPolyfill`: Adds `applyImpulse` and `clearVelocity` methods to the Player class.
   - `consolePolyfill`: Overrides `console.log` to send messages to game chat.
 - **Profiling Utilities**: `addIdleDummy` and `clearIdleDummy` improve profiling accuracy by grouping idle time. [Documentation](docs/profilingDummy.md)
-- **Timings Class**: Granular time measurement with `begin()` and `end()`. 
+- **Timings Class**: Granular time measurement with `begin()` and `end()`.
 - **Logging System**: Flexible logging with levels, tags, filters, and scriptevent commands. [Documentation](docs/logging.md)
 - **ChatColor Class**: Simplify chat color formatting.
 - **ColorJSON Class**: Generate colored JSON for chat messages. [Documentation](docs/colorJson.md)
@@ -53,6 +54,7 @@ log.info("Hello, Minecraft World!");
 ```
 
 It also includes 2 commands to control the logging system:
+
 ```
 scriptevent logging:level <level either as string or as a number>
 # or
@@ -68,10 +70,9 @@ scriptevent log:filter <comma separated tags>
 [Documentation](docs/colorJson.md)
 
 ```typescript
-import { Logger } from "@bedrock-oss/bedrock-boost"
+import { ChatColor, ColorJSON } from "@bedrock-oss/bedrock-boost";
 
-const log = Logger.getLogger("main", "tag1", "tag2");
-log.info("Hello, Minecraft World!");
+console.log(ChatColor.RED + "Hello, Minecraft World!" + ChatColor.RESET);
 ```
 
 ### playerPolyfill
