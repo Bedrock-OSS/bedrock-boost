@@ -76,8 +76,9 @@ export default class EntityPulseScheduler extends PulseScheduler<Entity> {
             }
             // Special case for when the entity is loaded from a structure and removed the same tick
             if (!entity.isValid) {
-                system.runInterval(() => {
+                const runId = system.runInterval(() => {
                     if (entity.isValid && entity.matches(this.queryOptions)) {
+                        system.clearRun(runId);
                         this.push(entity);
                     }
                 }, 1);
