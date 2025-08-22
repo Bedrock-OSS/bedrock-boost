@@ -1,6 +1,7 @@
 import {
     EntityEquippableComponent,
     EquipmentSlot,
+    GameMode,
     ItemDurabilityComponent,
     ItemEnchantableComponent,
     Player,
@@ -50,10 +51,9 @@ export class ItemUtils {
         player: Player,
         options: ConsumeDurabilityOptions = {}
     ): boolean {
-        // Compare player's game mode as a string to handle both V1 and V2
         if (
             !options.ignoreCreative &&
-            player.getGameMode().toLowerCase() === 'creative'
+            player.getGameMode() === GameMode.Creative
         ) {
             return false;
         }
