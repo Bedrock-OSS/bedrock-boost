@@ -2,10 +2,85 @@
 
 type Path = (string | number)[];
 
+/**
+ * Machine-readable error codes produced by schema validation.
+ *
+ * @remarks Each member maps to a stable numeric identifier so consumers can
+ * branch on validation failures without brittle string matching.
+ */
+export enum ValidationIssueCode {
+    /** Value was required but missing or `undefined`. */
+    Required = 1,
+    /** Encountered `null` where a string was expected. */
+    StringNull = 2,
+    /** Encountered a non-string value. */
+    StringType = 3,
+    /** String must not be empty. */
+    StringEmpty = 4,
+    /** String length fell below the configured minimum. */
+    StringTooShort = 5,
+    /** String length exceeded the configured maximum. */
+    StringTooLong = 6,
+    /** String failed to match the configured regular expression. */
+    StringRegexMismatch = 7,
+    /** Encountered `null` where a number was expected. */
+    NumberNull = 8,
+    /** Encountered a non-number value or NaN. */
+    NumberType = 9,
+    /** Expected an integer but received a fractional value. */
+    NumberNotInteger = 10,
+    /** Number fell below an inclusive minimum. */
+    NumberTooSmall = 11,
+    /** Number failed to satisfy a strict greater-than comparison. */
+    NumberTooSmallExclusive = 12,
+    /** Number exceeded an inclusive maximum. */
+    NumberTooLarge = 13,
+    /** Number failed to satisfy a strict less-than comparison. */
+    NumberTooLargeExclusive = 14,
+    /** Encountered `null` where a boolean was expected. */
+    BooleanNull = 15,
+    /** Encountered a non-boolean value. */
+    BooleanType = 16,
+    /** Value did not match the expected literal. */
+    LiteralMismatch = 17,
+    /** Encountered `null` where an enum value was expected. */
+    EnumNull = 18,
+    /** Value was not one of the allowed enum options. */
+    EnumMismatch = 19,
+    /** Encountered `null` where an array was expected. */
+    ArrayNull = 20,
+    /** Encountered a non-array value. */
+    ArrayType = 21,
+    /** Array length failed to match an exact requirement. */
+    ArrayExactLengthMismatch = 22,
+    /** Array length fell below the configured minimum. */
+    ArrayTooShort = 23,
+    /** Array length exceeded the configured maximum. */
+    ArrayTooLong = 24,
+    /** Encountered `null` where a tuple was expected. */
+    TupleNull = 25,
+    /** Encountered a non-array value where a tuple was expected. */
+    TupleType = 26,
+    /** Tuple length did not match its schema definition. */
+    TupleLengthMismatch = 27,
+    /** Encountered `null` where no union option permits it. */
+    UnexpectedNull = 28,
+    /** No union option accepted the provided value. */
+    UnionNoMatch = 29,
+    /** Encountered `null` where an object was expected. */
+    ObjectNull = 30,
+    /** Encountered a non-object value. */
+    ObjectType = 31,
+    /** Object contained a property that is not allowed. */
+    ObjectUnknownKey = 32,
+    /** Custom refinement predicate returned false. */
+    RefinementFailed = 33,
+}
+
 export type ValidationIssue = {
     path: string; // e.g. $.player.location.x
     message: string;
-    code?: string; // optional machine-readable code
+    code: ValidationIssueCode;
 };
 
 export class ValidationError extends Error {
@@ -36,7 +111,11 @@ export interface Schema<T> {
     optional(): Schema<T | undefined>;
     required(): this;
     nullable(): Schema<T | null>;
-    refine(pred: (v: T) => boolean, message: string, code?: string): Schema<T>;
+    refine(
+        pred: (v: T) => boolean,
+        message: string,
+        code?: ValidationIssueCode
+    ): Schema<T>;
 }
 
 //#region Base schema (mutating)
@@ -45,7 +124,7 @@ abstract class BaseSchema<T> implements Schema<T> {
     protected _refinements: Array<{
         pred: (v: T) => boolean;
         message: string;
-        code?: string;
+        code?: ValidationIssueCode;
     }> = [];
     protected _isOptional = false;
     protected _isNullable = false;
@@ -63,7 +142,11 @@ abstract class BaseSchema<T> implements Schema<T> {
         this._isNullable = true;
         return this as unknown as Schema<T | null>;
     }
-    refine(pred: (v: T) => boolean, message: string, code?: string): Schema<T> {
+    refine(
+        pred: (v: T) => boolean,
+        message: string,
+        code?: ValidationIssueCode
+    ): Schema<T> {
         this._refinements.push({ pred, message, code });
         return this;
     }
@@ -96,7 +179,11 @@ abstract class BaseSchema<T> implements Schema<T> {
             for (const r of this._refinements) {
                 if (!r.pred(out as T)) {
                     throw new ValidationError([
-                        { path: '$', message: r.message, code: r.code },
+                        {
+                            path: '$',
+                            message: r.message,
+                            code: r.code ?? ValidationIssueCode.RefinementFailed,
+                        },
                     ]);
                 }
             }
@@ -127,7 +214,7 @@ abstract class BaseSchema<T> implements Schema<T> {
         issues: ValidationIssue[],
         path: Path,
         message: string,
-        code?: string
+        code: ValidationIssueCode
     ) {
         issues.push({ path: pathToString(path), message, code });
     }
@@ -167,35 +254,55 @@ class StringSchema extends BaseSchema<string> {
     ) {
         if (value === undefined) {
             if (optional) return undefined as any;
-            this.issue(issues, path, 'Required');
+            this.issue(issues, path, 'Required', ValidationIssueCode.Required);
             return undefined as any;
         }
         if (value === null) {
             if (nullable) return null as any;
-            this.issue(issues, path, 'Expected string, got null');
+            this.issue(
+                issues,
+                path,
+                'Expected string, got null',
+                ValidationIssueCode.StringNull
+            );
             return undefined as any;
         }
         if (typeof value !== 'string') {
-            this.issue(issues, path, `Expected string, got ${typeof value}`);
+            this.issue(
+                issues,
+                path,
+                `Expected string, got ${typeof value}`,
+                ValidationIssueCode.StringType
+            );
             return undefined as any;
         }
         if (this._nonEmpty && value.length === 0)
-            this.issue(issues, path, 'String must not be empty', 'too_small');
+            this.issue(
+                issues,
+                path,
+                'String must not be empty',
+                ValidationIssueCode.StringEmpty
+            );
         if (this._min !== undefined && value.length < this._min)
             this.issue(
                 issues,
                 path,
                 `String length < ${this._min}`,
-                'too_small'
+                ValidationIssueCode.StringTooShort
             );
         if (this._max !== undefined && value.length > this._max)
-            this.issue(issues, path, `String length > ${this._max}`, 'too_big');
+            this.issue(
+                issues,
+                path,
+                `String length > ${this._max}`,
+                ValidationIssueCode.StringTooLong
+            );
         if (this._regex && !this._regex.test(value))
             this.issue(
                 issues,
                 path,
                 `String does not match ${this._regex}`,
-                'invalid_string'
+                ValidationIssueCode.StringRegexMismatch
             );
         return value;
     }
@@ -244,33 +351,63 @@ class NumberSchema extends BaseSchema<number> {
     ) {
         if (value === undefined) {
             if (optional) return undefined as any;
-            this.issue(issues, path, 'Required');
+            this.issue(issues, path, 'Required', ValidationIssueCode.Required);
             return undefined as any;
         }
         if (value === null) {
             if (nullable) return null as any;
-            this.issue(issues, path, 'Expected number, got null');
+            this.issue(
+                issues,
+                path,
+                'Expected number, got null',
+                ValidationIssueCode.NumberNull
+            );
             return undefined as any;
         }
         if (typeof value !== 'number' || Number.isNaN(value)) {
-            this.issue(issues, path, `Expected number, got ${typeof value}`);
+            this.issue(
+                issues,
+                path,
+                `Expected number, got ${typeof value}`,
+                ValidationIssueCode.NumberType
+            );
             return undefined as any;
         }
         if (this._int && !Number.isInteger(value))
-            this.issue(issues, path, 'Expected integer', 'invalid_number');
+            this.issue(
+                issues,
+                path,
+                'Expected integer',
+                ValidationIssueCode.NumberNotInteger
+            );
         if (this._min !== undefined && value < this._min)
-            this.issue(issues, path, `Number < ${this._min}`, 'too_small');
+            this.issue(
+                issues,
+                path,
+                `Number < ${this._min}`,
+                ValidationIssueCode.NumberTooSmall
+            );
         if (this._gt !== undefined && !(value > this._gt))
             this.issue(
                 issues,
                 path,
                 `Number must be > ${this._gt}`,
-                'too_small'
+                ValidationIssueCode.NumberTooSmallExclusive
             );
         if (this._max !== undefined && value > this._max)
-            this.issue(issues, path, `Number > ${this._max}`, 'too_big');
+            this.issue(
+                issues,
+                path,
+                `Number > ${this._max}`,
+                ValidationIssueCode.NumberTooLarge
+            );
         if (this._lt !== undefined && !(value < this._lt))
-            this.issue(issues, path, `Number must be < ${this._lt}`, 'too_big');
+            this.issue(
+                issues,
+                path,
+                `Number must be < ${this._lt}`,
+                ValidationIssueCode.NumberTooLargeExclusive
+            );
         return value;
     }
 }
@@ -285,16 +422,26 @@ class BooleanSchema extends BaseSchema<boolean> {
     ) {
         if (value === undefined) {
             if (optional) return undefined as any;
-            this.issue(issues, path, 'Required');
+            this.issue(issues, path, 'Required', ValidationIssueCode.Required);
             return undefined as any;
         }
         if (value === null) {
             if (nullable) return null as any;
-            this.issue(issues, path, 'Expected boolean, got null');
+            this.issue(
+                issues,
+                path,
+                'Expected boolean, got null',
+                ValidationIssueCode.BooleanNull
+            );
             return undefined as any;
         }
         if (typeof value !== 'boolean') {
-            this.issue(issues, path, `Expected boolean, got ${typeof value}`);
+            this.issue(
+                issues,
+                path,
+                `Expected boolean, got ${typeof value}`,
+                ValidationIssueCode.BooleanType
+            );
             return undefined as any;
         }
         return value;
@@ -318,7 +465,7 @@ class LiteralSchema<
     ) {
         if (value === undefined) {
             if (optional) return undefined as any;
-            this.issue(issues, path, 'Required');
+            this.issue(issues, path, 'Required', ValidationIssueCode.Required);
             return undefined as any;
         }
         if (this._value === null) {
@@ -326,7 +473,8 @@ class LiteralSchema<
                 this.issue(
                     issues,
                     path,
-                    `Expected literal ${JSON.stringify(this._value)}`
+                    `Expected literal ${JSON.stringify(this._value)}`,
+                    ValidationIssueCode.LiteralMismatch
                 );
                 return undefined as any;
             }
@@ -336,7 +484,8 @@ class LiteralSchema<
             this.issue(
                 issues,
                 path,
-                `Expected literal ${JSON.stringify(this._value)}`
+                `Expected literal ${JSON.stringify(this._value)}`,
+                ValidationIssueCode.LiteralMismatch
             );
             return undefined as any;
         }
@@ -359,19 +508,25 @@ class EnumSchema<T extends string | number> extends BaseSchema<T> {
     ) {
         if (value === undefined) {
             if (optional) return undefined as any;
-            this.issue(issues, path, 'Required');
+            this.issue(issues, path, 'Required', ValidationIssueCode.Required);
             return undefined as any;
         }
         if (value === null) {
             if (nullable) return null as any;
-            this.issue(issues, path, 'Expected enum value, got null');
+            this.issue(
+                issues,
+                path,
+                'Expected enum value, got null',
+                ValidationIssueCode.EnumNull
+            );
             return undefined as any;
         }
         if (!this._set.has(value as any)) {
             this.issue(
                 issues,
                 path,
-                `Expected one of ${[...this._set].map(String).join(', ')}`
+                `Expected one of ${[...this._set].map(String).join(', ')}`,
+                ValidationIssueCode.EnumMismatch
             );
             return undefined as any;
         }
@@ -412,16 +567,26 @@ class ArraySchema<T> extends BaseSchema<T[]> {
     ) {
         if (value === undefined) {
             if (optional) return undefined as any;
-            this.issue(issues, path, 'Required');
+            this.issue(issues, path, 'Required', ValidationIssueCode.Required);
             return undefined as any;
         }
         if (value === null) {
             if (nullable) return null as any;
-            this.issue(issues, path, 'Expected array, got null');
+            this.issue(
+                issues,
+                path,
+                'Expected array, got null',
+                ValidationIssueCode.ArrayNull
+            );
             return undefined as any;
         }
         if (!Array.isArray(value)) {
-            this.issue(issues, path, 'Expected array');
+            this.issue(
+                issues,
+                path,
+                'Expected array',
+                ValidationIssueCode.ArrayType
+            );
             return undefined as any;
         }
 
@@ -431,17 +596,22 @@ class ArraySchema<T> extends BaseSchema<T[]> {
                 issues,
                 path,
                 `Array length must be ${this._exact}`,
-                'invalid_array'
+                ValidationIssueCode.ArrayExactLengthMismatch
             );
         if (this._min !== undefined && arr.length < this._min)
             this.issue(
                 issues,
                 path,
                 `Array length < ${this._min}`,
-                'too_small'
+                ValidationIssueCode.ArrayTooShort
             );
         if (this._max !== undefined && arr.length > this._max)
-            this.issue(issues, path, `Array length > ${this._max}`, 'too_big');
+            this.issue(
+                issues,
+                path,
+                `Array length > ${this._max}`,
+                ValidationIssueCode.ArrayTooLong
+            );
 
         const out: T[] = new Array(arr.length);
         for (let i = 0; i < arr.length; i++) {
@@ -468,16 +638,26 @@ class TupleSchema<T extends any[]> extends BaseSchema<T> {
     ) {
         if (value === undefined) {
             if (optional) return undefined as any;
-            this.issue(issues, path, 'Required');
+            this.issue(issues, path, 'Required', ValidationIssueCode.Required);
             return undefined as any;
         }
         if (value === null) {
             if (nullable) return null as any;
-            this.issue(issues, path, 'Expected tuple, got null');
+            this.issue(
+                issues,
+                path,
+                'Expected tuple, got null',
+                ValidationIssueCode.TupleNull
+            );
             return undefined as any;
         }
         if (!Array.isArray(value)) {
-            this.issue(issues, path, 'Expected tuple (array)');
+            this.issue(
+                issues,
+                path,
+                'Expected tuple (array)',
+                ValidationIssueCode.TupleType
+            );
             return undefined as any;
         }
         if (value.length !== this.elements.length)
@@ -485,7 +665,7 @@ class TupleSchema<T extends any[]> extends BaseSchema<T> {
                 issues,
                 path,
                 `Tuple length must be ${this.elements.length}`,
-                'invalid_tuple'
+                ValidationIssueCode.TupleLengthMismatch
             );
 
         const out: any[] = new Array(this.elements.length);
@@ -518,12 +698,17 @@ class UnionSchema<T> extends BaseSchema<T> {
     ) {
         if (value === undefined) {
             if (optional) return undefined as any;
-            this.issue(issues, path, 'Required');
+            this.issue(issues, path, 'Required', ValidationIssueCode.Required);
             return undefined as any;
         }
         if (value === null) {
             if (nullable) return null as any;
-            this.issue(issues, path, 'Unexpected null');
+            this.issue(
+                issues,
+                path,
+                'Unexpected null',
+                ValidationIssueCode.UnexpectedNull
+            );
             return undefined as any;
         }
 
@@ -543,7 +728,7 @@ class UnionSchema<T> extends BaseSchema<T> {
             issues,
             path,
             `No union variant matched: ${msgs}`,
-            'invalid_union'
+            ValidationIssueCode.UnionNoMatch
         );
         return undefined as any;
     }
@@ -579,16 +764,26 @@ class ObjectSchema<
     ): Out {
         if (value === undefined) {
             if (optional) return undefined as any;
-            this.issue(issues, path, 'Required');
+            this.issue(issues, path, 'Required', ValidationIssueCode.Required);
             return undefined as any;
         }
         if (value === null) {
             if (nullable) return null as any;
-            this.issue(issues, path, 'Expected object, got null');
+            this.issue(
+                issues,
+                path,
+                'Expected object, got null',
+                ValidationIssueCode.ObjectNull
+            );
             return undefined as any;
         }
         if (typeof value !== 'object' || Array.isArray(value)) {
-            this.issue(issues, path, 'Expected object');
+            this.issue(
+                issues,
+                path,
+                'Expected object',
+                ValidationIssueCode.ObjectType
+            );
             return undefined as any;
         }
 
@@ -610,7 +805,12 @@ class ObjectSchema<
             for (const k in v) {
                 if (!(k in this.props)) {
                     path.push(k);
-                    this.issue(issues, path, 'Unknown property', 'unknown_key');
+                    this.issue(
+                        issues,
+                        path,
+                        'Unknown property',
+                        ValidationIssueCode.ObjectUnknownKey
+                    );
                     path.pop();
                 }
             }

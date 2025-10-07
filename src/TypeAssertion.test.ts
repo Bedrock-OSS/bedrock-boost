@@ -1,4 +1,8 @@
-import { TypeBuilder, ValidationError } from './TypeAssertion';
+import {
+    TypeBuilder,
+    ValidationError,
+    ValidationIssueCode,
+} from './TypeAssertion';
 
 describe('TypeAssertion schemas', () => {
     it('parses optional and nullable strings correctly', () => {
@@ -9,11 +13,7 @@ describe('TypeAssertion schemas', () => {
     });
 
     it('fails refinement when predicate returns false', () => {
-        const schema = TypeBuilder.number().refine(
-            (value) => value % 2 === 0,
-            'Must be even',
-            'not_even'
-        );
+        const schema = TypeBuilder.number().refine((value) => value % 2 === 0, 'Must be even');
 
         expect(schema.parse(4)).toBe(4);
 
@@ -24,7 +24,11 @@ describe('TypeAssertion schemas', () => {
             expect(error).toBeInstanceOf(ValidationError);
             const validationError = error as ValidationError;
             expect(validationError.issues).toEqual([
-                { path: '$', message: 'Must be even', code: 'not_even' },
+                {
+                    path: '$',
+                    message: 'Must be even',
+                    code: ValidationIssueCode.RefinementFailed,
+                },
             ]);
         }
     });
@@ -44,7 +48,7 @@ describe('TypeAssertion schemas', () => {
                 {
                     path: '$.values[1]',
                     message: 'Expected number, got string',
-                    code: undefined,
+                    code: ValidationIssueCode.NumberType,
                 },
             ]);
         }
@@ -67,7 +71,7 @@ describe('TypeAssertion schemas', () => {
             const validationError = error as ValidationError;
             expect(validationError.issues[0]).toMatchObject({
                 path: '$',
-                code: 'invalid_union',
+                code: ValidationIssueCode.UnionNoMatch,
             });
             expect(validationError.issues[0].message).toContain(
                 'No union variant matched'
@@ -90,7 +94,7 @@ describe('TypeAssertion schemas', () => {
                 {
                     path: '$.extra',
                     message: 'Unknown property',
-                    code: 'unknown_key',
+                    code: ValidationIssueCode.ObjectUnknownKey,
                 },
             ]);
         }
@@ -121,7 +125,7 @@ describe('TypeAssertion schemas', () => {
                 {
                     path: '$',
                     message: 'Expected number, got string',
-                    code: undefined,
+                    code: ValidationIssueCode.NumberType,
                 },
             ]);
         }
