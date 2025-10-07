@@ -1,11 +1,13 @@
 import { Vector2, Direction, VectorXZ } from '@minecraft/server';
 import { Logger } from './Logging';
 import Vec3 from './Vec3';
+import MutVec2 from './MutVec2';
 
 type VectorLike =
     | VectorXZ
     | Vector2
     | Vec2
+    | MutVec2
     | Vec3
     | Direction
     | number[]
@@ -56,6 +58,9 @@ export default class Vec2 implements Vector2 {
         } else if (x instanceof Vec2) {
             this.x = x.x;
             this.y = x.y;
+        } else if (x instanceof MutVec2) {
+            this.x = x.x;
+            this.y = x.y;
         } else if (x instanceof Vec3) {
             this.x = x.x;
             this.y = x.y;
@@ -91,6 +96,7 @@ export default class Vec2 implements Vector2 {
     static from(x: number[]): Vec2;
     static from(x: VectorLike, y?: number): Vec2 {
         if (x instanceof Vec2) return x;
+        if (x instanceof MutVec2) return new Vec2(x.x, x.y);
         if (typeof x === 'number' && y !== undefined) {
             return new Vec2(x, y);
         }
@@ -109,6 +115,7 @@ export default class Vec2 implements Vector2 {
     }
     private static _from(x: VectorLike, y?: number): Vec2 {
         if (x instanceof Vec2) return x;
+        if (x instanceof MutVec2) return new Vec2(x.x, x.y);
         if (typeof x === 'number' && y !== undefined) {
             return new Vec2(x, y);
         }
@@ -132,6 +139,14 @@ export default class Vec2 implements Vector2 {
      */
     copy(): Vec2 {
         return new Vec2(this.x, this.y);
+    }
+    /**
+     * Creates a mutable copy of the current vector.
+     *
+     * @returns A mutable vector with the same values as the current vector.
+     */
+    toMutable(): MutVec2 {
+        return new MutVec2(this.x, this.y);
     }
     /**
      * Creates a new direction vector from yaw rotation.

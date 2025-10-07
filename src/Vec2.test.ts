@@ -82,6 +82,16 @@ describe('Vec2', () => {
         expect(copyVec.y).toEqual(vec.y);
     });
 
+    it('should create a mutable copy of Vec2 instance', () => {
+        const vec = new Vec2(1, 2);
+        const mutable = vec.toMutable();
+        expect(mutable.x).toEqual(vec.x);
+        expect(mutable.y).toEqual(vec.y);
+        mutable.add(1, 1);
+        expect(vec.x).toEqual(1);
+        expect(vec.y).toEqual(2);
+    });
+
     // fromYawPitch tests
     it('should convert yaw and pitch to a normal vector', () => {
         const vec = Vec2.fromYaw(45);
