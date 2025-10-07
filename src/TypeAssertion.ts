@@ -312,6 +312,8 @@ class LiteralSchema<
         path: Path,
         issues: ValidationIssue[],
         optional: boolean,
+        //LiteralSchema can only be null if the literal is null
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         nullable: boolean
     ) {
         if (value === undefined) {
