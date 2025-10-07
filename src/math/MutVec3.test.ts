@@ -5,12 +5,28 @@ import { Direction, StructureRotation } from '@minecraft/server';
 describe('MutVec3', () => {
     // Constructor tests
     it('creates with Direction constants', () => {
-        expect(new MutVec3(Direction.Down)).toMatchObject({ x: 0, y: -1, z: 0 });
+        expect(new MutVec3(Direction.Down)).toMatchObject({
+            x: 0,
+            y: -1,
+            z: 0,
+        });
         expect(new MutVec3(Direction.Up)).toMatchObject({ x: 0, y: 1, z: 0 });
-        expect(new MutVec3(Direction.North)).toMatchObject({ x: 0, y: 0, z: -1 });
-        expect(new MutVec3(Direction.South)).toMatchObject({ x: 0, y: 0, z: 1 });
+        expect(new MutVec3(Direction.North)).toMatchObject({
+            x: 0,
+            y: 0,
+            z: -1,
+        });
+        expect(new MutVec3(Direction.South)).toMatchObject({
+            x: 0,
+            y: 0,
+            z: 1,
+        });
         expect(new MutVec3(Direction.East)).toMatchObject({ x: 1, y: 0, z: 0 });
-        expect(new MutVec3(Direction.West)).toMatchObject({ x: -1, y: 0, z: 0 });
+        expect(new MutVec3(Direction.West)).toMatchObject({
+            x: -1,
+            y: 0,
+            z: 0,
+        });
     });
 
     it('creates from numbers/array/objects', () => {
@@ -18,7 +34,11 @@ describe('MutVec3', () => {
         expect(new MutVec3([4, 5, 6])).toMatchObject({ x: 4, y: 5, z: 6 });
         const src = new MutVec3(7, 8, 9);
         expect(new MutVec3(src)).toMatchObject({ x: 7, y: 8, z: 9 });
-        expect(new MutVec3({ x: 7, y: 8, z: 9 } as any)).toMatchObject({ x: 7, y: 8, z: 9 });
+        expect(new MutVec3({ x: 7, y: 8, z: 9 } as any)).toMatchObject({
+            x: 7,
+            y: 8,
+            z: 9,
+        });
     });
 
     it('throws for invalid vector inputs', () => {
@@ -58,7 +78,9 @@ describe('MutVec3', () => {
 
     it('normalize throws on zero', () => {
         const v = new MutVec3(0, 0, 0);
-        expect(() => v.normalize()).toThrow('Cannot normalize zero-length vector');
+        expect(() => v.normalize()).toThrow(
+            'Cannot normalize zero-length vector'
+        );
     });
 
     it('length and lengthSquared', () => {
@@ -224,22 +246,40 @@ describe('MutVec3', () => {
         expect(new MutVec3(0, 0, -1).toDirection()).toBe(Direction.North);
         const weird = new MutVec3(0.5, 0.7, 0.5).toDirection();
         expect(weird).toBe(Direction.Up);
-        expect(() => new MutVec3(0, 0, 0).toDirection()).toThrow('Cannot convert zero-length vector to direction');
+        expect(() => new MutVec3(0, 0, 0).toDirection()).toThrow(
+            'Cannot convert zero-length vector to direction'
+        );
     });
 
     // string formatting
     it('toString formats values', () => {
         expect(new MutVec3(1, 1, 1).toString()).toBe('MutVec3(1, 1, 1)');
-        expect(new MutVec3(1, 2, 3).toString('long', ';')).toBe('MutVec3(1;2;3)');
+        expect(new MutVec3(1, 2, 3).toString('long', ';')).toBe(
+            'MutVec3(1;2;3)'
+        );
         expect(new MutVec3(1, 1, 1).toString('short')).toBe('1, 1, 1');
         expect(new MutVec3(1, 2, 3).toString('short', ';')).toBe('1;2;3');
     });
 
     it('fromString parses values', () => {
-        expect(MutVec3.fromString('MutVec3(1, 2, 3)')).toMatchObject({ x: 1, y: 2, z: 3 });
-        expect(MutVec3.fromString('MutVec3(1;2;3)', 'long', ';')).toMatchObject({ x: 1, y: 2, z: 3 });
-        expect(MutVec3.fromString('1, 1, 1', 'short')).toMatchObject({ x: 1, y: 1, z: 1 });
-        expect(MutVec3.fromString('1;2;3', 'short', ';')).toMatchObject({ x: 1, y: 2, z: 3 });
+        expect(MutVec3.fromString('MutVec3(1, 2, 3)')).toMatchObject({
+            x: 1,
+            y: 2,
+            z: 3,
+        });
+        expect(MutVec3.fromString('MutVec3(1;2;3)', 'long', ';')).toMatchObject(
+            { x: 1, y: 2, z: 3 }
+        );
+        expect(MutVec3.fromString('1, 1, 1', 'short')).toMatchObject({
+            x: 1,
+            y: 1,
+            z: 1,
+        });
+        expect(MutVec3.fromString('1;2;3', 'short', ';')).toMatchObject({
+            x: 1,
+            y: 2,
+            z: 3,
+        });
     });
 
     describe('toStructureRotation', () => {
@@ -247,18 +287,28 @@ describe('MutVec3', () => {
             const v0 = MutVec3.fromRotation({ x: 0, y: 0 });
             expect(v0.toStructureRotation()).toEqual(StructureRotation.None);
             const v90 = MutVec3.fromRotation({ x: 0, y: 90 });
-            expect(v90.toStructureRotation()).toEqual(StructureRotation.Rotate90);
+            expect(v90.toStructureRotation()).toEqual(
+                StructureRotation.Rotate90
+            );
             const v180 = MutVec3.fromRotation({ x: 0, y: 180 });
-            expect(v180.toStructureRotation()).toEqual(StructureRotation.Rotate180);
+            expect(v180.toStructureRotation()).toEqual(
+                StructureRotation.Rotate180
+            );
             const v270 = MutVec3.fromRotation({ x: 0, y: -90 });
-            expect(v270.toStructureRotation()).toEqual(StructureRotation.Rotate270);
+            expect(v270.toStructureRotation()).toEqual(
+                StructureRotation.Rotate270
+            );
             const v120 = MutVec3.fromRotation({ x: 0, y: 120 });
-            expect(v120.toStructureRotation()).toEqual(StructureRotation.Rotate90);
+            expect(v120.toStructureRotation()).toEqual(
+                StructureRotation.Rotate90
+            );
         });
 
         it('throws for zero vector', () => {
             const v = new MutVec3(0, 0, 0);
-            expect(() => v.toStructureRotation()).toThrow('Cannot convert zero-length vector to direction');
+            expect(() => v.toStructureRotation()).toThrow(
+                'Cannot convert zero-length vector to direction'
+            );
         });
     });
 

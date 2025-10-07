@@ -1,7 +1,7 @@
-export { default as Vec3 } from './Vec3';
-export { default as Vec2 } from './Vec2';
-export { default as MutVec3 } from './MutVec3';
-export { default as MutVec2 } from './MutVec2';
+export { default as Vec3 } from './math/Vec3';
+export { default as Vec2 } from './math/Vec2';
+export { default as MutVec3 } from './math/MutVec3';
+export { default as MutVec2 } from './math/MutVec2';
 export { default as Timings } from './Timings';
 export * from './Cache';
 export * from './Logging';

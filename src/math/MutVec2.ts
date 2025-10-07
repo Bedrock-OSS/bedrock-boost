@@ -245,9 +245,7 @@ export default class MutVec2 implements Vector2 {
     distanceSquared(x: number[]): number;
     distanceSquared(x: VectorLike, y?: number): number {
         const v = MutVec2._from(x, y);
-        return this.copy()
-            .subtract(v)
-            .lengthSquared();
+        return this.copy().subtract(v).lengthSquared();
     }
 
     lerp(v: Vector2, t: number): MutVec2 {

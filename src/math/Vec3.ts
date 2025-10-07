@@ -5,7 +5,7 @@ import {
     StructureRotation,
 } from '@minecraft/server';
 import MutVec3 from './MutVec3';
-import { Logger } from './Logging';
+import { Logger } from '../Logging';
 
 type VectorLike = Vector3 | Vec3 | Direction | number[] | number;
 

@@ -1,5 +1,5 @@
 import { Entity } from '@minecraft/server';
-import Vec3 from '../Vec3';
+import Vec3 from '../math/Vec3';
 
 export interface EntityHitbox {
     bound: Vec3;

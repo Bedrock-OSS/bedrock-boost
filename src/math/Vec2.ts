@@ -1,5 +1,5 @@
 import { Vector2, Direction, VectorXZ } from '@minecraft/server';
-import { Logger } from './Logging';
+import { Logger } from '../Logging';
 import Vec3 from './Vec3';
 import MutVec2 from './MutVec2';
 
