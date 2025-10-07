@@ -83,7 +83,17 @@ export type ValidationIssue = {
     code: ValidationIssueCode;
 };
 
+/**
+ * Aggregated validation failure produced by {@link Schema.parse}.
+ *
+ * @public
+ */
 export class ValidationError extends Error {
+    /**
+     * Creates a new validation error that exposes all collected issues.
+     *
+     * @param issues - Structured report for each failed path.
+     */
     constructor(public issues: ValidationIssue[]) {
         super(issues.map((i) => `${i.path}: ${i.message}`).join('\n'));
         this.name = 'ValidationError';
@@ -94,6 +104,12 @@ export type SafeParseSuccess<T> = { success: true; data: T };
 export type SafeParseFailure = { success: false; errors: ValidationIssue[] };
 export type SafeParseResult<T> = SafeParseSuccess<T> | SafeParseFailure;
 
+/**
+ * Converts a validation path into a human-readable string for error reporting.
+ *
+ * @param path - Sequence of object keys and array indices describing location.
+ * @returns Path string using JSONPath-like formatting (e.g. `$.foo[0]`).
+ */
 function pathToString(path: Path): string {
     if (path.length === 0) return '$';
     let s = '$';
@@ -103,14 +119,61 @@ function pathToString(path: Path): string {
 
 //#region Public Schema interface
 
+/**
+ * Type-safe runtime validator and transformer for a value of type {@link T}.
+ *
+ * @public
+ */
 export interface Schema<T> {
+    /**
+     * Validates and returns a value when all schema constraints pass.
+     *
+     * @param value - Raw input to validate.
+     * @returns The parsed value if validation succeeds.
+     * @throws ValidationError Thrown when validation fails.
+     */
     parse(value: unknown): T;
+    /**
+     * Validates the value in place, throwing if it does not satisfy the schema.
+     *
+     * @param value - Raw input to validate.
+     * @throws ValidationError Thrown when validation fails.
+     */
     assert(value: unknown): asserts value is T;
+    /**
+     * Attempts to parse a value without throwing.
+     *
+     * @param value - Raw input to validate.
+     * @returns Success with parsed data or failure with validation issues.
+     */
     safeParse(value: unknown): SafeParseResult<T>;
 
+    /**
+     * Allows `undefined` in addition to the current schema.
+     *
+     * @returns A schema permitting `undefined`.
+     */
     optional(): Schema<T | undefined>;
+    /**
+     * Removes `undefined` from the accepted set of values.
+     *
+     * @returns The current schema with `undefined` disallowed.
+     */
     required(): this;
+    /**
+     * Allows `null` in addition to the current schema.
+     *
+     * @returns A schema permitting `null`.
+     */
     nullable(): Schema<T | null>;
+    /**
+     * Adds a custom predicate to refine acceptable values.
+     *
+     * @param pred - Predicate returning `true` when the value is valid.
+     * @param message - Human friendly description shown on failure.
+     * @param code - Optional machine readable identifier for the failure.
+     * @returns A schema reflecting the additional refinement.
+     */
     refine(
         pred: (v: T) => boolean,
         message: string,
@@ -120,6 +183,9 @@ export interface Schema<T> {
 
 //#region Base schema (mutating)
 
+/**
+ * Provides default behaviour for schema refinements, optionality, and parsing.
+ */
 abstract class BaseSchema<T> implements Schema<T> {
     protected _refinements: Array<{
         pred: (v: T) => boolean;
@@ -129,19 +195,41 @@ abstract class BaseSchema<T> implements Schema<T> {
     protected _isOptional = false;
     protected _isNullable = false;
 
-    // Mutating chainers (no allocations)
+    /**
+     * Marks the schema as accepting `undefined` values without cloning.
+     *
+     * @returns The current schema configured to allow `undefined`.
+     */
     optional(): Schema<T | undefined> {
         this._isOptional = true;
         return this as unknown as Schema<T | undefined>;
     }
+    /**
+     * Marks the schema as disallowing `undefined` values.
+     *
+     * @returns The current schema with optional flag cleared.
+     */
     required(): this {
         this._isOptional = false;
         return this;
     }
+    /**
+     * Marks the schema as accepting `null` values without cloning.
+     *
+     * @returns The current schema configured to allow `null`.
+     */
     nullable(): Schema<T | null> {
         this._isNullable = true;
         return this as unknown as Schema<T | null>;
     }
+    /**
+     * Appends a refinement predicate that runs after core validation succeeds.
+     *
+     * @param pred - Predicate invoked with the parsed value.
+     * @param message - Error message used when the predicate fails.
+     * @param code - Optional issue code to classify the refinement failure.
+     * @returns The current schema with the refinement registered.
+     */
     refine(
         pred: (v: T) => boolean,
         message: string,
@@ -151,10 +239,22 @@ abstract class BaseSchema<T> implements Schema<T> {
         return this;
     }
 
+    /**
+     * Ensures the provided value satisfies the schema, throwing on failure.
+     *
+     * @param value - Value to validate.
+     * @throws ValidationError When validation fails.
+     */
     assert(value: unknown): asserts value is T {
         this.parse(value);
     }
 
+    /**
+     * Attempts to parse a value and capture failures without throwing.
+     *
+     * @param value - Value to validate.
+     * @returns Success with the parsed value or failure with collected issues.
+     */
     safeParse(value: unknown): SafeParseResult<T> {
         try {
             return { success: true, data: this.parse(value) };
@@ -165,6 +265,13 @@ abstract class BaseSchema<T> implements Schema<T> {
         }
     }
 
+    /**
+     * Parses a value using the schema and executes refinements on success.
+     *
+     * @param value - Value to validate.
+     * @returns The parsed value when validation succeeds.
+     * @throws ValidationError When validation or refinement fails.
+     */
     parse(value: unknown): T {
         const issues: ValidationIssue[] = [];
         const out = this._validate(
@@ -182,7 +289,8 @@ abstract class BaseSchema<T> implements Schema<T> {
                         {
                             path: '$',
                             message: r.message,
-                            code: r.code ?? ValidationIssueCode.RefinementFailed,
+                            code:
+                                r.code ?? ValidationIssueCode.RefinementFailed,
                         },
                     ]);
                 }
@@ -191,7 +299,15 @@ abstract class BaseSchema<T> implements Schema<T> {
         return out as T;
     }
 
-    /** Call a child schema's internal validator without protected-access errors */
+    /**
+     * Call a child schema's internal validator without protected-access errors.
+     *
+     * @param schema - Child schema to delegate to.
+     * @param value - Value to validate.
+     * @param path - Current traversal path.
+     * @param issues - Mutable issue collection shared across validations.
+     * @returns Result produced by the child schema.
+     */
     protected _validateChild<U>(
         schema: Schema<U>,
         value: unknown,
@@ -202,6 +318,15 @@ abstract class BaseSchema<T> implements Schema<T> {
         return s._validate(value, path, issues, s._isOptional, s._isNullable);
     }
 
+    /**
+     * Core validation hook implemented by concrete schema types.
+     *
+     * @param value - Value to validate.
+     * @param path - Current traversal path.
+     * @param issues - Mutable issue collection shared across validations.
+     * @param optional - Whether `undefined` should be accepted.
+     * @param nullable - Whether `null` should be accepted.
+     */
     protected abstract _validate(
         value: unknown,
         path: Path,
@@ -210,6 +335,14 @@ abstract class BaseSchema<T> implements Schema<T> {
         nullable: boolean
     ): T | undefined | null;
 
+    /**
+     * Records a validation issue with a positional path and machine code.
+     *
+     * @param issues - Aggregate issue collection to append to.
+     * @param path - Traversal path where the issue occurred.
+     * @param message - Human readable explanation of the failure.
+     * @param code - Machine readable classification of the failure.
+     */
     protected issue(
         issues: ValidationIssue[],
         path: Path,
@@ -228,23 +361,51 @@ class StringSchema extends BaseSchema<string> {
     private _regex?: RegExp;
     private _nonEmpty = false;
 
+    /**
+     * Requires strings to have a length greater than or equal to the given number.
+     *
+     * @param n - Minimum length permitted.
+     * @returns The current schema with the constraint applied.
+     */
     min(n: number) {
         this._min = n;
         return this;
     }
+    /**
+     * Requires strings to have a length less than or equal to the given number.
+     *
+     * @param n - Maximum length permitted.
+     * @returns The current schema with the constraint applied.
+     */
     max(n: number) {
         this._max = n;
         return this;
     }
+    /**
+     * Requires strings to match a specific regular expression.
+     *
+     * @param r - Regular expression the value must satisfy.
+     * @returns The current schema with the constraint applied.
+     */
     regex(r: RegExp) {
         this._regex = r;
         return this;
     }
+    /**
+     * Disallows empty strings.
+     *
+     * @returns The current schema with the constraint applied.
+     */
     notEmpty() {
         this._nonEmpty = true;
         return this;
     }
 
+    /**
+     * Validates a candidate string value against configured constraints.
+     *
+     * @inheritdoc
+     */
     protected _validate(
         value: unknown,
         path: Path,
@@ -315,33 +476,77 @@ class NumberSchema extends BaseSchema<number> {
     private _gt?: number;
     private _lt?: number;
 
+    /**
+     * Restricts numbers to integers.
+     *
+     * @returns The current schema with the constraint applied.
+     */
     int() {
         this._int = true;
         return this;
     }
+    /**
+     * Requires numbers to be greater than or equal to the provided minimum.
+     *
+     * @param n - Minimum inclusive value.
+     * @returns The current schema with the constraint applied.
+     */
     min(n: number) {
         this._min = n;
         return this;
     }
+    /**
+     * Requires numbers to be less than or equal to the provided maximum.
+     *
+     * @param n - Maximum inclusive value.
+     * @returns The current schema with the constraint applied.
+     */
     max(n: number) {
         this._max = n;
         return this;
     }
+    /**
+     * Requires numbers to be strictly greater than the provided bound.
+     *
+     * @param n - Exclusive lower bound.
+     * @returns The current schema with the constraint applied.
+     */
     gt(n: number) {
         this._gt = n;
         return this;
     }
+    /**
+     * Requires numbers to be strictly less than the provided bound.
+     *
+     * @param n - Exclusive upper bound.
+     * @returns The current schema with the constraint applied.
+     */
     lt(n: number) {
         this._lt = n;
         return this;
     }
+    /**
+     * Convenience helper for values greater than or equal to zero.
+     *
+     * @returns The current schema with the constraint applied.
+     */
     nonNegative() {
         return this.min(0);
     }
+    /**
+     * Convenience helper for values strictly greater than zero.
+     *
+     * @returns The current schema with the constraint applied.
+     */
     positive() {
         return this.gt(0);
     }
 
+    /**
+     * Validates a numeric candidate against configured constraints.
+     *
+     * @inheritdoc
+     */
     protected _validate(
         value: unknown,
         path: Path,
@@ -413,6 +618,11 @@ class NumberSchema extends BaseSchema<number> {
 }
 
 class BooleanSchema extends BaseSchema<boolean> {
+    /**
+     * Validates that a value is a boolean while respecting optional/nullable flags.
+     *
+     * @inheritdoc
+     */
     protected _validate(
         value: unknown,
         path: Path,
@@ -451,9 +661,17 @@ class BooleanSchema extends BaseSchema<boolean> {
 class LiteralSchema<
     V extends string | number | boolean | null,
 > extends BaseSchema<V> {
+    /**
+     * @param _value - Literal value the schema must match.
+     */
     constructor(private _value: V) {
         super();
     }
+    /**
+     * Validates that an input exactly matches the configured literal.
+     *
+     * @inheritdoc
+     */
     protected _validate(
         value: unknown,
         path: Path,
@@ -495,10 +713,18 @@ class LiteralSchema<
 
 class EnumSchema<T extends string | number> extends BaseSchema<T> {
     private _set: Set<T>;
+    /**
+     * @param values - Collection of allowed enum values.
+     */
     constructor(values: readonly T[]) {
         super();
         this._set = new Set(values);
     }
+    /**
+     * Validates that an input belongs to the configured enum set.
+     *
+     * @inheritdoc
+     */
     protected _validate(
         value: unknown,
         path: Path,
@@ -541,23 +767,49 @@ class ArraySchema<T> extends BaseSchema<T[]> {
     private _max?: number;
     private _exact?: number;
 
+    /**
+     * @param element - Schema used to validate each array element.
+     */
     constructor(private element: Schema<T>) {
         super();
     }
 
+    /**
+     * Requires arrays to have at least the given number of elements.
+     *
+     * @param n - Minimum length permitted.
+     * @returns The current schema with the constraint applied.
+     */
     min(n: number) {
         this._min = n;
         return this;
     }
+    /**
+     * Requires arrays to have at most the given number of elements.
+     *
+     * @param n - Maximum length permitted.
+     * @returns The current schema with the constraint applied.
+     */
     max(n: number) {
         this._max = n;
         return this;
     }
+    /**
+     * Requires arrays to have an exact length.
+     *
+     * @param n - Exact size the array must match.
+     * @returns The current schema with the constraint applied.
+     */
     size(n: number) {
         this._exact = n;
         return this;
     } // exact length
 
+    /**
+     * Validates array structure and each element against configured constraints.
+     *
+     * @inheritdoc
+     */
     protected _validate(
         value: unknown,
         path: Path,
@@ -625,10 +877,18 @@ class ArraySchema<T> extends BaseSchema<T[]> {
 }
 
 class TupleSchema<T extends any[]> extends BaseSchema<T> {
+    /**
+     * @param elements - Ordered list of schemas for each tuple index.
+     */
     constructor(private elements: { [K in keyof T]: Schema<T[K]> }) {
         super();
     }
 
+    /**
+     * Validates tuple length and delegates element validation to child schemas.
+     *
+     * @inheritdoc
+     */
     protected _validate(
         value: unknown,
         path: Path,
@@ -685,10 +945,18 @@ class TupleSchema<T extends any[]> extends BaseSchema<T> {
 }
 
 class UnionSchema<T> extends BaseSchema<T> {
+    /**
+     * @param options - Collection of schemas representing union variants.
+     */
     constructor(private options: Schema<any>[]) {
         super();
     }
 
+    /**
+     * Validates that the value matches at least one union variant.
+     *
+     * @inheritdoc
+     */
     protected _validate(
         value: unknown,
         path: Path,
@@ -747,6 +1015,11 @@ class ObjectSchema<
     P extends PropsRecord,
     Out extends object,
 > extends BaseSchema<Out> {
+    /**
+     * @param name - Optional descriptive name for error messages.
+     * @param props - Map of property schemas defining the object shape.
+     * @param _allowUnknown - Whether properties outside `props` are preserved.
+     */
     constructor(
         private name: string | undefined,
         private props: P,
@@ -755,6 +1028,11 @@ class ObjectSchema<
         super();
     }
 
+    /**
+     * Validates object structure, known properties, and unknown-key policy.
+     *
+     * @inheritdoc
+     */
     protected _validate(
         value: unknown,
         path: Path,
@@ -822,6 +1100,11 @@ class ObjectSchema<
     }
 }
 
+/**
+ * Fluent object schema builder that produces {@link Schema} instances.
+ *
+ * @public
+ */
 export class ObjectBuilder<P extends PropsRecord> {
     private _allowUnknown = false;
     constructor(
@@ -829,7 +1112,15 @@ export class ObjectBuilder<P extends PropsRecord> {
         private props: P
     ) {}
 
-    /** Mutates in place for speed; TS type is widened via return type */
+    /**
+     * Adds a property schema to the current builder.
+     *
+     * @typeParam K - Property name being added.
+     * @typeParam S - Schema that validates the property.
+     * @param key - Object key to associate with the schema.
+     * @param schema - Schema that validates the property value.
+     * @returns The builder with an updated type signature.
+     */
     property<K extends string, S extends Schema<any>>(
         key: K,
         schema: S
@@ -840,12 +1131,21 @@ export class ObjectBuilder<P extends PropsRecord> {
         >;
     }
 
+    /**
+     * Permits keys not explicitly defined in the builder.
+     *
+     * @returns The current builder with unknown-key support enabled.
+     */
     allowUnknown(): this {
         this._allowUnknown = true;
         return this;
     }
 
-    /** One-off shallow copy & freeze to stabilize the schema */
+    /**
+     * Finalises and freezes the builder into an object schema.
+     *
+     * @returns An immutable schema that validates the configured shape.
+     */
     build(): ObjectSchema<P, InferProps<P>> {
         const frozen = Object.freeze({ ...(this.props as any) }) as P;
         return new ObjectSchema<P, InferProps<P>>(
@@ -855,6 +1155,11 @@ export class ObjectBuilder<P extends PropsRecord> {
         );
     }
 
+    /**
+     * Convenience wrapper that returns the built schema directly.
+     *
+     * @returns A schema equivalent to the result of {@link build}.
+     */
     asSchema(): Schema<InferProps<P>> {
         return this.build();
     }
@@ -862,28 +1167,99 @@ export class ObjectBuilder<P extends PropsRecord> {
 
 //#region Factory (public API)
 
+/**
+ * Factory helpers for constructing common {@link Schema} variants.
+ *
+ * @public
+ */
 export const TypeBuilder = {
     // primitives
+    /**
+     * Creates a schema that validates string values.
+     *
+     * @returns A string schema.
+     */
     string: () => new StringSchema(),
+    /**
+     * Creates a schema that validates numeric values.
+     *
+     * @returns A number schema.
+     */
     number: () => new NumberSchema(),
+    /**
+     * Creates a schema that validates boolean values.
+     *
+     * @returns A boolean schema.
+     */
     boolean: () => new BooleanSchema(),
+    /**
+     * Creates a schema that accepts a single literal value.
+     *
+     * @typeParam V - Literal value type.
+     * @param v - Literal value the schema must match.
+     * @returns A literal schema.
+     */
     literal: <V extends string | number | boolean | null>(v: V) =>
         new LiteralSchema(v),
+    /**
+     * Creates a schema that validates members of an enum-like collection.
+     *
+     * @typeParam T - Enumeration member type.
+     * @param values - Allowed values for the enum.
+     * @returns An enum schema.
+     */
     enum: <T extends string | number>(values: readonly T[]) =>
         new EnumSchema(values),
 
     // arrays & tuples
+    /**
+     * Creates a schema that validates arrays of another schema.
+     *
+     * @typeParam T - Element type validated by `elem`.
+     * @param elem - Schema for each array element.
+     * @returns An array schema.
+     */
     array: <T>(elem: Schema<T>) => new ArraySchema(elem),
+    /**
+     * Creates a schema that validates tuples with positional schemas.
+     *
+     * @typeParam T - Tuple element types.
+     * @param elements - Schema for each tuple member.
+     * @returns A tuple schema.
+     */
     tuple: <T extends any[]>(...elements: { [K in keyof T]: Schema<T[K]> }) =>
         new TupleSchema<T>(elements as any),
 
     // unions
+    /**
+     * Creates a schema that accepts one of two possible shapes.
+     *
+     * @typeParam A - First schema type.
+     * @typeParam B - Second schema type.
+     * @param a - Schema for the first option.
+     * @param b - Schema for the second option.
+     * @returns A union schema covering both input schemas.
+     */
     union: <A, B>(a: Schema<A>, b: Schema<B>): Schema<A | B> =>
         new UnionSchema<any>([a, b]),
+    /**
+     * Creates a schema that accepts any of the provided options.
+     *
+     * @typeParam T - Tuple of schema types.
+     * @param options - Schemas for each union variant.
+     * @returns A union schema covering all provided schemas.
+     */
     oneOf: <T extends any[]>(...options: { [K in keyof T]: Schema<T[K]> }) =>
         new UnionSchema<any>(options as any),
 
     // objects (ESLint-safe default type)
+    /**
+     * Starts building an object schema through {@link ObjectBuilder}.
+     *
+     * @typeParam P - Property record type.
+     * @param name - Optional human-readable schema name.
+     * @returns A new object schema builder.
+     */
     object: <P extends PropsRecord = Record<string, never>>(name?: string) =>
         new ObjectBuilder<P>(name, {} as P),
 };
