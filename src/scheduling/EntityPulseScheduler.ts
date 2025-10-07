@@ -11,6 +11,7 @@ export default class EntityPulseScheduler extends PulseScheduler<Entity> {
         'bedrock-boost',
         'entity-pulse-scheduler'
     );
+    private readonly filteredScratch: Entity[] = [];
     /**
      * Creates a new EntityPulseScheduler instance.
      * @param period The period of the scheduler.
@@ -95,25 +96,49 @@ export default class EntityPulseScheduler extends PulseScheduler<Entity> {
     }
 
     push(...items: Entity[]): number {
-        const filtered = items.filter(
-            (item) =>
-                item.isValid &&
-                !this.items.some((existingItem) =>
-                    this.compareEntities(existingItem, item)
-                )
-        );
-        return super.push(...filtered);
+        const filtered = this.filteredScratch;
+        filtered.length = 0;
+        for (const item of items) {
+            if (!item.isValid) {
+                continue;
+            }
+            let duplicate = false;
+            for (const existingItem of this.items) {
+                if (this.compareEntities(existingItem, item)) {
+                    duplicate = true;
+                    break;
+                }
+            }
+            if (!duplicate) {
+                filtered.push(item);
+            }
+        }
+        const result = super.push(...filtered);
+        filtered.length = 0;
+        return result;
     }
 
     unshift(...items: Entity[]): number {
-        const filtered = items.filter(
-            (item) =>
-                item.isValid &&
-                !this.items.some((existingItem) =>
-                    this.compareEntities(existingItem, item)
-                )
-        );
-        return super.unshift(...filtered);
+        const filtered = this.filteredScratch;
+        filtered.length = 0;
+        for (const item of items) {
+            if (!item.isValid) {
+                continue;
+            }
+            let duplicate = false;
+            for (const existingItem of this.items) {
+                if (this.compareEntities(existingItem, item)) {
+                    duplicate = true;
+                    break;
+                }
+            }
+            if (!duplicate) {
+                filtered.push(item);
+            }
+        }
+        const result = super.unshift(...filtered);
+        filtered.length = 0;
+        return result;
     }
 
     splice(start: number, deleteCount?: number | undefined): Entity[];
@@ -122,12 +147,22 @@ export default class EntityPulseScheduler extends PulseScheduler<Entity> {
         if (deleteCount === void 0) {
             return super.splice(start);
         }
-        const filtered = items.filter(
-            (item) =>
-                !this.items.some((existingItem) =>
-                    this.compareEntities(existingItem, item)
-                )
-        );
-        return super.splice(start, deleteCount, ...filtered);
+        const filtered = this.filteredScratch;
+        filtered.length = 0;
+        for (const item of items) {
+            let duplicate = false;
+            for (const existingItem of this.items) {
+                if (this.compareEntities(existingItem, item)) {
+                    duplicate = true;
+                    break;
+                }
+            }
+            if (!duplicate) {
+                filtered.push(item);
+            }
+        }
+        const result = super.splice(start, deleteCount, ...filtered);
+        filtered.length = 0;
+        return result;
     }
 }
