@@ -5,16 +5,20 @@ export default class VanillaItemTags {
     public static readonly Boats = 'minecraft:boats';
     public static readonly BookshelfBooks = 'minecraft:bookshelf_books';
     public static readonly ChainmailTier = 'minecraft:chainmail_tier';
+    public static readonly ChestBoat = 'minecraft:chest_boat';
     public static readonly Coals = 'minecraft:coals';
+    public static readonly CopperTier = 'minecraft:copper_tier';
     public static readonly CrimsonStems = 'minecraft:crimson_stems';
     public static readonly DecoratedPotSherds =
         'minecraft:decorated_pot_sherds';
     public static readonly DiamondTier = 'minecraft:diamond_tier';
     public static readonly Digger = 'minecraft:digger';
     public static readonly Door = 'minecraft:door';
+    public static readonly Egg = 'minecraft:egg';
     public static readonly GoldenTier = 'minecraft:golden_tier';
     public static readonly HangingActor = 'minecraft:hanging_actor';
     public static readonly HangingSign = 'minecraft:hanging_sign';
+    public static readonly Harness = 'minecraft:harness';
     public static readonly HorseArmor = 'minecraft:horse_armor';
     public static readonly IronTier = 'minecraft:iron_tier';
     public static readonly IsArmor = 'minecraft:is_armor';
@@ -38,6 +42,8 @@ export default class VanillaItemTags {
     public static readonly MangroveLogs = 'minecraft:mangrove_logs';
     public static readonly MusicDisc = 'minecraft:music_disc';
     public static readonly NetheriteTier = 'minecraft:netherite_tier';
+    public static readonly PiglinLoved = 'minecraft:piglin_loved';
+    public static readonly PiglinRepellents = 'minecraft:piglin_repellents';
     public static readonly Planks = 'minecraft:planks';
     public static readonly Sand = 'minecraft:sand';
     public static readonly Sign = 'minecraft:sign';
@@ -50,12 +56,12 @@ export default class VanillaItemTags {
     public static readonly StoneTier = 'minecraft:stone_tier';
     public static readonly StoneToolMaterials =
         'minecraft:stone_tool_materials';
+    public static readonly TransformableItems = 'minecraft:transformable_items';
     public static readonly TransformMaterials = 'minecraft:transform_materials';
     public static readonly TransformTemplates = 'minecraft:transform_templates';
-    public static readonly TransformableItems = 'minecraft:transformable_items';
+    public static readonly TrimmableArmors = 'minecraft:trimmable_armors';
     public static readonly TrimMaterials = 'minecraft:trim_materials';
     public static readonly TrimTemplates = 'minecraft:trim_templates';
-    public static readonly TrimmableArmors = 'minecraft:trimmable_armors';
     public static readonly VibrationDamper = 'minecraft:vibration_damper';
     public static readonly WarpedStems = 'minecraft:warped_stems';
     public static readonly WoodenSlabs = 'minecraft:wooden_slabs';
