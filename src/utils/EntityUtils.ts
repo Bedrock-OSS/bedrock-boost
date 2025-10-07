@@ -30,7 +30,7 @@ export class EntityUtils {
             dirVec: Vec3,
             maxDist: number
         ) => {
-            let rayDistance = dimension
+            const rayDistance = dimension
                 .getEntitiesFromRay(origin, dirVec, {
                     type: entity.typeId,
                     ignoreBlockCollision: true,
@@ -83,11 +83,9 @@ export class EntityUtils {
 
         if (height === 0 || width === 0 || length === 0) return null;
 
-        let bound = Vec3.from(width, height, length);
-
-        let offset = Vec3.from(-leftWidth, -lowerHeight, -backLength);
-
-        let finalLocation = location.add(offset);
+        const bound = Vec3.from(width, height, length);
+        const offset = Vec3.from(-leftWidth, -lowerHeight, -backLength);
+        const finalLocation = location.add(offset);
 
         return {
             bound,
