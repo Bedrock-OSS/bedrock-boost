@@ -144,6 +144,19 @@ export default class MutVec2 implements Vector2 {
         return this;
     }
 
+    directionTo(x: number, y: number): MutVec2;
+    directionTo(x: MutVec2): MutVec2;
+    directionTo(x: Vec2): MutVec2;
+    directionTo(x: Vector2): MutVec2;
+    directionTo(x: VectorXZ): MutVec2;
+    directionTo(x: Direction): MutVec2;
+    directionTo(x: number[]): MutVec2;
+    directionTo(x: VectorLike, y?: number): MutVec2 {
+        const v = MutVec2._from(x, y);
+        v.subtract(this).normalize();
+        return this;
+    }
+
     subtract(x: number, y: number): MutVec2;
     subtract(x: MutVec2): MutVec2;
     subtract(x: Vec2): MutVec2;

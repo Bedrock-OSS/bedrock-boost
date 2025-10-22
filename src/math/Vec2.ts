@@ -195,6 +195,24 @@ export default class Vec2 implements Vector2 {
         const v: Vec2 = Vec2._from(x, y);
         return Vec2.from(v.x + this.x, v.y + this.y);
     }
+
+    /**
+     * Returns the normalized vector pointing from this vector to the input.
+     *
+     * @param v - The vector to point towards.
+     * @returns The direction to the passed in Vector. Equivalent to (B-A).normalized()
+     */
+    directionTo(x: number, y: number): Vec2;
+    directionTo(x: Vec2): Vec2;
+    directionTo(x: Vector2): Vec2;
+    directionTo(x: VectorXZ): Vec2;
+    directionTo(x: Direction): Vec2;
+    directionTo(x: number[]): Vec2;
+    directionTo(x: VectorLike, y?: number): Vec2 {
+        const v: Vec2 = Vec2._from(x, y);
+        return v.subtract(this).normalize();
+    }
+    
     /**
      * Subtracts another vector from the current vector.
      *

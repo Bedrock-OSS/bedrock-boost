@@ -183,6 +183,18 @@ export default class MutVec3 implements Vector3 {
         return this;
     }
 
+    directionTo(x: number, y: number, z: number): MutVec3;
+    directionTo(x: Vector3): MutVec3;
+    directionTo(x: Vec3): MutVec3;
+    directionTo(x: MutVec3): MutVec3;
+    directionTo(x: Direction): MutVec3;
+    directionTo(x: number[]): MutVec3;
+    directionTo(x: VectorLike, y?: number, z?: number): MutVec3 {
+        const v = MutVec3._from(x, y, z);
+        v.subtract(this).normalize();
+        return this;
+    }
+
     subtract(x: number, y: number, z: number): MutVec3;
     subtract(x: Vector3): MutVec3;
     subtract(x: Vec3): MutVec3;

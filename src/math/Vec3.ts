@@ -7,7 +7,7 @@ import {
 import MutVec3 from './MutVec3';
 import { Logger } from '../Logging';
 
-type VectorLike = Vector3 | Vec3 | Direction | number[] | number;
+type VectorLike = Vector3 | MutVec3 | Vec3 | Direction | number[] | number;
 
 export default class Vec3 implements Vector3 {
     private static readonly log = Logger.getLogger(
@@ -240,6 +240,7 @@ export default class Vec3 implements Vector3 {
             y: yaw,
         };
     }
+
     /**
      * Adds three numbers to the current vector.
      *
@@ -285,6 +286,53 @@ export default class Vec3 implements Vector3 {
     add(x: VectorLike, y?: number, z?: number): Vec3 {
         const v: Vec3 = Vec3._from(x, y, z);
         return Vec3.from(v.x + this.x, v.y + this.y, v.z + this.z);
+    }
+
+    /**
+     * Returns the normalized vector pointing from this vector to the input.
+     *
+     * @param x - The x component of the target vector.
+     * @param y - The y component target vector.
+     * @param z - The z component target vector.
+     * @returns The direction to the passed in Vector. Equivalent to (B-A).normalized()
+     */
+    directionTo(x: number, y: number, z: number): Vec3;
+
+    /**
+     * Returns the normalized vector pointing from this vector to the input.
+     *
+     * @param x - The Vec3 to be added.
+     * @returns The direction to the passed in Vector. Equivalent to (B-A).normalized()
+     */
+    directionTo(x: Vec3): Vec3;
+
+    /**
+     * Returns the normalized vector pointing from this vector to the input.
+     *
+     * @param x - The Vector3 to be added.
+     * @returns The direction to the passed in Vector. Equivalent to (B-A).normalized()
+     */
+    directionTo(x: Vector3): Vec3;
+
+    /**
+     * Returns the normalized vector pointing from this vector to the input.
+     *
+     * @param x - The Direction to be added.
+     * @returns The direction to the passed in Vector. Equivalent to (B-A).normalized()
+     */
+    directionTo(x: Direction): Vec3;
+
+    /**
+     * Returns the normalized vector pointing from this vector to the input.
+     *
+     * @param x - The array of numbers to be added.
+     * @returns The direction to the passed in Vector. Equivalent to (B-A).normalized()
+     */
+    directionTo(x: number[]): Vec3;
+
+    directionTo(x: VectorLike, y?: number, z?: number) {
+        const v: Vec3 = Vec3._from(x, y, z);
+        return v.subtract(this).normalize();
     }
 
     /**
@@ -477,6 +525,7 @@ export default class Vec3 implements Vector3 {
         const len = this.length();
         return Vec3.from(this.x / len, this.y / len, this.z / len);
     }
+
     /**
      * Computes the length (magnitude) of the vector.
      *
