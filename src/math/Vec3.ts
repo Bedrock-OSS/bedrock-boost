@@ -142,6 +142,9 @@ export default class Vec3 implements Vector3 {
         );
     }
     private static _from(x: VectorLike, y?: number, z?: number): Vec3 {
+        if (typeof x === 'number' && y === undefined && z === undefined) {
+            return new Vec3(x, x, x);
+        }
         if (x instanceof Vec3) return x;
         if (typeof x === 'number' && y !== undefined && z !== undefined) {
             return new Vec3(x, y, z);
@@ -276,6 +279,14 @@ export default class Vec3 implements Vector3 {
     add(x: Direction): Vec3;
 
     /**
+     * Adds a Scaler to the current vector.
+     *
+     * @param x - The Scaler to be added.
+     * @returns The updated vector after addition.
+     */
+    add(x: number): Vec3;
+
+    /**
      * Adds an array of numbers to the current vector.
      *
      * @param x - The array of numbers to be added.
@@ -354,6 +365,14 @@ export default class Vec3 implements Vector3 {
     subtract(x: Vec3): Vec3;
 
     /**
+     * Subtracts a Scaler from the current vector.
+     *
+     * @param x - The Scaler to be subtracted.
+     * @returns The updated vector after subtraction.
+     */
+    subtract(x: number): Vec3;
+
+    /**
      * Subtracts another Vector3 from the current vector.
      *
      * @param x - The Vector3 to be subtracted.
@@ -376,6 +395,14 @@ export default class Vec3 implements Vector3 {
      * @returns The updated vector after subtraction.
      */
     subtract(x: number[]): Vec3;
+
+    /**
+     * Subtracts a Scaler from the current vector.
+     *
+     * @param x - The number to be subtracted.
+     * @returns The updated vector after subtraction.
+     */
+    subtract(x: number): Vec3;
 
     subtract(x: VectorLike, y?: number, z?: number): Vec3 {
         const v: Vec3 = Vec3._from(x, y, z);

@@ -9,6 +9,7 @@ describe('Vec3', () => {
         expect(vec.y).toEqual(-1);
         expect(vec.z).toEqual(0);
     });
+    
 
     it('should create a Vec3 instance with correct values for Direction.Up', () => {
         const vec = new Vec3(Direction.Up);
@@ -201,6 +202,15 @@ describe('Vec3', () => {
         expect(result.z).toEqual(9);
     });
 
+    it('should add a single number to a vec3', () => {
+        const vec1 = new Vec3(1, 2, 3);
+        const result = vec1.add(1);
+        expect(result.x).toEqual(2);
+        expect(result.y).toEqual(3);
+        expect(result.z).toEqual(4);
+    });
+    
+
     it('should add a Vec3 instance and three numbers correctly', () => {
         const vec = new Vec3(1, 2, 3);
         const result = vec.add(4, 5, 6);
@@ -273,6 +283,14 @@ describe('Vec3', () => {
         expect(result.x).toEqual(4);
         expect(result.y).toEqual(4);
         expect(result.z).toEqual(6);
+    });
+
+    // Direction to tests
+    it('should get the direction to a Vec3 correctly.', () => {
+        const vec = new Vec3(0, 0, 0);
+        const target = new Vec3(0, 0, 1);
+        const desiredResult = new Vec3(0, 0, 1);
+        expect(vec.directionTo(target)).toEqual(desiredResult);
     });
 
     // multiply and divide tests

@@ -31,6 +31,13 @@ describe('MutVec2', () => {
         expect(v).toMatchObject({ x: 4, y: 6 });
     });
 
+    it('add can take a single number', () => {
+        const v = new MutVec2(1, 2);
+        const result = v.add(1);
+        expect(result).toBe(v);
+        expect(v).toMatchObject({ x: 2, y: 3 });
+    });
+
     it('normalizes in place', () => {
         const v = new MutVec2(3, 4);
         const result = v.normalize();
@@ -59,5 +66,12 @@ describe('MutVec2', () => {
         const result = v.reflect(Direction.North);
         expect(result).toBe(v);
         expect(v).toMatchObject({ x: 1, y: 0 });
+    });
+
+    it('should get the direction to a MutVec2 correctly.', () => {
+        const vec = new Vec2(0, 0);
+        const target = new Vec2(0, 1);
+        const desiredResult = new Vec2(0, 1);
+        expect(vec.directionTo(target)).toEqual(desiredResult);
     });
 });

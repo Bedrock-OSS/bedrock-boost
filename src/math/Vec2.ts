@@ -114,6 +114,9 @@ export default class Vec2 implements Vector2 {
         return new Vec2(x as any, y as any);
     }
     private static _from(x: VectorLike, y?: number): Vec2 {
+        if (typeof x === 'number' && y === undefined) {
+            return new Vec2(x, x);
+        }
         if (x instanceof Vec2) return x;
         if (x instanceof MutVec2) return new Vec2(x.x, x.y);
         if (typeof x === 'number' && y !== undefined) {
@@ -191,6 +194,7 @@ export default class Vec2 implements Vector2 {
     add(x: VectorXZ): Vec2;
     add(x: Direction): Vec2;
     add(x: number[]): Vec2;
+    add(x: number): Vec2;
     add(x: VectorLike, y?: number): Vec2 {
         const v: Vec2 = Vec2._from(x, y);
         return Vec2.from(v.x + this.x, v.y + this.y);
@@ -212,7 +216,7 @@ export default class Vec2 implements Vector2 {
         const v: Vec2 = Vec2._from(x, y);
         return v.subtract(this).normalize();
     }
-    
+
     /**
      * Subtracts another vector from the current vector.
      *
@@ -225,6 +229,7 @@ export default class Vec2 implements Vector2 {
     subtract(x: VectorXZ): Vec2;
     subtract(x: Direction): Vec2;
     subtract(x: number[]): Vec2;
+    subtract(x: number): Vec2;
     subtract(x: VectorLike, y?: number): Vec2 {
         const v: Vec2 = Vec2._from(x, y);
         return Vec2.from(this.x - v.x, this.y - v.y);
@@ -243,9 +248,6 @@ export default class Vec2 implements Vector2 {
     multiply(x: number[]): Vec2;
     multiply(x: number): Vec2;
     multiply(x: VectorLike, y?: number): Vec2 {
-        if (typeof x === 'number' && y === undefined) {
-            return Vec2.from(this.x * x, this.y * x);
-        }
         const v: Vec2 = Vec2._from(x, y);
         return Vec2.from(v.x * this.x, v.y * this.y);
     }
@@ -272,10 +274,6 @@ export default class Vec2 implements Vector2 {
     divide(x: number[]): Vec2;
     divide(x: number): Vec2;
     divide(x: VectorLike, y?: number): Vec2 {
-        if (typeof x === 'number' && y === undefined) {
-            if (x === 0) throw new Error('Cannot divide by zero');
-            return Vec2.from(this.x / x, this.y / x);
-        }
         const v: Vec2 = Vec2._from(x, y);
         if (v.x === 0 || v.y === 0) throw new Error('Cannot divide by zero');
         return Vec2.from(this.x / v.x, this.y / v.y);

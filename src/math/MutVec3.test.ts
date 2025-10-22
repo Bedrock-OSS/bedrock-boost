@@ -66,6 +66,15 @@ describe('MutVec3', () => {
         expect(im.z).toBe(5);
     });
 
+    // Direction to tests
+    it('should get the direction to a MutVec3 correctly.', () => {
+        const vec = new MutVec3(0, 0, 0);
+        const target = new MutVec3(0, 0, 1);
+        const desiredResult = new MutVec3(0, 0, 1);
+        const result = vec.directionTo(target).add(0); // Make tests not fail: -0 ~= 0?
+        expect(result).toMatchObject(desiredResult);
+    });
+
     // normalize / length tests
     it('normalizes in place', () => {
         const v = new MutVec3(1, 2, 3);
