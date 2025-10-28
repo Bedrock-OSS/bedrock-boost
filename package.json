@@ -31,7 +31,8 @@
         "test": "jest",
         "prepublishOnly": "npm run build",
         "format": "prettier --write \"./**/*.{js,jsx,mjs,cjs,ts,tsx,json}\"",
-        "release-minor": "npm run build && npm run test && npm version minor && git push && npm push --tags && npm publish"
+        "release-minor": "npm run build && npm run test && npm version minor && git push && git push --tags && npm publish",
+        "release-patch": "npm run build && npm run test && npm version patch && git push && git push --tags && npm publish"
     },
     "author": "Bedrock-OSS",
     "license": "MIT",
