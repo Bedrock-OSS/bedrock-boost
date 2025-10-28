@@ -105,6 +105,10 @@ export default class MutVec3 implements Vector3 {
     }
 
     private static _from(x: VectorLike, y?: number, z?: number): MutVec3 {
+        if (typeof x === 'number' && y === undefined && z === undefined) {
+            return new MutVec3(x, x, x)
+        }
+
         if (x instanceof MutVec3) return x;
         if (typeof x === 'number' && y !== undefined && z !== undefined)
             return new MutVec3(x, y, z);
@@ -175,11 +179,24 @@ export default class MutVec3 implements Vector3 {
     add(x: MutVec3): MutVec3;
     add(x: Direction): MutVec3;
     add(x: number[]): MutVec3;
+    add(x: number): MutVec3;
     add(x: VectorLike, y?: number, z?: number): MutVec3 {
         const v = MutVec3._from(x, y, z);
         this.x += v.x;
         this.y += v.y;
         this.z += v.z;
+        return this;
+    }
+
+    directionTo(x: number, y: number, z: number): MutVec3;
+    directionTo(x: Vector3): MutVec3;
+    directionTo(x: Vec3): MutVec3;
+    directionTo(x: MutVec3): MutVec3;
+    directionTo(x: Direction): MutVec3;
+    directionTo(x: number[]): MutVec3;
+    directionTo(x: VectorLike, y?: number, z?: number): MutVec3 {
+        const v = MutVec3._from(x, y, z);
+        this.subtract(v).multiply(-1).normalize();
         return this;
     }
 
@@ -189,6 +206,7 @@ export default class MutVec3 implements Vector3 {
     subtract(x: MutVec3): MutVec3;
     subtract(x: Direction): MutVec3;
     subtract(x: number[]): MutVec3;
+    subtract(x: number): MutVec3;
     subtract(x: VectorLike, y?: number, z?: number): MutVec3 {
         const v = MutVec3._from(x, y, z);
         this.x -= v.x;
@@ -205,12 +223,6 @@ export default class MutVec3 implements Vector3 {
     multiply(x: number[]): MutVec3;
     multiply(x: number): MutVec3;
     multiply(x: VectorLike, y?: number, z?: number): MutVec3 {
-        if (typeof x === 'number' && y === undefined && z === undefined) {
-            this.x *= x;
-            this.y *= x;
-            this.z *= x;
-            return this;
-        }
         const v = MutVec3._from(x, y, z);
         this.x *= v.x;
         this.y *= v.y;

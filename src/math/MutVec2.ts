@@ -93,6 +93,9 @@ export default class MutVec2 implements Vector2 {
     }
 
     private static _from(x: VectorLike, y?: number): MutVec2 {
+        if (typeof x === 'number' && y === undefined) {
+            return new MutVec2(x, x)
+        }
         if (x instanceof MutVec2) return x;
         if (x instanceof Vec2) return new MutVec2(x);
         if (typeof x === 'number' && y !== undefined) return new MutVec2(x, y);
@@ -137,10 +140,24 @@ export default class MutVec2 implements Vector2 {
     add(x: VectorXZ): MutVec2;
     add(x: Direction): MutVec2;
     add(x: number[]): MutVec2;
+    add(x: number): MutVec2;
     add(x: VectorLike, y?: number): MutVec2 {
         const v = MutVec2._from(x, y);
         this.x += v.x;
         this.y += v.y;
+        return this;
+    }
+
+    directionTo(x: number, y: number): MutVec2;
+    directionTo(x: MutVec2): MutVec2;
+    directionTo(x: Vec2): MutVec2;
+    directionTo(x: Vector2): MutVec2;
+    directionTo(x: VectorXZ): MutVec2;
+    directionTo(x: Direction): MutVec2;
+    directionTo(x: number[]): MutVec2;
+    directionTo(x: VectorLike, y?: number): MutVec2 {
+        const v = MutVec2._from(x, y);
+        v.subtract(this).normalize();
         return this;
     }
 
@@ -151,6 +168,7 @@ export default class MutVec2 implements Vector2 {
     subtract(x: VectorXZ): MutVec2;
     subtract(x: Direction): MutVec2;
     subtract(x: number[]): MutVec2;
+    subtract(x: number): MutVec2;
     subtract(x: VectorLike, y?: number): MutVec2 {
         const v = MutVec2._from(x, y);
         this.x -= v.x;

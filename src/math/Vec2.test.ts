@@ -106,6 +106,14 @@ describe('Vec2', () => {
         expect(yawPitch).toBeCloseTo(45);
     });
 
+    // Direction to tests
+    it('should get the direction to a Vec2 correctly.', () => {
+        const vec = new Vec2(0, 0);
+        const target = new Vec2(0, 1);
+        const desiredResult = new Vec2(0, 1);
+        expect(vec.directionTo(target)).toEqual(desiredResult);
+    });
+
     // normalize tests
     it('should normalize a Vec2 instance', () => {
         const vec = new Vec2(1, 2).normalize();
@@ -203,6 +211,13 @@ describe('Vec2', () => {
         const result = vec1.add(vec2);
         expect(result.x).toEqual(5);
         expect(result.y).toEqual(7);
+    });
+
+    it('should add a scaler to a Vec2 correctly', () => {
+        const vec1 = new Vec2(1, 2);
+        const result = vec1.add(1);
+        expect(result.x).toEqual(2);
+        expect(result.y).toEqual(3);
     });
 
     it('should add a Vec2 instance and three numbers correctly', () => {
