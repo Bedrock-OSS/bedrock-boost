@@ -1,0 +1,30 @@
+name: 📋 Checks
+env:
+  FORCE_COLOR: true
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  merge_group: {}
+  workflow_dispatch: {}
+
+jobs:
+  test:
+    name: 📋 Nodejs Checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📦 Checkout Repository
+        uses: actions/checkout@v5
+
+      - name: 🏗️ Setup Node.js Environment
+        uses: actions/setup-node@v4
+
+      - name: 🏗️ Setup project
+        run: npm install
+
+      - name: 📋 Run Tests
+        run: npm run test
