@@ -100,6 +100,18 @@ export default class DirectionUtils {
     };
 
     /**
+     * Strings by their direction representation.
+     */
+    public static readonly ToString: Record<Direction, string> = {
+        [Direction.North]: 'north',
+        [Direction.East]: 'east',
+        [Direction.South]: 'south',
+        [Direction.West]: 'west',
+        [Direction.Up]: 'up',
+        [Direction.Down]: 'down',
+    };
+
+    /**
      * All directions.
      */
     public static readonly Values: Direction[] = [
