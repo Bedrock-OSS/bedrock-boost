@@ -22,9 +22,12 @@ jobs:
 
       - name: 🏗️ Setup Node.js Environment
         uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
 
       - name: 🏗️ Setup project
-        run: npm install
+        run: npm ci
 
       - name: 📋 Run Tests
         run: npm run test

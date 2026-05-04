@@ -11,6 +11,7 @@
         "resolveJsonModule": true,
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
-        "allowUnusedLabels": true
+        "allowUnusedLabels": true,
+        "types": ["jest"]
     }
 }
