@@ -328,4 +328,79 @@ describe('MutVec3', () => {
         expect(a.almostEqual(new MutVec3(1.1, 2.1, 3.1), 0.05)).toBe(false);
         expect(a.almostEqual(1.1, 2.1, 3.1, 0.2)).toBe(true);
     });
+
+    describe('argument dispatch', () => {
+        it('from always returns a new instance', () => {
+            const vec = new MutVec3(1, 2, 3);
+            expect(MutVec3.from(vec)).not.toBe(vec);
+            expect(MutVec3.from(vec)).toEqual(vec);
+            expect(MutVec3.from(new Vec3(1, 2, 3))).toEqual(vec);
+            expect(MutVec3.from({ x: 1, y: 2, z: 3 })).toEqual(vec);
+            expect(MutVec3.from([1, 2, 3])).toEqual(vec);
+            expect(MutVec3.from(Direction.Down)).toEqual(new MutVec3(0, -1, 0));
+        });
+
+        it('from and the constructor reject invalid arguments', () => {
+            expect(() => MutVec3.from(1 as any)).toThrow('Invalid arguments');
+            expect(() => MutVec3.from(null as any)).toThrow(
+                'Invalid arguments'
+            );
+            expect(() => new MutVec3('Sideways' as any)).toThrow(
+                'Invalid vector'
+            );
+            expect(
+                () => new MutVec3({ x: 1, y: undefined, z: 3 } as any)
+            ).toThrow('Invalid vector');
+        });
+
+        it('operations accept every argument shape', () => {
+            expect(new MutVec3(1, 2, 3).add(1)).toEqual(new MutVec3(2, 3, 4)); // scalar broadcast
+            expect(new MutVec3(1, 2, 3).add(1, 1, 1)).toEqual(
+                new MutVec3(2, 3, 4)
+            );
+            expect(new MutVec3(1, 2, 3).add([1, 1, 1])).toEqual(
+                new MutVec3(2, 3, 4)
+            );
+            expect(new MutVec3(1, 2, 3).add({ x: 1, y: 1, z: 1 })).toEqual(
+                new MutVec3(2, 3, 4)
+            );
+            expect(new MutVec3(1, 2, 3).add(new Vec3(1, 1, 1))).toEqual(
+                new MutVec3(2, 3, 4)
+            );
+            expect(new MutVec3(1, 2, 3).add(Direction.Up)).toEqual(
+                new MutVec3(1, 3, 3)
+            );
+            const other = new MutVec3(1, 1, 1);
+            expect(new MutVec3(1, 2, 3).add(other)).toEqual(
+                new MutVec3(2, 3, 4)
+            );
+            expect(other).toEqual(new MutVec3(1, 1, 1)); // argument untouched
+        });
+    });
+
+    describe('fast-path methods', () => {
+        const b = { x: 4, y: 6, z: 3 };
+        const fresh = () => new MutVec3(1, 2, 3);
+
+        it('match their dispatching counterparts and mutate in place', () => {
+            const v = fresh();
+            expect(v.addVec(b)).toBe(v);
+            expect(v).toEqual(fresh().add(b));
+            expect(fresh().subtractVec(b)).toEqual(fresh().subtract(b));
+            expect(fresh().multiplyVec(b)).toEqual(fresh().multiply(b));
+            expect(fresh().divideVec(b)).toEqual(fresh().divide(b));
+            expect(fresh().dotVec(b)).toEqual(fresh().dot(b));
+            expect(fresh().crossVec(b)).toEqual(fresh().cross(b));
+            expect(fresh().distanceVec(b)).toEqual(fresh().distance(b));
+            expect(fresh().distanceSquaredVec(b)).toEqual(
+                fresh().distanceSquared(b)
+            );
+        });
+
+        it('divideVec rejects zero components', () => {
+            expect(() => fresh().divideVec({ x: 1, y: 0, z: 1 })).toThrow(
+                'Cannot divide by zero'
+            );
+        });
+    });
 });

@@ -52,7 +52,7 @@ export default class ColorJSON {
     /**
      * The default ColorJSON instance
      */
-    public static readonly DEFAULT: ColorJSON = new ColorJSON();
+    public static readonly DEFAULT: ColorJSON = /* @__PURE__ */ new ColorJSON();
 
     private static createPlain(): ColorJSON {
         const plain = new ColorJSON();
@@ -74,7 +74,8 @@ export default class ColorJSON {
     /**
      * A ColorJSON instance that does not colorize anything.
      */
-    public static readonly PLAIN: ColorJSON = this.createPlain();
+    public static readonly PLAIN: ColorJSON =
+        /* @__PURE__ */ this.createPlain();
 
     /**
      * Transforms a value into a chat-friendly, colored JSON representation.

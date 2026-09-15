@@ -3,7 +3,10 @@ import { Logger } from './Logging';
  * A simple class to measure the time it takes to perform an operation.
  */
 export default class Timings {
-    private static readonly log = Logger.getLogger('Timings', 'timings');
+    private static readonly log = /* @__PURE__ */ Logger.getLogger(
+        'Timings',
+        'timings'
+    );
     static lastTime = -1;
     static lastOperation = '';
 

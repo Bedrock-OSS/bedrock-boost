@@ -1,4 +1,5 @@
 import Vec3 from './Vec3';
+import MutVec3 from './MutVec3';
 import { Direction, StructureRotation } from '@minecraft/server';
 
 describe('Vec3', () => {
@@ -811,4 +812,79 @@ describe('Vec3', () => {
             );
         });
     });
+
+    describe('argument dispatch', () => {
+        it('from returns the same instance for a Vec3 and shared constants for directions', () => {
+            const vec = new Vec3(1, 2, 3);
+            expect(Vec3.from(vec)).toBe(vec);
+            expect(Vec3.from(Direction.Up)).toBe(Vec3.Up);
+            expect(Vec3.from(Direction.West)).toBe(Vec3.West);
+        });
+
+        it('from accepts plain vectors, mutable vectors and arrays', () => {
+            expect(Vec3.from({ x: 1, y: 2, z: 3 })).toEqual(new Vec3(1, 2, 3));
+            expect(Vec3.from(new MutVec3(4, 5, 6))).toEqual(new Vec3(4, 5, 6));
+            expect(Vec3.from([7, 8, 9])).toEqual(new Vec3(7, 8, 9));
+        });
+
+        it('from rejects invalid arguments', () => {
+            expect(() => Vec3.from(1 as any)).toThrow('Invalid arguments');
+            expect(() => Vec3.from(null as any)).toThrow('Invalid arguments');
+            expect(() => Vec3.from('Sideways' as any)).toThrow('Invalid arguments');
+            expect(() => Vec3.from({ x: 1, y: undefined, z: 3 } as any)).toThrow('Invalid vector');
+        });
+
+        it('constructor rejects invalid strings and objects', () => {
+            expect(() => new Vec3('Sideways' as any)).toThrow('Invalid vector');
+            expect(() => new Vec3({ x: 1, y: NaN, z: 3 })).toThrow('Invalid vector');
+            expect(() => new Vec3(undefined as any)).toThrow('Invalid vector');
+        });
+
+        it('operations accept every argument shape', () => {
+            const vec = new Vec3(1, 2, 3);
+            expect(vec.add(1)).toEqual(new Vec3(2, 3, 4)); // scalar broadcast
+            expect(vec.add(1, 1, 1)).toEqual(new Vec3(2, 3, 4));
+            expect(vec.add([1, 1, 1])).toEqual(new Vec3(2, 3, 4));
+            expect(vec.add({ x: 1, y: 1, z: 1 })).toEqual(new Vec3(2, 3, 4));
+            expect(vec.add(new MutVec3(1, 1, 1))).toEqual(new Vec3(2, 3, 4));
+            expect(vec.add(Direction.Up)).toEqual(new Vec3(1, 3, 3));
+            expect(vec.dot(Direction.Up)).toEqual(2);
+        });
+
+        it('distance matches the previous subtract-based implementation', () => {
+            const a = new Vec3(1, 2, 3);
+            const b = new Vec3(4, 6, 3);
+            expect(a.distance(b)).toEqual(5);
+            expect(a.distance(4, 6, 3)).toEqual(5);
+            expect(a.distanceSquared(b)).toEqual(25);
+            expect(a.distanceSquared({ x: 4, y: 6, z: 3 })).toEqual(25);
+        });
+    });
+
+    describe('fast-path methods', () => {
+        const a = new Vec3(1, 2, 3);
+        const b = { x: 4, y: 6, z: 3 };
+
+        it('match their dispatching counterparts', () => {
+            expect(a.addVec(b)).toEqual(a.add(b));
+            expect(a.subtractVec(b)).toEqual(a.subtract(b));
+            expect(a.multiplyVec(b)).toEqual(a.multiply(b));
+            expect(a.divideVec(b)).toEqual(a.divide(b));
+            expect(a.dotVec(b)).toEqual(a.dot(b));
+            expect(a.crossVec(b)).toEqual(a.cross(b));
+            expect(a.distanceVec(b)).toEqual(a.distance(b));
+            expect(a.distanceSquaredVec(b)).toEqual(a.distanceSquared(b));
+        });
+
+        it('accept Vec3 and MutVec3 arguments and do not mutate the receiver', () => {
+            expect(a.addVec(new Vec3(1, 1, 1))).toEqual(new Vec3(2, 3, 4));
+            expect(a.addVec(new MutVec3(1, 1, 1))).toEqual(new Vec3(2, 3, 4));
+            expect(a).toEqual(new Vec3(1, 2, 3));
+        });
+
+        it('divideVec rejects zero components', () => {
+            expect(() => a.divideVec({ x: 1, y: 0, z: 1 })).toThrow('Cannot divide by zero');
+        });
+    });
+
 });

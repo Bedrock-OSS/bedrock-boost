@@ -6,7 +6,7 @@ import { Logger } from '../Logging';
  * @template T The type of items in the scheduler.
  */
 export default class PulseScheduler<T> {
-    private static readonly log: Logger = Logger.getLogger(
+    private static readonly log: Logger = /* @__PURE__ */ Logger.getLogger(
         'PulseScheduler',
         'bedrock-boost',
         'pulse-scheduler'

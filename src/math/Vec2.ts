@@ -14,16 +14,16 @@ type VectorLike =
     | number;
 
 export default class Vec2 implements Vector2 {
-    private static readonly log = Logger.getLogger(
+    private static readonly log = /* @__PURE__ */ Logger.getLogger(
         'vec2',
         'vec2',
         'bedrock-boost'
     );
-    public static readonly Zero = new Vec2(0, 0);
-    public static readonly North = new Vec2(Direction.North);
-    public static readonly South = new Vec2(Direction.South);
-    public static readonly East = new Vec2(Direction.East);
-    public static readonly West = new Vec2(Direction.West);
+    public static readonly Zero = /* @__PURE__ */ new Vec2(0, 0);
+    public static readonly North = /* @__PURE__ */ new Vec2(Direction.North);
+    public static readonly South = /* @__PURE__ */ new Vec2(Direction.South);
+    public static readonly East = /* @__PURE__ */ new Vec2(Direction.East);
+    public static readonly West = /* @__PURE__ */ new Vec2(Direction.West);
 
     readonly x: number;
     readonly y: number;

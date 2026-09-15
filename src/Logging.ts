@@ -36,14 +36,38 @@ export enum OutputType {
  * The `LogLevel` class defines the various logging levels used by the logger.
  */
 export class LogLevel {
-    static All: LogLevel = new LogLevel(-2, 'all');
-    static Trace: LogLevel = new LogLevel(-2, 'trace', ChatColor.DARK_AQUA);
-    static Debug: LogLevel = new LogLevel(-1, 'debug', ChatColor.AQUA);
-    static Info: LogLevel = new LogLevel(0, 'info', ChatColor.GREEN);
-    static Warn: LogLevel = new LogLevel(1, 'warn', ChatColor.GOLD);
-    static Error: LogLevel = new LogLevel(2, 'error', ChatColor.RED);
-    static Fatal: LogLevel = new LogLevel(3, 'fatal', ChatColor.DARK_RED);
-    static Off: LogLevel = new LogLevel(100, 'off');
+    static All: LogLevel = /* @__PURE__ */ new LogLevel(-2, 'all');
+    static Trace: LogLevel = /* @__PURE__ */ new LogLevel(
+        -2,
+        'trace',
+        ChatColor.DARK_AQUA
+    );
+    static Debug: LogLevel = /* @__PURE__ */ new LogLevel(
+        -1,
+        'debug',
+        ChatColor.AQUA
+    );
+    static Info: LogLevel = /* @__PURE__ */ new LogLevel(
+        0,
+        'info',
+        ChatColor.GREEN
+    );
+    static Warn: LogLevel = /* @__PURE__ */ new LogLevel(
+        1,
+        'warn',
+        ChatColor.GOLD
+    );
+    static Error: LogLevel = /* @__PURE__ */ new LogLevel(
+        2,
+        'error',
+        ChatColor.RED
+    );
+    static Fatal: LogLevel = /* @__PURE__ */ new LogLevel(
+        3,
+        'fatal',
+        ChatColor.DARK_RED
+    );
+    static Off: LogLevel = /* @__PURE__ */ new LogLevel(100, 'off');
 
     /**
      * The list of all available log levels.

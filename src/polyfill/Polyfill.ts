@@ -2,7 +2,7 @@ import { world } from '@minecraft/server';
 import { install as playerInstall } from './PlayerPolyfill';
 
 export default class Polyfill {
-    private static _installed: Map<string, boolean> = new Map<
+    private static _installed: Map<string, boolean> = /* @__PURE__ */ new Map<
         string,
         boolean
     >();

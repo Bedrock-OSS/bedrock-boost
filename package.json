@@ -19,6 +19,7 @@
     "files": [
         "dist"
     ],
+    "sideEffects": false,
     "exports": {
         ".": {
             "import": "./dist/index.mjs",

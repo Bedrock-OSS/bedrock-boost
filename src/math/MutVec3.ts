@@ -9,6 +9,17 @@ import Vec3 from './Vec3';
 // Matches Vec3 constructor flexibility, but this class is mutable and all ops mutate `this`.
 type VectorLike = Vector3 | Vec3 | MutVec3 | Direction | number[] | number;
 
+// Direction values are strings, so they are matched through a lookup table
+// instead of a chain of string comparisons.
+const DIRECTION_VECTORS: Record<string, readonly [number, number, number]> = {
+    [Direction.Down]: [0, -1, 0],
+    [Direction.Up]: [0, 1, 0],
+    [Direction.North]: [0, 0, -1],
+    [Direction.South]: [0, 0, 1],
+    [Direction.East]: [1, 0, 0],
+    [Direction.West]: [-1, 0, 0],
+};
+
 export default class MutVec3 implements Vector3 {
     x: number;
     y: number;
@@ -21,42 +32,21 @@ export default class MutVec3 implements Vector3 {
     constructor(x: Direction);
     constructor(x: number[]);
     constructor(x: VectorLike, y?: number, z?: number) {
-        if (x === Direction.Down) {
-            this.x = 0;
-            this.y = -1;
-            this.z = 0;
-        } else if (x === Direction.Up) {
-            this.x = 0;
-            this.y = 1;
-            this.z = 0;
-        } else if (x === Direction.North) {
-            this.x = 0;
-            this.y = 0;
-            this.z = -1;
-        } else if (x === Direction.South) {
-            this.x = 0;
-            this.y = 0;
-            this.z = 1;
-        } else if (x === Direction.East) {
-            this.x = 1;
-            this.y = 0;
-            this.z = 0;
-        } else if (x === Direction.West) {
-            this.x = -1;
-            this.y = 0;
-            this.z = 0;
-        } else if (typeof x === 'number') {
+        // Branches are ordered by how often they are hit.
+        if (typeof x === 'number') {
             this.x = x;
             this.y = y!;
             this.z = z!;
+        } else if (typeof x === 'string') {
+            const direction = DIRECTION_VECTORS[x];
+            if (!direction) throw new Error('Invalid vector');
+            this.x = direction[0];
+            this.y = direction[1];
+            this.z = direction[2];
         } else if (Array.isArray(x)) {
             this.x = x[0];
             this.y = x[1];
             this.z = x[2];
-        } else if (x instanceof MutVec3 || x instanceof Vec3) {
-            this.x = x.x;
-            this.y = x.y;
-            this.z = x.z;
         } else {
             if (
                 !x ||
@@ -79,63 +69,140 @@ export default class MutVec3 implements Vector3 {
     static from(x: Direction): MutVec3;
     static from(x: number[]): MutVec3;
     static from(x: VectorLike, y?: number, z?: number): MutVec3 {
-        if (x instanceof MutVec3) return new MutVec3(x);
-        if (typeof x === 'number' && y !== undefined && z !== undefined)
-            return new MutVec3(x, y, z);
-        if (Array.isArray(x)) return new MutVec3(x);
-        if (x === Direction.Down) return new MutVec3(Direction.Down);
-        if (x === Direction.Up) return new MutVec3(Direction.Up);
-        if (x === Direction.North) return new MutVec3(Direction.North);
-        if (x === Direction.South) return new MutVec3(Direction.South);
-        if (x === Direction.East) return new MutVec3(Direction.East);
-        if (x === Direction.West) return new MutVec3(Direction.West);
-        if (
-            !x ||
-            (!(x as any).x && (x as any).x !== 0) ||
-            (!(x as any).y && (x as any).y !== 0) ||
-            (!(x as any).z && (x as any).z !== 0)
-        ) {
-            throw new Error('Invalid arguments');
+        if (typeof x === 'number') {
+            if (y !== undefined && z !== undefined) return new MutVec3(x, y, z);
+        } else if (x) {
+            // Instances are copied too, so the returned vector is always a new one.
+            return new MutVec3(x as any);
         }
-        return new MutVec3(
-            (x as any).x as number,
-            (x as any).y as number,
-            (x as any).z as number
-        );
+        throw new Error('Invalid arguments');
     }
 
     private static _from(x: VectorLike, y?: number, z?: number): MutVec3 {
-        if (typeof x === 'number' && y === undefined && z === undefined) {
-            return new MutVec3(x, x, x)
+        if (typeof x === 'number') {
+            if (y === undefined && z === undefined) return new MutVec3(x, x, x);
+            if (y !== undefined && z !== undefined) return new MutVec3(x, y, z);
+        } else if (x instanceof MutVec3) {
+            return x;
+        } else if (x) {
+            return new MutVec3(x as any);
         }
-
-        if (x instanceof MutVec3) return x;
-        if (typeof x === 'number' && y !== undefined && z !== undefined)
-            return new MutVec3(x, y, z);
-        if (Array.isArray(x)) return new MutVec3(x);
-        if (x === Direction.Down) return new MutVec3(Direction.Down);
-        if (x === Direction.Up) return new MutVec3(Direction.Up);
-        if (x === Direction.North) return new MutVec3(Direction.North);
-        if (x === Direction.South) return new MutVec3(Direction.South);
-        if (x === Direction.East) return new MutVec3(Direction.East);
-        if (x === Direction.West) return new MutVec3(Direction.West);
-        if (
-            !x ||
-            (!(x as any).x && (x as any).x !== 0) ||
-            (!(x as any).y && (x as any).y !== 0) ||
-            (!(x as any).z && (x as any).z !== 0)
-        ) {
-            throw new Error('Invalid arguments');
-        }
-        return new MutVec3(
-            (x as any).x as number,
-            (x as any).y as number,
-            (x as any).z as number
-        );
+        throw new Error('Invalid arguments');
     }
 
     copy() {
         return new MutVec3(this.x, this.y, this.z);
+    }
+
+    /**
+     * Adds a vector to the current vector in place. Unlike `add`, this method
+     * takes only a vector and skips the argument dispatch, which makes it the
+     * faster choice in code that runs every tick.
+     *
+     * @param v - The vector to be added.
+     * @returns The updated vector.
+     */
+    addVec(v: Vector3): MutVec3 {
+        this.x += v.x;
+        this.y += v.y;
+        this.z += v.z;
+        return this;
+    }
+
+    /**
+     * Subtracts a vector from the current vector in place. Fast-path variant of
+     * `subtract`.
+     *
+     * @param v - The vector to be subtracted.
+     * @returns The updated vector.
+     */
+    subtractVec(v: Vector3): MutVec3 {
+        this.x -= v.x;
+        this.y -= v.y;
+        this.z -= v.z;
+        return this;
+    }
+
+    /**
+     * Multiplies the current vector component-wise by a vector in place.
+     * Fast-path variant of `multiply`; use `scale` for scalars.
+     *
+     * @param v - The vector multiplier.
+     * @returns The updated vector.
+     */
+    multiplyVec(v: Vector3): MutVec3 {
+        this.x *= v.x;
+        this.y *= v.y;
+        this.z *= v.z;
+        return this;
+    }
+
+    /**
+     * Divides the current vector component-wise by a vector in place. Fast-path
+     * variant of `divide`.
+     *
+     * @param v - The vector divisor.
+     * @returns The updated vector.
+     * @throws If any component of the divisor is zero.
+     */
+    divideVec(v: Vector3): MutVec3 {
+        if (v.x === 0 || v.y === 0 || v.z === 0)
+            throw new Error('Cannot divide by zero');
+        this.x /= v.x;
+        this.y /= v.y;
+        this.z /= v.z;
+        return this;
+    }
+
+    /**
+     * Computes the dot product with a vector. Fast-path variant of `dot`.
+     *
+     * @param v - The other vector.
+     * @returns The dot product.
+     */
+    dotVec(v: Vector3): number {
+        return this.x * v.x + this.y * v.y + this.z * v.z;
+    }
+
+    /**
+     * Replaces the current vector with its cross product with a vector.
+     * Fast-path variant of `cross`.
+     *
+     * @param v - The other vector.
+     * @returns The updated vector.
+     */
+    crossVec(v: Vector3): MutVec3 {
+        const cx = this.y * v.z - this.z * v.y;
+        const cy = this.z * v.x - this.x * v.z;
+        const cz = this.x * v.y - this.y * v.x;
+        this.x = cx;
+        this.y = cy;
+        this.z = cz;
+        return this;
+    }
+
+    /**
+     * Computes the distance to a vector. Fast-path variant of `distance`.
+     *
+     * @param v - The other vector.
+     * @returns The distance between the vectors.
+     */
+    distanceVec(v: Vector3): number {
+        return Math.hypot(this.x - v.x, this.y - v.y, this.z - v.z);
+    }
+
+    /**
+     * Computes the squared distance to a vector. Fast-path variant of
+     * `distanceSquared`.
+     *
+     * @param v - The other vector.
+     * @returns The squared distance between the vectors.
+     */
+    distanceSquaredVec(v: Vector3): number {
+        const dx = this.x - v.x;
+        const dy = this.y - v.y;
+        const dz = this.z - v.z;
+        return dx * dx + dy * dy + dz * dz;
     }
 
     toImmutable() {
@@ -181,7 +248,7 @@ export default class MutVec3 implements Vector3 {
     add(x: number[]): MutVec3;
     add(x: number): MutVec3;
     add(x: VectorLike, y?: number, z?: number): MutVec3 {
-        const v = MutVec3._from(x, y, z);
+        const v = x instanceof MutVec3 ? x : MutVec3._from(x, y, z);
         this.x += v.x;
         this.y += v.y;
         this.z += v.z;
@@ -195,7 +262,7 @@ export default class MutVec3 implements Vector3 {
     directionTo(x: Direction): MutVec3;
     directionTo(x: number[]): MutVec3;
     directionTo(x: VectorLike, y?: number, z?: number): MutVec3 {
-        const v = MutVec3._from(x, y, z);
+        const v = x instanceof MutVec3 ? x : MutVec3._from(x, y, z);
         this.subtract(v).multiply(-1).normalize();
         return this;
     }
@@ -208,7 +275,7 @@ export default class MutVec3 implements Vector3 {
     subtract(x: number[]): MutVec3;
     subtract(x: number): MutVec3;
     subtract(x: VectorLike, y?: number, z?: number): MutVec3 {
-        const v = MutVec3._from(x, y, z);
+        const v = x instanceof MutVec3 ? x : MutVec3._from(x, y, z);
         this.x -= v.x;
         this.y -= v.y;
         this.z -= v.z;
@@ -223,7 +290,7 @@ export default class MutVec3 implements Vector3 {
     multiply(x: number[]): MutVec3;
     multiply(x: number): MutVec3;
     multiply(x: VectorLike, y?: number, z?: number): MutVec3 {
-        const v = MutVec3._from(x, y, z);
+        const v = x instanceof MutVec3 ? x : MutVec3._from(x, y, z);
         this.x *= v.x;
         this.y *= v.y;
         this.z *= v.z;
@@ -252,7 +319,7 @@ export default class MutVec3 implements Vector3 {
             this.z /= x;
             return this;
         }
-        const v = MutVec3._from(x, y, z);
+        const v = x instanceof MutVec3 ? x : MutVec3._from(x, y, z);
         if (v.x === 0 || v.y === 0 || v.z === 0)
             throw new Error('Cannot divide by zero');
         this.x /= v.x;
@@ -286,7 +353,7 @@ export default class MutVec3 implements Vector3 {
     cross(x: Direction): MutVec3;
     cross(x: number[]): MutVec3;
     cross(x: VectorLike, y?: number, z?: number): MutVec3 {
-        const v = MutVec3._from(x, y, z);
+        const v = x instanceof MutVec3 ? x : MutVec3._from(x, y, z);
         const cx = this.y * v.z - this.z * v.y;
         const cy = this.z * v.x - this.x * v.z;
         const cz = this.x * v.y - this.y * v.x;
@@ -303,7 +370,7 @@ export default class MutVec3 implements Vector3 {
     distance(x: Direction): number;
     distance(x: number[]): number;
     distance(x: VectorLike, y?: number, z?: number) {
-        const v = MutVec3._from(x, y, z);
+        const v = x instanceof MutVec3 ? x : MutVec3._from(x, y, z);
         return this.copy().subtract(v).length();
     }
 
@@ -314,7 +381,7 @@ export default class MutVec3 implements Vector3 {
     distanceSquared(x: Direction): number;
     distanceSquared(x: number[]): number;
     distanceSquared(x: VectorLike, y?: number, z?: number) {
-        const v = MutVec3._from(x, y, z);
+        const v = x instanceof MutVec3 ? x : MutVec3._from(x, y, z);
         return this.copy().subtract(v).lengthSquared();
     }
 
@@ -364,7 +431,7 @@ export default class MutVec3 implements Vector3 {
     dot(x: Direction): number;
     dot(x: number[]): number;
     dot(x: VectorLike, y?: number, z?: number) {
-        const v = MutVec3._from(x, y, z);
+        const v = x instanceof MutVec3 ? x : MutVec3._from(x, y, z);
         return this.x * v.x + this.y * v.y + this.z * v.z;
     }
 
@@ -375,7 +442,7 @@ export default class MutVec3 implements Vector3 {
     angleBetween(x: Direction): number;
     angleBetween(x: number[]): number;
     angleBetween(x: VectorLike, y?: number, z?: number) {
-        const v = MutVec3._from(x, y, z);
+        const v = x instanceof MutVec3 ? x : MutVec3._from(x, y, z);
         const dotProduct = this.dot(v);
         const lenSq1 = this.lengthSquared();
         if (lenSq1 === 0) return 0;
@@ -393,7 +460,7 @@ export default class MutVec3 implements Vector3 {
     projectOnto(x: Direction): MutVec3;
     projectOnto(x: number[]): MutVec3;
     projectOnto(x: VectorLike, y?: number, z?: number): MutVec3 {
-        const v = MutVec3._from(x, y, z);
+        const v = x instanceof MutVec3 ? x : MutVec3._from(x, y, z);
         if (v.isZero()) {
             this.x = 0;
             this.y = 0;

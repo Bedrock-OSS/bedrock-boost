@@ -92,6 +92,30 @@ Checks if the current vector is equal to another vector.
 ### `toString(format, separator)`
 Returns a string representation of the vector. Format being either `short` *"x, y, z"* or `long` *"Vec3(x, y, z)"* default being `long` with `", "` as a separator.
 
+## Fast-path methods
+Every operation accepts several argument shapes (`add(x, y, z)`, `add(vector)`, `add(scalar)`, `add(Direction.Up)`, `add([x, y, z])`) and figures out at runtime which one it got. That dispatch is cheap for the common shapes, but in code that runs every tick for many entities it adds up. For those places each arithmetic operation has a variant that takes exactly one `Vector3`-shaped argument and does nothing else:
+
+| Dispatching | Fast path |
+|---|---|
+| `add(v)` | `addVec(v)` |
+| `subtract(v)` | `subtractVec(v)` |
+| `multiply(v)` | `multiplyVec(v)` (use `scale(n)` for scalars) |
+| `divide(v)` | `divideVec(v)` |
+| `dot(v)` | `dotVec(v)` |
+| `cross(v)` | `crossVec(v)` |
+| `distance(v)` | `distanceVec(v)` |
+| `distanceSquared(v)` | `distanceSquaredVec(v)` |
+
+The argument can be a `Vec3`, a `MutVec3` or any plain `{ x, y, z }` object such as `entity.location`, so no conversion is needed. `MutVec3` has the same methods, mutating in place. Prefer them in hot loops and keep the flexible overloads everywhere else, where readability matters more than the dispatch cost.
+
+```javascript
+const velocity = entity.getVelocity();
+const toTarget = target.subtractVec(entity.location);
+if (toTarget.dotVec(velocity) > 0) {
+    entity.applyImpulse(toTarget.normalize().scale(0.2));
+}
+```
+
 ## Usage Example
 ```javascript
 import Vec3 from './Vec3';

@@ -6,7 +6,7 @@ import { Logger } from '../Logging';
  * Represents a PulseScheduler that processes players.
  */
 export default class PlayerPulseScheduler extends PulseScheduler<Player> {
-    private static readonly logger = Logger.getLogger(
+    private static readonly logger = /* @__PURE__ */ Logger.getLogger(
         'PlayerPulseScheduler',
         'bedrock-boost',
         'player-pulse-scheduler'

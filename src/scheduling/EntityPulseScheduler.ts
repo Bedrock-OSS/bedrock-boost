@@ -6,7 +6,7 @@ import { Logger } from '../Logging';
  * Represents a PulseScheduler that processes entities matching a query.
  */
 export default class EntityPulseScheduler extends PulseScheduler<Entity> {
-    private static readonly logger = Logger.getLogger(
+    private static readonly logger = /* @__PURE__ */ Logger.getLogger(
         'EntityPulseScheduler',
         'bedrock-boost',
         'entity-pulse-scheduler'
