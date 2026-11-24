@@ -158,7 +158,7 @@ export default class MutVec2 implements Vector2 {
     directionTo(x: VectorLike, y?: number): MutVec2 {
         const v = MutVec2._from(x, y);
         v.subtract(this).normalize();
-        return this;
+        return v;
     }
 
     subtract(x: number, y: number): MutVec2;
