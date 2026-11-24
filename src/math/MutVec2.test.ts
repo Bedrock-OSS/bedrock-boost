@@ -74,4 +74,21 @@ describe('MutVec2', () => {
         const desiredResult = new Vec2(0, 1);
         expect(vec.directionTo(target)).toEqual(desiredResult);
     });
+
+    it('directionTo mutates itself and leaves a MutVec2 target unchanged', () => {
+        const vec = new MutVec2(1, 1);
+        const target = new MutVec2(4, 5);
+        const result = vec.directionTo(target);
+        expect(result).toBe(vec);
+        expect(result.x).toBeCloseTo(0.6);
+        expect(result.y).toBeCloseTo(0.8);
+        expect(target).toMatchObject({ x: 4, y: 5 });
+    });
+
+    it('directionTo works with plain coordinates', () => {
+        const vec = new MutVec2(1, 1);
+        vec.directionTo(1, 3);
+        expect(vec.x).toBeCloseTo(0);
+        expect(vec.y).toBeCloseTo(1);
+    });
 });
